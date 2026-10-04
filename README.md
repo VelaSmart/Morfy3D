@@ -155,7 +155,13 @@ images: [{
 
 Ao substituir o painel por uma foto real, atualize `src` e `alt` e use `layout: "photo"`, ou omita `layout`. Isso remove os recortes destinados ao painel de identidade. A foto é ajustada ao espaço disponível. Para mostrar uma segunda vista, adicione outro objeto à lista `images`.
 
-Os slogans, a apresentação institucional, os rótulos gerais de teste e outros textos editoriais ficam no HTML. O logotipo DECKRA usa um trecho da referência visual definido no CSS; a troca das fotos do produto pela configuração não modifica esse logo.
+Os slogans, a apresentação institucional, os rótulos gerais de teste e outros textos editoriais ficam no HTML. As logos usam PNGs com fundo transparente, separados das imagens dos produtos:
+
+- `assets/images/morfy-logo-transparent.png`: logo principal nos cabeçalhos e rodapés.
+- `assets/images/morfy-symbol-transparent.png`: símbolo da seção “A essência MORFY” e ícone do site.
+- `assets/images/deckra-logo-transparent.png`: logo e slogan no hero DECKRA.
+
+Para atualizar a identidade, substitua o PNG correspondente mantendo transparência, proporção e margens livres nas bordas. O CSS usa `contain` para exibir as logos inteiras e permite que a sombra suave do símbolo MORFY ultrapasse a caixa da imagem. Se mudar o nome do arquivo, atualize a referência no HTML ou no CSS. A troca das fotos em `products.js` não modifica essas logos. Os arquivos originais de referência permanecem em `assets/images/`.
 
 ## Modo de demonstração e marketplaces
 
