@@ -6,6 +6,8 @@ O site usa HTML, CSS e JavaScript, com imagens e fontes locais. Funciona no nave
 
 Repositório: [VelaSmart/Morfy3D](https://github.com/VelaSmart/Morfy3D).
 
+Site publicado: [Abrir MORFY](https://velasmart.github.io/Morfy3D/) · [Abrir DECKRA](https://velasmart.github.io/Morfy3D/deckra.html).
+
 **Esta é uma versão de teste.** Os produtos, ilustrações e imagens conceituais permitem avaliar o visual e a navegação. Não representam estoque, preço, disponibilidade, dimensões, materiais ou compatibilidade confirmados.
 
 ## Páginas e recursos
@@ -189,9 +191,9 @@ Nesse modo, links vazios ou inválidos não geram botões. O produto continua di
 
 Os botões identificam a plataforma e abrem os anúncios com `target="_blank"` e `rel="noopener noreferrer"`, preservando o site MORFY. O site usa **“Consultar preço na plataforma”**; preço, disponibilidade, frete e condições são definidos no marketplace.
 
-## Ativar o GitHub Pages neste repositório
+## GitHub Pages: publicação e configuração
 
-O endereço esperado, **após habilitar o Pages e concluir a publicação**, é [velasmart.github.io/Morfy3D](https://velasmart.github.io/Morfy3D/). Este guia não confirma que a publicação já está ativa.
+O site está publicado em [velasmart.github.io/Morfy3D](https://velasmart.github.io/Morfy3D/), com a branch `main` e a pasta `/(root)` como origem. As instruções abaixo permitem revisar ou reconfigurar a publicação.
 
 1. Confirme que `index.html`, `deckra.html`, `assets/` e `.nojekyll` estão na raiz da branch `main`.
 2. Abra [Settings → Pages do repositório](https://github.com/VelaSmart/Morfy3D/settings/pages), com uma conta que tenha permissão para configurar o Pages.
