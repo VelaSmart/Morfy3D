@@ -157,11 +157,21 @@ Ao substituir o painel por uma foto real, atualize `src` e `alt` e use `layout: 
 
 Os slogans, a apresentação institucional, os rótulos gerais de teste e outros textos editoriais ficam no HTML. As logos usam PNGs com fundo transparente, separados das imagens dos produtos:
 
-- `assets/images/morfy-logo-transparent.png`: logo principal nos cabeçalhos e rodapés.
-- `assets/images/morfy-symbol-transparent.png`: símbolo da seção “A essência MORFY” e ícone do site.
+- `assets/images/morfy-official-logo-transparent.png`: logo principal nos cabeçalhos e rodapés.
+- `assets/images/morfy-official-symbol-transparent.png`: símbolo da seção “A essência MORFY” e ícone do site.
 - `assets/images/deckra-logo-transparent.png`: logo e slogan no hero DECKRA.
 
-Para atualizar a identidade, substitua o PNG correspondente mantendo transparência, proporção e margens livres nas bordas. O CSS usa `contain` para exibir as logos inteiras e permite que a sombra suave do símbolo MORFY ultrapasse a caixa da imagem. Se mudar o nome do arquivo, atualize a referência no HTML ou no CSS. A troca das fotos em `products.js` não modifica essas logos. Os arquivos originais de referência permanecem em `assets/images/`.
+Para atualizar a identidade, substitua o PNG correspondente mantendo transparência, proporção e margens livres nas bordas. O CSS usa `contain` para exibir as logos inteiras e permite que a sombra suave do símbolo MORFY ultrapasse a caixa da imagem. Se mudar o nome do arquivo, atualize a referência no HTML ou no CSS. A troca das fotos em `products.js` não modifica essas logos. Os cinco arquivos oficiais fornecidos pela marca estão preservados em `assets/images/`:
+
+| Arquivo recebido | Arquivo no repositório | Uso |
+| --- | --- | --- |
+| `Morfy (1).png` | `morfy-official-light-source.png` | Versão clara; origem da logo transparente usada no site escuro. |
+| `Morfy (2).png` | `morfy-official-symbol-source.png` | Símbolo azul; origem do PNG transparente da seção MORFY e do ícone do site. |
+| `Morfy (3).png` | `morfy-official-digital-real.png` | Arte horizontal oficial, disponível para uso futuro. |
+| `Morfy (4).png` | `morfy-official-brand-poster.png` | Pôster de identidade oficial, disponível para uso futuro. |
+| `Morfy.png` | `morfy-official-dark-source.png` | Versão escura para aplicação sobre fundos claros. |
+
+As versões transparentes mantêm a arte oficial e removem o fundo branco e as margens vazias por processamento de pixels. Os originais foram preservados sem alteração. Os cinco originais desta entrega ficam disponíveis no repositório; as páginas usam apenas as duas versões transparentes derivadas deles.
 
 ## Modo de demonstração e marketplaces
 
