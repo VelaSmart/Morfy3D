@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0f14">
+  <meta name="description" content="MORFY. Ideias que ganham forma. Explore uma vitrine de impressão 3D, design e criatividade.">
+  <title>MORFY — Ideias que ganham forma</title>
+  <link rel="icon" href="./assets/images/morfy-symbol.png" type="image/png">
+  <link rel="preload" href="./assets/fonts/montserrat.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <script src="./assets/js/products.js" defer></script>
+  <script src="./assets/js/app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Pular para o conteúdo</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="./index.html" aria-label="MORFY — início"><span class="morfy-logo"><img src="./assets/images/morfy-logo.png" alt="MORFY" width="1600" height="618"></span></a>
+      <button id="menu-toggle" class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menu"><span></span><span></span></button>
+      <nav id="main-nav" class="main-nav" aria-label="Navegação principal">
+        <a href="./index.html#catalogo" class="nav-link" aria-current="page">Produtos 3D</a>
+        <a href="./deckra.html" class="nav-link">DECKRA <span class="nav-dot"></span></a>
+        <a href="#sobre" class="nav-link">A MORFY</a>
+        <a href="#catalogo" class="button button-small button-quiet">Explorar catálogo <span aria-hidden="true">↗</span></a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <section class="hero container" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="accent-line"></span> DO DIGITAL AO REAL</p>
+        <h1 id="hero-title">Ideias que<br>ganham <span class="text-accent">forma.</span></h1>
+        <p class="hero-description">Design, criatividade e impressão 3D.<br>Objetos que dão um novo sentido ao seu espaço.</p>
+        <div class="hero-actions">
+          <a href="#catalogo" class="button button-primary">Explorar produtos <span aria-hidden="true">↗</span></a>
+          <a href="./deckra.html" class="button button-outline">Conhecer o DECKRA <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="hero-caption"><span class="status-dot"></span> Pequenas formas. Grandes possibilidades.</div>
+      </div>
+      <div class="hero-visual">
+        <img class="hero-image" src="./assets/images/morfy-hero.png" alt="Composição ilustrativa de um vaso geométrico, um organizador e um pequeno dragão em impressão 3D" width="1536" height="1024" fetchpriority="high">
+        <div class="visual-coordinate" aria-hidden="true"><span>ESTÚDIO MORFY</span><span>+ 3D</span></div>
+        <div class="visual-label"><span class="tiny-label">DESIGN EM CADA CAMADA</span><span>Do conceito à sua mesa.</span></div>
+        <span class="image-disclaimer">Imagem conceitual</span>
+      </div>
+    </section>
+    <div class="brand-strip">
+      <div class="container strip-inner"><span>TECNOLOGIA COM PROPÓSITO</span><span class="strip-star" aria-hidden="true">✳</span><span>CRIATIVIDADE SEM LIMITES</span><span class="strip-star" aria-hidden="true">✳</span><span>IDEIAS QUE GANHAM FORMA</span><span class="strip-star" aria-hidden="true">✳</span></div>
+    </div>
+    <section id="catalogo" class="section container catalog-section" aria-labelledby="catalog-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">EXPLORE A MORFY</p><h2 id="catalog-title">Uma forma para cada ideia<span class="text-accent">.</span></h2></div>
+        <p class="section-description">Do útil ao inesperado.<br>Encontre algo que combina com você.</p>
+      </div>
+      <div class="catalog-toolbar">
+        <div class="category-filters" role="group" aria-label="Filtrar por categoria">
+          <button type="button" class="filter-button" data-category="todos" aria-pressed="true">Todos</button>
+          <button type="button" class="filter-button" data-category="utilitarios" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3 1 3h4l1-3 3 2-1 3 2 3 3 1v4l-3 1-2 3 1 3-3 2-1-3h-4l-1 3-3-2 1-3-2-3-3-1v-4l3-1 2-3-1-3Z" transform="translate(1 -2) scale(.9)"/><circle cx="12" cy="12" r="3"/></svg>Utilitários</button>
+          <button type="button" class="filter-button" data-category="decoracao" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8M5 9v12h14V9M10 21v-7h4v7"/></svg>Decoração</button>
+          <button type="button" class="filter-button" data-category="geek" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8c3 0 4 2 5 9 0 3-2 4-4 1l-2-2H9l-2 2c-2 3-4 2-4-1 1-7 2-9 5-9Z M7 9v5M4.5 11.5h5M16 10h.01M18 13h.01"/></svg>Geek</button>
+        </div>
+        <div class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><label class="sr-only" for="product-search">Buscar produtos</label><input id="product-search" type="search" placeholder="Buscar uma ideia..." autocomplete="off"></div>
+      </div>
+      <div class="catalog-meta"><span id="product-count" aria-live="polite">6 produtos</span><span class="demo-label"><span class="status-dot"></span> Catálogo demonstrativo</span></div>
+      <div id="product-grid" class="product-grid"></div>
+      <div id="empty-state" class="empty-state" hidden><span class="empty-symbol" aria-hidden="true">⌕</span><h3>Nenhuma ideia por aqui ainda.</h3><p>Tente outra busca ou explore todas as categorias.</p><button id="reset-filters" type="button" class="button button-outline">Ver todos os produtos</button></div>
+      <noscript><p class="notice">Ative o JavaScript para explorar o catálogo, os filtros e os detalhes dos produtos.</p></noscript>
+      <p class="catalog-footnote">Produtos e imagens de demonstração. Consulte os detalhes de cada peça.</p>
+    </section>
+    <section class="container deckra-banner" aria-labelledby="deckra-banner-title">
+      <div class="deckra-banner-copy"><p class="eyebrow purple-text">UM NOVO JEITO DE CRIAR</p><h2 id="deckra-banner-title">Seu setup.<br>Seu controle.</h2><p>Conheça o DECKRA. Controladores e periféricos com a personalidade da cultura maker.</p><a href="./deckra.html" class="button button-purple">Descobrir o DECKRA <span aria-hidden="true">↗</span></a></div>
+      <div class="reference-scene banner-scene" data-deckra-image="hero" role="img" aria-label="Referência conceitual de um controlador DECKRA com teclas e controles giratórios"></div>
+      <span class="banner-note">DECKRA / HARDWARE FEITO PARA VOCÊ</span>
+    </section>
+    <section id="sobre" class="section container about-section" aria-labelledby="about-title">
+      <div class="about-symbol"><img src="./assets/images/morfy-symbol.png" alt="Símbolo tridimensional da MORFY" width="1280" height="1280" loading="lazy"></div>
+      <div class="about-copy"><p class="eyebrow">A ESSÊNCIA MORFY</p><h2 id="about-title">A próxima ideia<br>pode ser a sua.</h2><p>A MORFY nasce da transformação. Unimos tecnologia, criatividade e funcionalidade para dar forma a ideias através da impressão 3D.</p><p>Utilitários, decoração e universo geek. Um espaço para descobrir possibilidades e enxergar o cotidiano por outro ângulo.</p><a href="#catalogo" class="text-link">Encontre sua próxima ideia <span aria-hidden="true">↗</span></a></div>
+    </section>
+    <section class="marketplace-intro container" aria-label="Como comprar"><span class="tiny-label">VIU ALGO QUE GOSTOU?</span><p>Escolha a peça aqui.<br><strong>Compre na sua plataforma favorita.</strong></p><div class="platform-names"><span>Shopee</span><span>Mercado Livre</span><span>TikTok Shop</span></div></section>
+  </main>
+  <footer class="site-footer"><div class="container footer-top"><a class="brand" href="./index.html" aria-label="MORFY — início"><span class="morfy-logo"><img src="./assets/images/morfy-logo.png" alt="MORFY" width="1600" height="618" loading="lazy"></span></a><p>Ideias que ganham forma.</p><nav aria-label="Navegação do rodapé"><a href="#catalogo">Produtos 3D</a><a href="./deckra.html">DECKRA</a><a href="#sobre">A MORFY</a></nav></div><div class="container footer-bottom"><span>© <span data-year>2026</span> MORFY.</span><span>Vitrine de demonstração · Do digital ao real.</span><a href="#main" aria-label="Voltar ao início">Voltar ao topo ↑</a></div></footer>
+  <dialog id="product-dialog" class="product-dialog" aria-labelledby="modal-title" aria-describedby="modal-description">
+    <button class="dialog-close" type="button" data-close-dialog aria-label="Fechar detalhes">×</button>
+    <div class="modal-layout"><div class="modal-visual"><img id="modal-image" src="./assets/images/organizer.svg" alt="" width="600" height="500"></div><div class="modal-content"><p id="modal-category" class="eyebrow"></p><h2 id="modal-title"></h2><p id="modal-description" class="modal-description"></p><ul id="modal-features" class="feature-list"></ul><p id="modal-demo-note" class="demo-note"></p><div class="buy-area"><h3>Onde comprar</h3><p class="platform-price">Consultar preço na plataforma</p><div id="modal-marketplaces" class="marketplace-buttons"></div><p class="marketplace-hint">Preço, disponibilidade e frete são definidos em cada plataforma.</p></div></div></div>
+  </dialog>
+  <div id="site-toast" class="site-toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

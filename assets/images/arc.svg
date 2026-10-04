@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="500" viewBox="0 0 600 500" role="img" aria-label="Ilustração de demonstração: suporte curvo para headset em grafite e azul">
+  <defs>
+    <radialGradient id="bg" cx="68%" cy="26%" r="80%"><stop stop-color="#243449"/><stop offset=".5" stop-color="#141b27"/><stop offset="1" stop-color="#0b0f14"/></radialGradient>
+    <linearGradient id="dark" x1="0" y1="0" x2="1" y2=".5"><stop stop-color="#5a6575"/><stop offset=".34" stop-color="#303c4e"/><stop offset="1" stop-color="#152032"/></linearGradient>
+    <linearGradient id="edge" x1="0" x2="1"><stop stop-color="#172a47"/><stop offset=".3" stop-color="#3b82f6"/><stop offset=".8" stop-color="#1e4ea4"/><stop offset="1" stop-color="#172d54"/></linearGradient>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4d5d74"/><stop offset="1" stop-color="#162235"/></linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8493a8"/><stop offset=".2" stop-color="#435268"/><stop offset="1" stop-color="#1c2e47"/></linearGradient>
+    <pattern id="layers" width="4" height="4.4" patternUnits="userSpaceOnUse"><path d="M0 1h4" stroke="#b5c8e5" opacity=".09" stroke-width=".6"/></pattern>
+    <clipPath id="arc"><path d="M241 354c25-14 29-37 29-73V169c0-28 19-51 49-53 22-1 46 4 72 16l-2 30c-30-13-48-19-65-16-10 2-17 10-17 27v109c0 50-7 77-31 96Z"/></clipPath>
+    <filter id="blur"><feGaussianBlur stdDeviation="13"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="3"/></filter>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h600v500H0z"/>
+  <path d="M0 385 600 346v154H0Z" fill="#0d1520" opacity=".5"/>
+  <ellipse cx="339" cy="395" rx="155" ry="22" fill="#03060b" opacity=".9" filter="url(#blur)"/>
+  <ellipse cx="285" cy="398" rx="98" ry="10" fill="#000" opacity=".72" filter="url(#soft)"/>
+  <path d="M193 355q66-36 162-11l33 32v15q-108 35-195-3Z" fill="url(#base)"/>
+  <path d="M193 355q66-36 162-11l33 32q-108 34-195-4Z" fill="url(#top)"/>
+  <path d="M194 372q86 38 193 4v8q-111 33-193-2Z" fill="url(#edge)"/>
+  <path d="M204 358q62-25 146-5l24 21q-91 21-165-4Z" fill="#22334c" opacity=".55"/>
+  <path d="M258 354c25-15 29-39 29-75V167c0-28 19-50 49-52 19-1 45 5 66 16l-11 1c-26-12-50-17-72-16-30 2-49 25-49 53v112c0 36-4 59-29 73Z" fill="url(#top)"/>
+  <path d="M241 354c25-14 29-37 29-73V169c0-28 19-51 49-53 22-1 46 4 72 16l-2 30c-30-13-48-19-65-16-10 2-17 10-17 27v109c0 50-7 77-31 96Z" fill="url(#dark)"/>
+  <path d="m391 132 11-1-1 28-12 3Z" fill="url(#edge)"/>
+  <path d="M276 378c24-19 31-46 31-96V173c0-17 7-25 17-27 17-3 35 3 65 16l12-3c-32-15-56-21-75-18-15 3-23 14-23 32v109c0 50-7 77-26 91Z" fill="url(#edge)"/>
+  <path d="M241 354c25-14 29-37 29-73V169c0-28 19-51 49-53 22-1 46 4 72 16l-2 30c-30-13-48-19-65-16-10 2-17 10-17 27v109c0 50-7 77-31 96Z" fill="url(#layers)" clip-path="url(#arc)"/>
+  <path d="M250 353c25-19 25-41 25-74V169c0-27 18-47 44-49 20-2 44 3 69 15" fill="none" stroke="#b5c6db" stroke-width="1.1" opacity=".44"/>
+  <path d="M283 364c18-19 20-40 20-82V173c0-18 9-29 23-32 20-3 43 3 72 16" fill="none" stroke="#76adff" stroke-width="1" opacity=".5"/>
+  <path d="M203 358q63-29 147-11M201 384q72 28 169 3" fill="none" stroke="#a4b7d1" stroke-width=".8" opacity=".22"/>
+  <ellipse cx="295" cy="399" rx="85" ry="6" fill="#3b82f6" opacity=".085" filter="url(#soft)"/>
+</svg>

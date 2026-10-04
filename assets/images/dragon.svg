@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="500" viewBox="0 0 600 500" role="img" aria-label="Ilustração de demonstração: mini dragão articulado branco">
+  <defs>
+    <radialGradient id="bg" cx="64%" cy="28%" r="78%"><stop stop-color="#293344"/><stop offset=".48" stop-color="#151c27"/><stop offset="1" stop-color="#0b0f14"/></radialGradient>
+    <linearGradient id="white" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fbfcfd"/><stop offset=".4" stop-color="#dce1e8"/><stop offset="1" stop-color="#8190a5"/></linearGradient>
+    <linearGradient id="light" x1="0" y1="0" x2="1" y2=".8"><stop stop-color="#fff"/><stop offset="1" stop-color="#bbc4d0"/></linearGradient>
+    <linearGradient id="shade" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#c7ced9"/><stop offset="1" stop-color="#63748c"/></linearGradient>
+    <linearGradient id="horn" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff"/><stop offset="1" stop-color="#9baabc"/></linearGradient>
+    <radialGradient id="eye" cx="35%" cy="30%"><stop stop-color="#92bfff"/><stop offset=".3" stop-color="#426aa0"/><stop offset=".8" stop-color="#182b45"/><stop offset="1" stop-color="#0d1726"/></radialGradient>
+    <pattern id="layers" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 1h4" stroke="#465975" opacity=".09" stroke-width=".55"/></pattern>
+    <filter id="blur"><feGaussianBlur stdDeviation="13"/></filter>
+    <filter id="soft"><feGaussianBlur stdDeviation="3"/></filter>
+    <clipPath id="head"><path d="M234 163c-43 1-65 25-68 64-4 36 16 64 45 77 18 9 42 13 69 7 40-9 62-31 63-64 1-37-13-70-42-80-15-6-33-6-67-4Z"/></clipPath>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h600v500H0z"/>
+  <path d="M0 384 600 350v150H0Z" fill="#0f1620" opacity=".65"/>
+  <ellipse cx="311" cy="391" rx="168" ry="27" fill="#03070b" opacity=".9" filter="url(#blur)"/>
+  <ellipse cx="281" cy="391" rx="98" ry="10" fill="#000" opacity=".6" filter="url(#soft)"/>
+  <!-- Linked tail segments. -->
+  <path d="M370 337c43 9 62-1 74-21 9-16 3-36 14-52-1 41 18 49-3 79-19 28-42 32-81 23Z" fill="url(#shade)"/>
+  <path d="m421 324 7 19 17-2-5-21Z" fill="url(#white)"/>
+  <path d="m443 308 4 23 13-14-7-19Z" fill="url(#light)"/>
+  <path d="m447 282 11-18 8 33-13 1Z" fill="url(#horn)"/>
+  <path d="m418 324-7-17 18 12Z" fill="url(#horn)"/>
+  <!-- Body and flexible plates. -->
+  <path d="M277 277c16-28 44-34 80-12 38 22 47 64 29 97-15 26-64 37-101 14-34-20-35-66-8-99Z" fill="url(#white)"/>
+  <path d="M316 265c17 0 40 11 50 23l-12 21-23-3-22-24Z" fill="url(#light)"/>
+  <path d="m336 308 21 4 27 20-7 27-27 13-24-30Z" fill="url(#shade)"/>
+  <path d="M315 294c16 14 34 18 58 24M295 325c15 16 38 23 59 23" fill="none" stroke="#536681" stroke-width="4" opacity=".42"/>
+  <path d="M316 297c16 13 34 17 57 24M296 328c16 15 37 23 57 23" fill="none" stroke="#f8fafc" stroke-width="2" opacity=".58"/>
+  <path d="m320 269 10-29 15 37-9 6Z" fill="url(#horn)"/>
+  <path d="m349 287 13-23 11 40-13 4Z" fill="url(#horn)"/>
+  <path d="m373 319 12-18 7 31-11 6Z" fill="url(#horn)"/>
+  <!-- Far feet. -->
+  <path d="M346 350c-2 11-3 22 7 29 13 7 37 5 43-4 4-7-12-14-26-13l-1-14Z" fill="url(#shade)"/>
+  <path d="m376 368-4 9m11-7-3 9m9-6-2 5" stroke="#566b86" stroke-width="1.5" opacity=".55"/>
+  <!-- Face, ears, and horns. -->
+  <path d="m180 193-30-47 54 16 25 26Z" fill="url(#white)"/>
+  <path d="m167 163 18 29 24-13Z" fill="#a8b4c6"/>
+  <path d="m283 168 32-51 13 60-18 17Z" fill="url(#white)"/>
+  <path d="m315 132-15 38 18 9Z" fill="#8d9fb7"/>
+  <path d="M190 173c-4-22 0-42 15-71 1 35 7 51 23 60Z" fill="url(#horn)"/>
+  <path d="M260 165c-7-27-1-49 20-76-5 29 2 51 14 66Z" fill="url(#horn)"/>
+  <path d="M234 163c-43 1-65 25-68 64-4 36 16 64 45 77 18 9 42 13 69 7 40-9 62-31 63-64 1-37-13-70-42-80-15-6-33-6-67-4Z" fill="url(#white)"/>
+  <path d="M245 169c27-3 49 1 62 19 8 12 6 26-8 34l-43 10-13-28Z" fill="url(#light)"/>
+  <path d="m214 170 20-10 17 21-18 11-17-6Z" fill="#f5f7fa"/>
+  <path d="M168 231c12-10 26-9 44 2l31 24-23 30-37-19Z" fill="#b6c2d1" opacity=".5"/>
+  <path d="M234 163c-43 1-65 25-68 64-4 36 16 64 45 77 18 9 42 13 69 7 40-9 62-31 63-64 1-37-13-70-42-80-15-6-33-6-67-4Z" fill="url(#layers)" clip-path="url(#head)"/>
+  <path d="M234 207c16-15 36-16 53-4 14 12 20 29 12 45-8 13-30 16-46 7-19-10-29-33-19-48Z" fill="#899aaf"/>
+  <path d="M242 210c10-11 26-11 38-3 12 9 15 25 9 36-6 11-23 14-35 6-13-8-20-26-12-39Z" fill="url(#eye)"/>
+  <ellipse cx="259" cy="218" rx="7" ry="6" fill="#eef6ff" opacity=".9"/>
+  <ellipse cx="277" cy="239" rx="3" ry="2" fill="#b5d5ff" opacity=".45"/>
+  <path d="M231 207c13-20 37-26 59-10" fill="none" stroke="#f7f9fb" stroke-width="11" stroke-linecap="round"/>
+  <path d="M181 224c5-14 17-16 26-9 8 7 9 21 2 28-8 6-21 0-28-9Z" fill="#8293ab"/>
+  <path d="M186 223c4-8 12-9 17-4 5 5 5 13 0 17-5 4-13 0-17-6Z" fill="url(#eye)"/>
+  <ellipse cx="192" cy="222" rx="3" ry="3" fill="#e9f3ff" opacity=".8"/>
+  <path d="M193 253c-10-6-28-6-33 5-8 15 9 34 30 37 24 5 39-4 41-18 1-13-21-18-38-24Z" fill="url(#light)"/>
+  <path d="M167 278c15 10 35 14 52 7" fill="none" stroke="#7d8da3" stroke-width="2" stroke-linecap="round" opacity=".65"/>
+  <ellipse cx="175" cy="259" rx="4" ry="2.5" transform="rotate(18 175 259)" fill="#8999af"/>
+  <ellipse cx="193" cy="264" rx="4" ry="2.5" transform="rotate(18 193 264)" fill="#8999af"/>
+  <!-- Near arms and feet. -->
+  <path d="M270 298c-15 7-28 25-23 45 4 14 18 18 27 10 8-7 8-19 6-29l11-10Z" fill="url(#white)"/>
+  <path d="M278 332c-7 17-5 36 5 44 11 9 34 8 38-1 5-10-7-14-21-14l-2-22Z" fill="url(#light)"/>
+  <path d="m294 366-1 12m9-12 1 12m8-9 2 7" stroke="#8c9bb0" stroke-width="1.7" opacity=".7"/>
+  <path d="M234 319c-15 7-23 27-18 43 4 11 14 14 20 7 6-6 4-19 4-27Z" fill="url(#white)"/>
+  <path d="M224 355c-12 13-14 23-7 29 10 8 33 7 37-1 4-8-7-15-20-14Z" fill="url(#light)"/>
+  <path d="m227 377-2 9m10-8-1 9m9-8 2 6" stroke="#8c9bb0" stroke-width="1.5" opacity=".7"/>
+  <path d="M228 306c10 8 24 13 37 12" fill="none" stroke="#fbfdff" stroke-width="1.2" opacity=".55"/>
+</svg>

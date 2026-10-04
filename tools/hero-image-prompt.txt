@@ -1,0 +1,13 @@
+Asset: assets/images/morfy-hero.png
+Method: built-in ImageGen. This image illustrates demonstration products; it is not a photograph of confirmed commercial products.
+
+Use case: product-mockup
+Asset type: premium landscape website hero photograph, aspect ratio approximately 3:2.
+Primary request: a minimalist cinematic studio still life of three demonstration 3D printed objects for the MORFY product showcase. No branding or text.
+Scene/backdrop: seamless near-black charcoal background and a low architectural charcoal pedestal, very dark studio floor, subtle realistic contact shadows.
+Subject: a faceted matte offwhite origami-style vase at the back right; a geometric angular black pen cup containing two simple blue pens at middle right; an attractive small articulated offwhite dragon toy at front right on the pedestal. The dragon has a charming sculptural face, articulated body segments, small horns and tiny feet, believable 3D printed collectible scale.
+Style/medium: high-end photographic product rendering with camera realism, tactile matte surfaces, restrained editorial art direction, fine visible FDM layer texture on all printed objects, polished studio product photography.
+Composition/framing: landscape 3:2. Keep ALL objects within the rightmost 65% of the image. The leftmost 35% must be clean negative space, almost pure charcoal black with no objects, no highlights, no props, suitable for website headline overlay. Objects feel thoughtfully spaced, large but fully inside the frame, slightly isometric three quarter view. Vase tallest, cup medium height, dragon foreground.
+Lighting/mood: broad soft white key from upper right and subtle cool blue side light, delicate blue reflection on the dark pedestal, cinematic and premium, sufficient texture detail without harsh contrast.
+Color palette: charcoal #0b0f14, near-black, offwhite #f3f4f6, understated electric blue #3b82f6 and navy #1e3a8a.
+Constraints: no logos, no lettering, no watermarks, no interface elements, no price badges, no fake brand markings, no extra objects. This is an illustrative prototype asset, not documentary photography of an actual product.
