@@ -1,30 +1,33 @@
 # Decisões de hardware DECKRA
 
-Este documento deve ser preenchido com o hardware real antes de especificar pinagem, tensões, frequência de comunicação ou firmware.
+## Decisões atuais
 
-## Dados a confirmar
-- Fabricante e modelo exato da placa/microcontrolador:
-- Tensão lógica de GPIO:
-- Interface USB e capacidades USB HID:
-- Quantidade e tipo de potenciômetros:
-- Quantidade e tipo de botões:
-- Encoders, LEDs, displays ou outros componentes:
-- Alimentação e consumo estimado:
-- Esquema elétrico e pinagem:
-- Sistema operacional prioritário:
-- Método de gravação e recuperação de firmware:
+- **Placa alvo:** Arduino Leonardo ou Arduino Micro (ATmega32U4).
+- **Comunicação inicial com o PC:** USB Serial/CDC.
+- **Sistema operacional prioritário:** Windows 10/11.
+- **Controles previstos:** potenciômetros, botões e LEDs RGB.
+- **Aplicativo:** Tauri 2 + React + TypeScript; backend Rust para gerenciar a porta serial.
 
-## Verificações de segurança
-- Consultar datasheet e documentação oficial da placa.
-- Não conectar sinais com níveis de tensão não confirmados.
-- Verificar se a placa aceita USB HID nativamente ou exige suporte adicional.
-- Não definir pinos apenas por conveniência antes do esquema elétrico.
-- Separar alimentação de periféricos e lógica, se o desenho do circuito exigir.
+## Dados que ainda precisam ser confirmados
 
-## Decisão de ligação ao computador
-Opções a avaliar:
-- **USB serial:** simples para diagnóstico e mensagens customizadas; o aplicativo precisará interpretar o protocolo.
-- **USB HID:** pode ser reconhecido como teclado/controle sem um agente serial, mas depende da placa, do firmware e dos requisitos para configuração.
-- **Abordagem híbrida:** HID para eventos em uso e um canal definido para configuração, caso a plataforma de hardware suporte isso.
+- Leonardo ou Micro como placa definitiva.
+- Quantidade e identificação dos potenciômetros e botões.
+- Modelo, quantidade, tipo elétrico e corrente dos LEDs RGB.
+- LEDs RGB de anodo comum ou catodo comum; uso de resistores ou driver/transistores.
+- Pinos e esquema elétrico completos.
+- Comportamento esperado dos potenciômetros (valores brutos, curva, deadzone e mapeamento).
+- Se os botões precisam funcionar como atalhos globais ou apenas dentro do aplicativo.
+- Requisitos de perfis e persistência.
 
-Escolher após confirmar placa, experiência de uso desejada e requisitos de configuração.
+## Regras de ligação segura
+
+- Consultar o pinout e a documentação oficial da placa escolhida.
+- Confirmar que todos os sinais estejam dentro dos limites elétricos do microcontrolador.
+- Potenciômetros devem ser conectados como divisores de tensão adequados à faixa ADC, com GND e referência corretos.
+- Cada LED deve ter limitação de corrente. Não conectar LEDs RGB diretamente aos pinos sem dimensionar resistores e corrente.
+- Se a corrente do LED exceder o que um GPIO pode fornecer, usar driver ou transistor apropriado.
+- Não especificar a pinagem final até que a contagem de controles e o circuito sejam confirmados.
+
+## Por que USB Serial primeiro?
+
+A porta serial permite que o aplicativo receba eventos customizados e configure LEDs sem precisar que o dispositivo se apresente como teclado USB. O Leonardo/Micro têm USB nativo, então USB HID pode ser avaliado depois para teclas físicas, mas misturar HID e Serial na primeira prova de conceito adicionaria complexidade sem necessidade.
