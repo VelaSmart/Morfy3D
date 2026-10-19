@@ -295,3 +295,5 @@ Todos os acessos Shopee usam a página geral do vendedor: `https://br.shp.ee/NnJ
 ## Porta-copos automotivo
 
 Produto cadastrado em Utilitários, com seis imagens editadas na identidade MORFY a partir das referências fornecidas. São imagens de apresentação; o copo ilustra o uso. Material ABS e finalidade de maior resistência ao calor e mecânica confirmados pelo responsável pela loja. Não foram presumidos dimensões, compatibilidade universal, temperaturas de uso ou itens inclusos. O botão Shopee abre a loja geral do vendedor. Os prompts de edição estão em `tools/porta-copos-image-prompts.txt`.
+
+A página DECKRA identifica o produto como projeto maker em evolução nas seções de apresentação, software e compra. Ela informa que bugs e falhas podem ocorrer e que os problemas identificados serão tratados o mais rápido possível.
