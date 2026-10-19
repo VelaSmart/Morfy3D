@@ -47,7 +47,7 @@
 .marketplace-button.is-available{border-color:#426fb4;background:#172a47}
 .marketplace-button.is-available:hover{border-color:#78aaff;background:#203c65}
 .marketplace-button>.marketplace-label{flex:1;min-width:0}
-.marketplace-button>span.marketplace-arrow{flex:0 0 auto;margin-left:auto}
+.marketplace-button.is-available .marketplace-status{color:#dce9ff;border-color:#55749e}
 .marketplace-button.is-unavailable,.marketplace-button.is-unavailable:hover{cursor:not-allowed;border-color:#2d3643;background:#111720;color:#a7b1c1}
 .marketplace-button.is-unavailable svg{color:#7e8a9e}
 .marketplace-button.is-unavailable .marketplace-status{color:#a1aec2;border-color:#344051}

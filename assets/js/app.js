@@ -98,7 +98,7 @@
         var button = createElement(url ? "a" : "button", "marketplace-button");
         button.dataset.marketplace = marketplace.id;
         button.appendChild(marketplaceIcon(marketplace.id));
-        button.appendChild(createElement("span", "marketplace-label", unavailable ? marketplace.label : marketplaceText(marketplace)));
+        button.appendChild(createElement("span", "marketplace-label", marketplace.label));
 
         if (url) {
           button.classList.add("is-available");
@@ -106,9 +106,7 @@
           button.target = "_blank";
           button.rel = "noopener noreferrer";
           button.setAttribute("aria-label", marketplaceText(marketplace) + " — abre em uma nova aba");
-          var arrow = createElement("span", "marketplace-arrow", "↗");
-          arrow.setAttribute("aria-hidden", "true");
-          button.appendChild(arrow);
+          button.appendChild(createElement("span", "marketplace-status", "ACESSAR PRODUTO"));
         } else if (unavailable) {
           button.type = "button";
           button.disabled = true;
