@@ -287,3 +287,5 @@ A seção `deckra.html#software` explica a associação de aplicativos do PC aos
 Para liberar o download, configure `deckra.softwareDownloadUrl` em `assets/js/products.js` com uma URL HTTPS real do instalador ou da página de distribuição. Enquanto o campo estiver vazio, o botão permanece desabilitado como “Download em breve”. Não há instalador, versão ou compatibilidade presumidos no projeto.
 
 O download aparece no início da seção de software, logo após o hero. O botão destacado continua sem ação enquanto não houver instalador configurado. A compra do DECKRA usa a mesma lista vertical do catálogo 3D; plataformas sem anúncio aparecem como indisponíveis, incluindo a Shopee.
+
+As imagens conceituais do hardware DECKRA agora usam arquivos independentes (`deckra-controller-hero.png` e `deckra-controller-detail.png`), gerados com image_gen a partir da direção visual do painel de marca. O hero mostra o dispositivo inteiro, sem ampliação de recortes do moodboard; os detalhes são uma segunda visualização conceitual. Não representam fotografia de um modelo final.

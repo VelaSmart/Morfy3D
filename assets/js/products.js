@@ -88,11 +88,10 @@ window.MORFY_CONFIG = {
     softwareDownloadUrl: "",
     category: "Controladores e periféricos",
     description: "Controladores e periféricos personalizados para PC. Uma proposta que une design, fabricação própria e cultura maker para dar forma ao seu jeito de criar, jogar e trabalhar.",
-    images: [{
-      src: "./assets/images/deckra-reference.png",
-      alt: "Referência conceitual de um controlador DECKRA com teclas e controles giratórios",
-      layout: "reference-board"
-    }],
+    images: [
+      { src: "./assets/images/deckra-controller-hero.png", alt: "Visualização conceitual de controlador DECKRA preto com teclas e potenciômetros sob iluminação roxa", layout: "product-photo" },
+      { src: "./assets/images/deckra-controller-detail.png", alt: "Detalhe conceitual das teclas, potenciômetros e acabamento preto do DECKRA", layout: "product-photo" }
+    ],
     features: [],
     demo: true,
     marketplaces: { shopee: "", mercadoLivre: "", tiktokShop: "" }
