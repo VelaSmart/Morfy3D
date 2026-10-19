@@ -1,17 +1,17 @@
 /*
  * Configuração da vitrine MORFY.
  * Edite os produtos, imagens e anúncios neste arquivo.
- * demoMode mantém os botões visíveis mesmo sem anúncios configurados.
- * Os produtos do catálogo já são reais; demoMode mantém apenas os botões
- * de teste enquanto os anúncios dos marketplaces não forem cadastrados.
+ * demoMode=false desliga os botões de teste sem anúncios.
+ * unavailable=true mantém uma plataforma visível como indisponível,
+ * sem link nem ação de clique. Cadastre anúncios separados por produto.
  * Use somente links completos e seguros, começando com https://.
  */
 window.MORFY_CONFIG = {
-  demoMode: true,
+  demoMode: false,
   marketplaces: [
     { id: "shopee", label: "Shopee" },
-    { id: "mercadoLivre", label: "Mercado Livre" },
-    { id: "tiktokShop", label: "TikTok Shop" }
+    { id: "mercadoLivre", label: "Mercado Livre", unavailable: true },
+    { id: "tiktokShop", label: "TikTok Shop", unavailable: true }
   ],
   products: [
     {
@@ -35,7 +35,7 @@ window.MORFY_CONFIG = {
         "Armadura cinza, espada, capa e laço rosa."
       ],
       demo: false,
-      marketplaces: { shopee: "", mercadoLivre: "", tiktokShop: "" }
+      marketplaces: { shopee: "https://br.shp.ee/iUUqJ7XX", mercadoLivre: "", tiktokShop: "" }
     },
     {
       id: "boneco-de-neve",
@@ -57,7 +57,29 @@ window.MORFY_CONFIG = {
         "Estilo natalino para compor a decoração."
       ],
       demo: false,
-      marketplaces: { shopee: "", mercadoLivre: "", tiktokShop: "" }
+      marketplaces: { shopee: "https://br.shp.ee/w63hYWts", mercadoLivre: "", tiktokShop: "" }
+    },
+    {
+      id: "chaveiro-tnt",
+      name: "Chaveiro TNT",
+      category: "geek",
+      description: "Um detalhe pixelado para levar com você. Chaveiro em impressão 3D com visual de bloco TNT, cores vermelha, branca e preta e argola metálica.",
+      images: [
+        { src: "./assets/images/chaveiro-tnt-apresentacao.png", alt: "Cinco peças em formato de bloco TNT, vermelhas, brancas e pretas, fotografadas sobre fundo branco", label: "Apresentação das peças" },
+        { src: "./assets/images/chaveiro-tnt-argola.jpg", alt: "Chaveiro TNT sobre uma mesa branca com corrente e argola metálica visíveis", label: "Chaveiro com argola" },
+        { src: "./assets/images/chaveiro-tnt-na-mao.jpg", alt: "Chaveiro TNT na palma da mão, mostrando a corrente e a argola metálica", label: "Na mão" },
+        { src: "./assets/images/chaveiro-tnt-detalhe.jpg", alt: "Peça TNT segurada na mão, mostrando os detalhes pixelados em relevo", label: "Detalhes em relevo" },
+        { src: "./assets/images/chaveiro-tnt-conjunto.png", alt: "Três peças TNT empilhadas sobre fundo branco, mostrando os detalhes das faces", label: "Peças empilhadas" },
+        { src: "./assets/images/chaveiro-tnt-setup.jpg", alt: "Peças TNT empilhadas em uma mesa com teclado e mousepad ao fundo", label: "No setup" }
+      ],
+      features: [
+        "Chaveiro em impressão 3D com visual de bloco TNT.",
+        "Detalhes pixelados em relevo, nas cores vermelha, branca e preta.",
+        "Corrente e argola metálica apresentadas nas fotos do chaveiro.",
+        "Confira no anúncio da Shopee a quantidade, as opções e as condições de compra."
+      ],
+      demo: false,
+      marketplaces: { shopee: "https://br.shp.ee/H42PTTaN", mercadoLivre: "", tiktokShop: "" }
     }
   ],
   deckra: {

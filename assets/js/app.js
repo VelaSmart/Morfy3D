@@ -92,14 +92,16 @@
       var buttonCount = 0;
 
       marketplaces.forEach(function (marketplace) {
-        var url = safeMarketplaceUrl(links[marketplace.id]);
-        if (!url && !config.demoMode) return;
+        var unavailable = marketplace.unavailable === true;
+        var url = unavailable ? null : safeMarketplaceUrl(links[marketplace.id]);
+        if (!url && !unavailable && !config.demoMode) return;
         var button = createElement(url ? "a" : "button", "marketplace-button");
         button.dataset.marketplace = marketplace.id;
         button.appendChild(marketplaceIcon(marketplace.id));
-        button.appendChild(createElement("span", "marketplace-label", marketplaceText(marketplace)));
+        button.appendChild(createElement("span", "marketplace-label", unavailable ? marketplace.label : marketplaceText(marketplace)));
 
         if (url) {
+          button.classList.add("is-available");
           button.href = url;
           button.target = "_blank";
           button.rel = "noopener noreferrer";
@@ -107,6 +109,13 @@
           var arrow = createElement("span", "marketplace-arrow", "↗");
           arrow.setAttribute("aria-hidden", "true");
           button.appendChild(arrow);
+        } else if (unavailable) {
+          button.type = "button";
+          button.disabled = true;
+          button.classList.add("is-unavailable");
+          button.setAttribute("aria-disabled", "true");
+          button.setAttribute("aria-label", marketplace.label + " — indisponível");
+          button.appendChild(createElement("span", "marketplace-status", "Indisponível"));
         } else {
           button.type = "button";
           button.classList.add("is-demo");

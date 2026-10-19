@@ -8,7 +8,7 @@ Repositório: [VelaSmart/Morfy3D](https://github.com/VelaSmart/Morfy3D).
 
 Site publicado: [Abrir MORFY](https://velasmart.github.io/Morfy3D/) · [Abrir DECKRA](https://velasmart.github.io/Morfy3D/deckra.html).
 
-**Catálogo atual:** Gatinho Cavaleiro (versões branca e laranja) e Boneco de Neve (6 cm e 10 cm), com as imagens fornecidas pela marca. Os seis produtos provisórios foram removidos. As medidas cadastradas vêm das imagens enviadas; preço, estoque e condições devem ser consultados no anúncio. Os botões de marketplaces continuam no modo de teste enquanto seus links estiverem vazios. A apresentação DECKRA mantém suas referências conceituais.
+**Catálogo atual:** Gatinho Cavaleiro (versões branca e laranja), Boneco de Neve (6 cm e 10 cm) e Chaveiro TNT, com as imagens anteriores fornecidas pela marca. Os seis produtos provisórios foram removidos. As medidas cadastradas vêm das imagens enviadas; preço, estoque, quantidade e condições devem ser consultados nos anúncios. Os três produtos possuem links reais da Shopee. Mercado Livre e TikTok Shop aparecem como **Indisponível**, sem ação de clique. A apresentação DECKRA mantém suas referências conceituais e ainda não possui anúncio da Shopee.
 
 ## Páginas e recursos
 
@@ -101,7 +101,7 @@ Este exemplo usa um produto do catálogo atual. Ao duplicá-lo, escolha outro `i
   features: ["Versões branca e laranja."],
   demo: false,
   marketplaces: {
-    shopee: "",
+    shopee: "https://br.shp.ee/iUUqJ7XX",
     mercadoLivre: "",
     tiktokShop: ""
   }
@@ -125,7 +125,7 @@ Não acrescente dimensões, materiais, resistência, quantidade de controles ou 
 
 ### Categorias e filtros
 
-O catálogo atual usa `decoracao` (Boneco de Neve) e `geek` (Gatinho Cavaleiro). O filtro `todos` reúne os dois itens. O rótulo `utilitarios` continua disponível no JavaScript para produtos futuros; seu filtro foi retirado enquanto não houver itens dessa categoria.
+O catálogo atual usa `decoracao` (Boneco de Neve) e `geek` (Gatinho Cavaleiro e Chaveiro TNT). O filtro `todos` reúne os três itens. O rótulo `utilitarios` continua disponível no JavaScript para produtos futuros; seu filtro foi retirado enquanto não houver itens dessa categoria.
 
 Para adicionar outra categoria:
 
@@ -141,7 +141,7 @@ Use `alt` para descrever o objeto e o que a imagem mostra. Para fotos reais, sub
 
 ## Atualizar o DECKRA
 
-As 13 imagens dos produtos estão em `assets/images/`, com os prefixos `gatinho-cavaleiro-` e `boneco-de-neve-`. São cópias dos arquivos fornecidos, com nomes organizados para publicação. A imagem repetida do gatinho não foi duplicada. Para alterar a capa, mova a imagem desejada para a primeira posição de `images`. Para incluir outra cor, medida ou vista, acrescente um objeto com `src`, `alt` e `label`. Não crie outro produto apenas para uma foto adicional.
+As 19 imagens dos produtos estão em `assets/images/`, com os prefixos `gatinho-cavaleiro-`, `boneco-de-neve-` e `chaveiro-tnt-`. As seis fotos do TNT incluem a peça com argola, detalhes, a peça na mão e conjuntos fotografados; as fotos de conjuntos não definem a quantidade vendida, que deve ser consultada no anúncio. São cópias dos arquivos fornecidos, com nomes organizados para publicação. A imagem repetida do gatinho não foi duplicada. Para alterar a capa, mova a imagem desejada para a primeira posição de `images`. Para incluir outra cor, medida ou vista, acrescente um objeto com `src`, `alt` e `label`. Não crie outro produto apenas para uma foto adicional.
 
 No mesmo arquivo, edite o objeto `deckra`. Mantenha `name: "DECKRA"`, atualize `description`, inclua apenas características confirmadas em `features` e configure os anúncios em `marketplaces`.
 
@@ -177,39 +177,40 @@ Para atualizar a identidade, substitua o PNG correspondente mantendo transparên
 
 As versões transparentes mantêm a arte oficial e removem o fundo branco e as margens vazias por processamento de pixels. Os originais foram preservados sem alteração. Os cinco originais desta entrega ficam disponíveis no repositório; as páginas usam apenas as duas versões transparentes derivadas deles.
 
-## Modo de demonstração e marketplaces
+## Marketplaces e disponibilidade
 
-Na configuração inicial:
+A configuração atual usa `demoMode: false`. Os links reais da Shopee foram fornecidos pelo responsável pela loja:
 
-```javascript
-demoMode: true
-```
+| Produto | Anúncio da Shopee |
+| --- | --- |
+| Gatinho Cavaleiro | https://br.shp.ee/iUUqJ7XX |
+| Boneco de Neve | https://br.shp.ee/w63hYWts |
+| Chaveiro TNT | https://br.shp.ee/H42PTTaN |
 
-Os três botões aparecem, mesmo com links vazios, para avaliar o layout. Um botão sem anúncio mostra um aviso de demonstração e não abre uma página fictícia. Um link válido já abre o anúncio em nova aba.
-
-Cada produto, inclusive o DECKRA, possui seus próprios campos:
+Cada produto possui campos próprios em `marketplaces`. Cole o endereço completo **HTTPS do anúncio daquele produto**. Não use links genéricos de loja ou de outro item. Deixe `""` quando não houver anúncio.
 
 ```javascript
 marketplaces: {
-  shopee: "",
+  shopee: "https://br.shp.ee/H42PTTaN",
   mercadoLivre: "",
   tiktokShop: ""
 }
 ```
 
-Cole o endereço completo **HTTPS do anúncio daquele produto** no campo da plataforma correspondente. Confirme que ele abre o item correto na Shopee, no Mercado Livre ou no TikTok Shop. Mantenha `""` quando não houver anúncio. Não reutilize um link de outro produto nem substitua por um endereço genérico de loja.
-
-Para exibir somente as plataformas configuradas:
+Na lista global `marketplaces`, Mercado Livre e TikTok Shop têm `unavailable: true`:
 
 ```javascript
-demoMode: false
+{ id: "mercadoLivre", label: "Mercado Livre", unavailable: true },
+{ id: "tiktokShop", label: "TikTok Shop", unavailable: true }
 ```
 
-Nesse modo, links vazios ou inválidos não geram botões. O produto continua disponível para consulta e, se não houver nenhum link, os detalhes informam que os anúncios ainda não foram configurados. A seção DECKRA usa a mesma regra.
+Esse estado exibe a plataforma com o selo **Indisponível** e botão desabilitado, mesmo se houver um link antigo. Para liberar uma plataforma futuramente, remova `unavailable` ou altere para `false`, cadastre os anúncios em cada produto e confira os destinos. Com `demoMode: false`, uma plataforma sem anúncio e sem `unavailable: true` fica oculta.
 
-`demoMode` controla apenas a presença dos botões de demonstração sem links. Os dois produtos atuais já têm `demo: false`; isso remove os selos e avisos de produto provisório mesmo com os botões de marketplaces em teste. Ao cadastrar outros produtos reais, use também `demo: false`. Revise os textos gerais de demonstração em `index.html` e `deckra.html` antes de apresentar a vitrine como catálogo comercial.
+O DECKRA ainda não possui link da Shopee, portanto não exibe botão ativo dessa plataforma. Mercado Livre e TikTok Shop aparecem indisponíveis também nessa página.
 
-Os botões identificam a plataforma e abrem os anúncios com `target="_blank"` e `rel="noopener noreferrer"`, preservando o site MORFY. O site usa **“Consultar preço na plataforma”**; preço, disponibilidade, frete e condições são definidos no marketplace.
+Os links ativos abrem em nova aba, com `target="_blank"` e `rel="noopener noreferrer"`. O site prioriza **“Consultar preço na plataforma”**; preço, frete, estoque, variações e quantidade são definidos no anúncio.
+
+Os três produtos atuais usam `demo: false`, sem selo de conceito. `demoMode: true` continua disponível para testar botões sem anúncios; ele não reativa plataformas marcadas com `unavailable: true`.
 
 ## GitHub Pages: publicação e configuração
 
@@ -229,7 +230,7 @@ A MORFY usa base escura, azul e a fonte Montserrat. O DECKRA usa base escura, ro
 
 As fontes estão hospedadas localmente. Preserve suas licenças ao distribuir o projeto: [Montserrat — SIL OFL](assets/fonts/Montserrat-OFL.txt) e [Sora — SIL OFL](assets/fonts/Sora-OFL.txt).
 
-As logos oficiais MORFY, o painel DECKRA e as imagens dos dois produtos foram fornecidos pela marca. A abertura apresenta a loja, destaca o botão Explorar produtos e usa o fundo técnico original `assets/images/morfy-slicing-hero.png`, criado com a ferramenta integrada ImageGen. O prompt final e a origem estão registrados em `tools/hero-slicing-prompt.txt`. O desenho ilustra modelo, camadas e plano de fatiamento; não é um produto adicional do catálogo. O texto permanece no HTML para acessibilidade, e a posição da imagem se adapta ao celular. As seis ilustrações SVG dos produtos provisórios foram removidas. A antiga imagem conceitual `assets/images/morfy-hero.png` e o registro `tools/hero-image-prompt.txt` permanecem arquivados e não são exibidos no catálogo.
+As logos oficiais MORFY, o painel DECKRA e as imagens dos três produtos foram fornecidos pela marca. A abertura apresenta a loja, destaca o botão Explorar produtos e usa o fundo técnico original `assets/images/morfy-slicing-hero.png`, criado com a ferramenta integrada ImageGen. O prompt final e a origem estão registrados em `tools/hero-slicing-prompt.txt`. O desenho ilustra modelo, camadas e plano de fatiamento; não é um produto adicional do catálogo. O texto permanece no HTML para acessibilidade, e a posição da imagem se adapta ao celular. As seis ilustrações SVG dos produtos provisórios foram removidas. A antiga imagem conceitual `assets/images/morfy-hero.png` e o registro `tools/hero-image-prompt.txt` permanecem arquivados e não são exibidos no catálogo.
 
 ## Verificar alterações
 
@@ -255,8 +256,9 @@ Depois, confira as duas páginas no navegador em computador e celular: busca, fi
 | Imagem, estilo ou fonte não carrega | Caminho relativo, arquivo enviado e maiúsculas/minúsculas iguais. Um caminho iniciado por `/` ignora `/Morfy3D/`. |
 | Catálogo fica vazio após editar | Erros no console do navegador e resultado de `node --check assets/js/products.js`; confira vírgulas, aspas e colchetes. |
 | Categoria nova não tem filtro | Rótulo em `app.js`, botão `data-category` em `index.html` e identificador igual no produto. |
-| Botão só mostra aviso | Link vazio ou inválido e `demoMode: true`. Cadastre o anúncio real ou mantenha o comportamento de teste. |
-| Botão desapareceu | Em `demoMode: false`, a plataforma precisa de um link HTTPS válido. |
+| Botão só mostra aviso | Link vazio ou inválido e `demoMode: true`. Cadastre o anúncio real e desative o modo de teste. |
+| Botão desapareceu | Em `demoMode: false`, a plataforma precisa de um link HTTPS válido ou de `unavailable: true` para aparecer desabilitada. |
+| Plataforma continua indisponível | Confira `unavailable` na lista global `marketplaces`; altere para `false` e cadastre o anúncio de cada produto. |
 | Foto DECKRA aparece com recorte de painel | Remova `layout: "reference-board"` e use `"photo"`, ou omita o campo. |
 | Prévia informa que a porta está ocupada | Encerre a prévia anterior. No servidor Node, a variável `MORFY_PREVIEW_PORT` permite escolher outra porta. |
 | Alteração publicada não aparece | Aguarde a execução de publicação, confira **Actions** e recarregue o navegador sem cache. |
