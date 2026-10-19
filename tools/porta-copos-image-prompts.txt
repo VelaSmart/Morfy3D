@@ -1,0 +1,14 @@
+Ferramenta: image_gen integrada. Edições das seis referências fornecidas pelo usuário.
+Direção comum: preservar a geometria do porta-copos, acabamento preto, base circular, aro aberto e presilhas; fundo grafite, acentos azuis MORFY, composição quadrada, textos em português. Sem inventar medidas ou desempenho térmico.
+
+1. Show empty holder full and uncropped on dark graphite studio background with restrained electric blue rim light, remove all colored arrows. Top small exact text 'MORFY', title 'Porta-copos automotivo', subtitle 'Praticidade para o seu espaço'. Premium square catalog cover.
+
+2. Preserve dashboard mounted holder and red cup exactly, improve light and sharpness, dark graphite automotive scene with subtle electric blue color accents, square composition. Top small 'MORFY' and caption 'No painel'. No other text.
+
+3. Preserve door mounted black holder and red cup exactly, improve sharpness, square composition focused on holder and attachment at car door, natural photographic automotive context with restrained cool blue color grading. Top small 'MORFY', caption 'Na porta'.
+
+4. Preserve holder, red cup, white lid, visible attachment clips exactly. Remove English box, arrow and all existing text, clean dark graphite studio background with subtle blue rim light, square high resolution catalog composition. Top small 'MORFY', caption 'Detalhes do encaixe'.
+
+5. Preserve black holder, red cup, white lid and side clip exactly. Clean dark graphite studio background, electric blue rim light, improve clarity while keeping realistic 3D printed texture. Square composition. Top small 'MORFY', caption 'Vista lateral'.
+
+6. Preserve geometry of empty holder exactly. Remove English text and all orange, red and blue arrows. Square technical catalog illustration on graphite background with restrained blue accents. Top small 'MORFY', title 'Estrutura aberta', subtitle 'Detalhes do suporte'. No temperature or performance claims.

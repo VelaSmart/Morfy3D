@@ -81,6 +81,57 @@ window.MORFY_CONFIG = {
       ],
       demo: false,
       marketplaces: { shopee: "https://br.shp.ee/H42PTTaN", mercadoLivre: "", tiktokShop: "" }
+    },
+    {
+      "id": "porta-copos-automotivo",
+      "name": "Porta-copos automotivo",
+      "category": "utilitarios",
+      "description": "Mais praticidade para o seu carro. Suporte para copos feito em ABS, com aro aberto, base circular e encaixe, apresentado em preto.",
+      "images": [
+        {
+          "src": "./assets/images/porta-copos-capa.png",
+          "alt": "Porta-copos automotivo preto com aro superior aberto, base circular e estrutura vertical",
+          "label": "Apresentação"
+        },
+        {
+          "src": "./assets/images/porta-copos-painel.png",
+          "alt": "Suporte preto com copo vermelho instalado no painel do carro",
+          "label": "No painel"
+        },
+        {
+          "src": "./assets/images/porta-copos-porta.png",
+          "alt": "Porta-copos preto com copo vermelho instalado na porta do carro",
+          "label": "Na porta"
+        },
+        {
+          "src": "./assets/images/porta-copos-encaixe.png",
+          "alt": "Detalhes das presilhas de encaixe do porta-copos preto com copo vermelho",
+          "label": "Detalhes do encaixe"
+        },
+        {
+          "src": "./assets/images/porta-copos-lateral.png",
+          "alt": "Vista lateral do suporte preto mostrando a estrutura e o copo vermelho",
+          "label": "Vista lateral"
+        },
+        {
+          "src": "./assets/images/porta-copos-estrutura.png",
+          "alt": "Vista da estrutura aberta do porta-copos preto, com base circular e nervuras verticais",
+          "label": "Estrutura aberta"
+        }
+      ],
+      "features": [
+        "Fabricado em ABS, escolhido pela maior resistência ao calor e mecânica.",
+      "Estrutura com aro superior aberto, base circular e apoio vertical.",
+        "Encaixes apresentados na galeria, com exemplos de uso no painel e na porta.",
+        "Copo usado nas imagens para demonstrar o suporte.",
+        "Confira a compatibilidade do encaixe e as dimensões na loja antes da compra."
+      ],
+      "demo": false,
+      "marketplaces": {
+        "shopee": "",
+        "mercadoLivre": "",
+        "tiktokShop": ""
+      }
     }
   ],
   deckra: {

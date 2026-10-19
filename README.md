@@ -8,7 +8,7 @@ Repositório: [VelaSmart/Morfy3D](https://github.com/VelaSmart/Morfy3D).
 
 Site publicado: [Abrir MORFY](https://velasmart.github.io/Morfy3D/) · [Abrir DECKRA](https://velasmart.github.io/Morfy3D/deckra.html).
 
-**Catálogo atual:** Gatinho Cavaleiro (versões branca e laranja), Boneco de Neve (6 cm e 10 cm) e Chaveiro TNT, com imagens fornecidas pela marca e artes do anúncio oficial da Shopee para o TNT. Os seis produtos provisórios foram removidos. As medidas cadastradas vêm das imagens enviadas; preço, estoque, quantidade e condições devem ser consultados nos anúncios. Os três produtos possuem links reais da Shopee. Mercado Livre e TikTok Shop aparecem como **Indisponível**, sem ação de clique. A apresentação DECKRA mantém suas referências conceituais e ainda não possui anúncio da Shopee.
+**Catálogo atual:** Gatinho Cavaleiro (versões branca e laranja), Boneco de Neve (6 cm e 10 cm) Chaveiro TNT e Porta-copos automotivo em ABS, com imagens fornecidas pela marca e artes do anúncio oficial da Shopee para o TNT. Os seis produtos provisórios foram removidos. As medidas cadastradas vêm das imagens enviadas; preço, estoque, quantidade e condições devem ser consultados nos anúncios. Todos os produtos têm acesso à loja geral da Shopee. Mercado Livre e TikTok Shop aparecem como **Indisponível**, sem ação de clique. A apresentação DECKRA mantém suas referências conceituais e ainda não possui anúncio da Shopee.
 
 ## Páginas e recursos
 
@@ -125,7 +125,7 @@ Não acrescente dimensões, materiais, resistência, quantidade de controles ou 
 
 ### Categorias e filtros
 
-O catálogo atual usa `decoracao` (Boneco de Neve) e `geek` (Gatinho Cavaleiro e Chaveiro TNT). O filtro `todos` reúne os três itens. O rótulo `utilitarios` continua disponível no JavaScript para produtos futuros; seu filtro foi retirado enquanto não houver itens dessa categoria.
+O catálogo atual usa `decoracao` (Boneco de Neve) e `geek` (Gatinho Cavaleiro e Chaveiro TNT). O filtro `todos` reúne os quatro itens. A categoria `utilitarios` apresenta o Porta-copos automotivo.
 
 Para adicionar outra categoria:
 
@@ -141,7 +141,7 @@ Use `alt` para descrever o objeto e o que a imagem mostra. Para fotos reais, sub
 
 ## Atualizar o DECKRA
 
-As 20 imagens dos produtos estão em `assets/images/`, com os prefixos `gatinho-cavaleiro-`, `boneco-de-neve-` e `chaveiro-tnt-`. O TNT usa sete imagens editadas do [anúncio oficial da Shopee](https://shopee.com.br/product/1934551108/58269578490), incluindo capa, fotos reais e conjuntos. As fotos de conjuntos não definem a quantidade vendida, que deve ser consultada no anúncio. A origem de cada imagem do TNT está registrada em `tools/tnt-shopee-image-sources.json`; os arquivos ficam no próprio repositório, sem depender do carregamento externo da Shopee. A imagem repetida do gatinho não foi duplicada. Para alterar a capa, mova a imagem desejada para a primeira posição de `images`. Para incluir outra cor, medida ou vista, acrescente um objeto com `src`, `alt` e `label`. Não crie outro produto apenas para uma foto adicional.
+As 26 imagens dos produtos estão em `assets/images/`, com os prefixos `gatinho-cavaleiro-`, `boneco-de-neve-` e `chaveiro-tnt-`. O TNT usa sete imagens editadas do [anúncio oficial da Shopee](https://shopee.com.br/product/1934551108/58269578490), incluindo capa, fotos reais e conjuntos. As fotos de conjuntos não definem a quantidade vendida, que deve ser consultada no anúncio. A origem de cada imagem do TNT está registrada em `tools/tnt-shopee-image-sources.json`; os arquivos ficam no próprio repositório, sem depender do carregamento externo da Shopee. A imagem repetida do gatinho não foi duplicada. Para alterar a capa, mova a imagem desejada para a primeira posição de `images`. Para incluir outra cor, medida ou vista, acrescente um objeto com `src`, `alt` e `label`. Não crie outro produto apenas para uma foto adicional.
 
 No mesmo arquivo, edite o objeto `deckra`. Mantenha `name: "DECKRA"`, atualize `description`, inclua apenas características confirmadas em `features` e configure os anúncios em `marketplaces`.
 
@@ -291,3 +291,7 @@ O download aparece no início da seção de software, logo após o hero. O botã
 As imagens conceituais do hardware DECKRA agora usam arquivos independentes (`deckra-controller-hero.png` e `deckra-controller-detail.png`), gerados com image_gen a partir da direção visual do painel de marca. O hero mostra o dispositivo inteiro, sem ampliação de recortes do moodboard; os detalhes são uma segunda visualização conceitual. Não representam fotografia de um modelo final.
 
 Todos os acessos Shopee usam a página geral do vendedor: `https://br.shp.ee/NnJwdcc4`. O destino central fica em `marketplaces[].sellerUrl` e tem prioridade sobre os links individuais preservados no cadastro. Os botões indicam “Acessar loja”, incluindo no DECKRA.
+
+## Porta-copos automotivo
+
+Produto cadastrado em Utilitários, com seis imagens editadas na identidade MORFY a partir das referências fornecidas. São imagens de apresentação; o copo ilustra o uso. Material ABS e finalidade de maior resistência ao calor e mecânica confirmados pelo responsável pela loja. Não foram presumidos dimensões, compatibilidade universal, temperaturas de uso ou itens inclusos. O botão Shopee abre a loja geral do vendedor. Os prompts de edição estão em `tools/porta-copos-image-prompts.txt`.
