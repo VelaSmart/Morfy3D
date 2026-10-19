@@ -75,7 +75,8 @@ Morfy3D/
 └── tools/
     ├── serve.cjs                  Servidor opcional de prévia local
     ├── verify.cjs                 Verificação de arquivos e configuração
-    └── hero-image-prompt.txt       Registro do prompt da imagem principal
+    ├── hero-image-prompt.txt       Registro da antiga imagem conceitual
+    └── hero-slicing-prompt.txt     Prompt do fundo técnico atual
 ```
 
 Os arquivos do site devem ficar **na raiz do repositório**, sem uma pasta `morfy-site` envolvendo `index.html`. Todos os caminhos de navegação, estilos, scripts, fontes e imagens são relativos, para funcionar também em `/Morfy3D/`.
@@ -228,7 +229,7 @@ A MORFY usa base escura, azul e a fonte Montserrat. O DECKRA usa base escura, ro
 
 As fontes estão hospedadas localmente. Preserve suas licenças ao distribuir o projeto: [Montserrat — SIL OFL](assets/fonts/Montserrat-OFL.txt) e [Sora — SIL OFL](assets/fonts/Sora-OFL.txt).
 
-As logos oficiais MORFY, o painel DECKRA e as imagens dos dois produtos foram fornecidos pela marca. A abertura do catálogo usa a capa do Gatinho Cavaleiro. As seis ilustrações SVG dos produtos provisórios foram removidas. A antiga imagem conceitual `assets/images/morfy-hero.png` e o registro `tools/hero-image-prompt.txt` permanecem arquivados e não são exibidos no catálogo.
+As logos oficiais MORFY, o painel DECKRA e as imagens dos dois produtos foram fornecidos pela marca. A abertura apresenta a loja, destaca o botão Explorar produtos e usa o fundo técnico original `assets/images/morfy-slicing-hero.png`, criado com a ferramenta integrada ImageGen. O prompt final e a origem estão registrados em `tools/hero-slicing-prompt.txt`. O desenho ilustra modelo, camadas e plano de fatiamento; não é um produto adicional do catálogo. O texto permanece no HTML para acessibilidade, e a posição da imagem se adapta ao celular. As seis ilustrações SVG dos produtos provisórios foram removidas. A antiga imagem conceitual `assets/images/morfy-hero.png` e o registro `tools/hero-image-prompt.txt` permanecem arquivados e não são exibidos no catálogo.
 
 ## Verificar alterações
 
