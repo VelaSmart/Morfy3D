@@ -100,3 +100,14 @@
   .slicer-explainer .slicer-steps{font-size:10px}
   .slicer-note{font-size:7px;margin-top:6px}
 }
+
+/* Software DECKRA: apresentação e download. */
+.software-preview{margin:0;border:1px solid #34303f;border-radius:14px;overflow:hidden;background:#111018}
+.software-preview img{display:block;width:100%;height:auto;object-fit:contain}
+.software-preview figcaption{padding:14px 20px;font-size:11px;color:#a7a0b8;border-top:1px solid #302b3d}
+.software-steps{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-block:32px}
+.software-steps .tiny-label{color:#a798e8}.software-steps h3{font-size:21px;margin:12px 0}.software-steps p{font-size:13px;line-height:1.9;color:#b0aabd;max-width:560px}
+.software-download-panel{display:flex;align-items:center;justify-content:space-between;gap:35px;padding:30px;border:1px solid #3e3457;border-radius:10px;background:#181420}
+.software-download-panel .eyebrow{font-size:9px;margin-bottom:13px}.software-download-panel h3{font-size:23px;margin-bottom:12px}.software-download-panel p:last-child{max-width:660px;color:#b0aabd;font-size:12px;line-height:1.9}
+.software-download-panel .button{flex-shrink:0}.software-download-panel button:disabled{cursor:not-allowed;opacity:.65}
+@media(max-width:700px){.software-steps{grid-template-columns:1fr;gap:25px}.software-download-panel{flex-direction:column;align-items:flex-start;padding:24px}.software-download-panel h3{font-size:21px}.software-preview figcaption{font-size:10px;padding:12px}.software-steps h3{font-size:19px}}

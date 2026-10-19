@@ -279,3 +279,9 @@ Na publicação por branch, salvar o domínio no Pages cria um arquivo `CNAME` n
 - Cadastre os anúncios corretos por produto e teste cada botão.
 - Use `demoMode: false`, ajuste `demo` dos produtos reais e revise os textos gerais de teste.
 - Rode o verificador e confira o site publicado em celular e por teclado.
+
+## Software DECKRA
+
+A seção `deckra.html#software` explica a associação de aplicativos do PC aos potenciômetros para controlar o volume e a atribuição de funções e atalhos às teclas. A imagem `assets/images/deckra-software-demo.png` é uma prévia ilustrativa, não uma captura do programa final.
+
+Para liberar o download, configure `deckra.softwareDownloadUrl` em `assets/js/products.js` com uma URL HTTPS real do instalador ou da página de distribuição. Enquanto o campo estiver vazio, o botão permanece desabilitado como “Download em breve”. Não há instalador, versão ou compatibilidade presumidos no projeto.

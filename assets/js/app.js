@@ -106,7 +106,7 @@
           button.target = "_blank";
           button.rel = "noopener noreferrer";
           button.setAttribute("aria-label", marketplaceText(marketplace) + " — abre em uma nova aba");
-          button.appendChild(createElement("span", "marketplace-status", "ACESSAR PRODUTO"));
+          button.appendChild(createElement("span", "marketplace-status", "Acessar produto"));
         } else if (unavailable) {
           button.type = "button";
           button.disabled = true;
@@ -327,6 +327,16 @@
     }
 
     var deckra = config.deckra || { name: "DECKRA", marketplaces: {} };
+    var softwareDownload = document.getElementById("software-download");
+    var downloadUrl = safeMarketplaceUrl(deckra.softwareDownloadUrl);
+    if (softwareDownload && downloadUrl) {
+      var downloadLink = createElement("a", "button button-purple", "Baixar software");
+      downloadLink.href = downloadUrl;
+      downloadLink.target = "_blank";
+      downloadLink.rel = "noopener noreferrer";
+      softwareDownload.replaceWith(downloadLink);
+      document.getElementById("software-download-note").textContent = "Consulte as instruções e a compatibilidade na página de download.";
+    }
     var deckraImages = Array.isArray(deckra.images) ? deckra.images : [];
     document.querySelectorAll("[data-deckra-image]").forEach(function (element) {
       var selectedImage = element.dataset.deckraImage === "detail" ? deckraImages[1] || deckraImages[0] : deckraImages[0];

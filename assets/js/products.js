@@ -85,6 +85,7 @@ window.MORFY_CONFIG = {
   ],
   deckra: {
     name: "DECKRA",
+    softwareDownloadUrl: "",
     category: "Controladores e periféricos",
     description: "Controladores e periféricos personalizados para PC. Uma proposta que une design, fabricação própria e cultura maker para dar forma ao seu jeito de criar, jogar e trabalhar.",
     images: [{
