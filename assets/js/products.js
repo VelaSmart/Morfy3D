@@ -9,7 +9,7 @@
 window.MORFY_CONFIG = {
   demoMode: false,
   marketplaces: [
-    { id: "shopee", label: "Shopee" },
+    { id: "shopee", label: "Shopee", sellerUrl: "https://br.shp.ee/NnJwdcc4" },
     { id: "mercadoLivre", label: "Mercado Livre", unavailable: true },
     { id: "tiktokShop", label: "TikTok Shop", unavailable: true }
   ],

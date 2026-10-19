@@ -289,3 +289,5 @@ Para liberar o download, configure `deckra.softwareDownloadUrl` em `assets/js/pr
 O download aparece no início da seção de software, logo após o hero. O botão destacado continua sem ação enquanto não houver instalador configurado. A compra do DECKRA usa a mesma lista vertical do catálogo 3D; plataformas sem anúncio aparecem como indisponíveis, incluindo a Shopee.
 
 As imagens conceituais do hardware DECKRA agora usam arquivos independentes (`deckra-controller-hero.png` e `deckra-controller-detail.png`), gerados com image_gen a partir da direção visual do painel de marca. O hero mostra o dispositivo inteiro, sem ampliação de recortes do moodboard; os detalhes são uma segunda visualização conceitual. Não representam fotografia de um modelo final.
+
+Todos os acessos Shopee usam a página geral do vendedor: `https://br.shp.ee/NnJwdcc4`. O destino central fica em `marketplaces[].sellerUrl` e tem prioridade sobre os links individuais preservados no cadastro. Os botões indicam “Acessar loja”, incluindo no DECKRA.

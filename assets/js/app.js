@@ -92,8 +92,9 @@
       var buttonCount = 0;
 
       marketplaces.forEach(function (marketplace) {
-        var unavailable = marketplace.unavailable === true || (product === config.deckra && !safeMarketplaceUrl(links[marketplace.id]));
-        var url = unavailable ? null : safeMarketplaceUrl(links[marketplace.id]);
+        var sellerUrl = safeMarketplaceUrl(marketplace.sellerUrl);
+        var unavailable = marketplace.unavailable === true || (product === config.deckra && !sellerUrl && !safeMarketplaceUrl(links[marketplace.id]));
+        var url = unavailable ? null : sellerUrl || safeMarketplaceUrl(links[marketplace.id]);
         if (!url && !unavailable && !config.demoMode) return;
         var button = createElement(url ? "a" : "button", "marketplace-button");
         button.dataset.marketplace = marketplace.id;
@@ -105,8 +106,8 @@
           button.href = url;
           button.target = "_blank";
           button.rel = "noopener noreferrer";
-          button.setAttribute("aria-label", marketplaceText(marketplace) + " — abre em uma nova aba");
-          button.appendChild(createElement("span", "marketplace-status", "Acessar produto"));
+          button.setAttribute("aria-label", (sellerUrl ? "Acessar loja na " + marketplace.label : marketplaceText(marketplace)) + " — abre em uma nova aba");
+          button.appendChild(createElement("span", "marketplace-status", sellerUrl ? "Acessar loja" : "Acessar produto"));
         } else if (unavailable) {
           button.type = "button";
           button.disabled = true;

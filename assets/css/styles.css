@@ -129,3 +129,7 @@
 .deckra-main-scene.is-product-photo{background-size:cover;background-repeat:no-repeat;background-position:center;background-color:#0b0b11;filter:none}.deckra-detail-scene.is-product-photo{background-size:cover;background-position:center;filter:none}.software-preview{max-width:1200px;margin-inline:auto}
 
 .deckra-main-scene.is-product-photo{transform:scale(1.08);transform-origin:center}
+
+/* Preenche integralmente o quadro, sem faixas nas laterais. */
+.deckra-hero-art .deckra-main-scene.is-product-photo{position:absolute;inset:0;width:100%;height:100%;background-size:cover!important;background-position:center!important;transform:scale(1.08)}
+.platform-names a:hover{color:#8fbdff}
