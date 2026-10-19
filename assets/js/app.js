@@ -82,7 +82,7 @@
     }
 
     function marketplaceText(marketplace) {
-      return marketplace.id === "shopee" ? "Ver na " + marketplace.label : "Ver no " + marketplace.label;
+      return marketplace.id === "shopee" ? "Acessar produto na " + marketplace.label : "Acessar produto no " + marketplace.label;
     }
 
     function renderMarketplaces(container, product) {

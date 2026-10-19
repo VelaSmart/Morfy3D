@@ -65,12 +65,13 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Um detalhe pixelado para levar com você. Chaveiro em impressão 3D com visual de bloco TNT, cores vermelha, branca e preta e argola metálica.",
       images: [
-        { src: "./assets/images/chaveiro-tnt-apresentacao.png", alt: "Cinco peças em formato de bloco TNT, vermelhas, brancas e pretas, fotografadas sobre fundo branco", label: "Apresentação das peças" },
-        { src: "./assets/images/chaveiro-tnt-argola.jpg", alt: "Chaveiro TNT sobre uma mesa branca com corrente e argola metálica visíveis", label: "Chaveiro com argola" },
-        { src: "./assets/images/chaveiro-tnt-na-mao.jpg", alt: "Chaveiro TNT na palma da mão, mostrando a corrente e a argola metálica", label: "Na mão" },
-        { src: "./assets/images/chaveiro-tnt-detalhe.jpg", alt: "Peça TNT segurada na mão, mostrando os detalhes pixelados em relevo", label: "Detalhes em relevo" },
-        { src: "./assets/images/chaveiro-tnt-conjunto.png", alt: "Três peças TNT empilhadas sobre fundo branco, mostrando os detalhes das faces", label: "Peças empilhadas" },
-        { src: "./assets/images/chaveiro-tnt-setup.jpg", alt: "Peças TNT empilhadas em uma mesa com teclado e mousepad ao fundo", label: "No setup" }
+        {"src":"./assets/images/chaveiro-tnt-shopee-01.jpg","alt":"Arte do anúncio com o Chaveiro TNT, argola metálica, diferentes ângulos e detalhes da peça","label":"Apresentação"},
+        {"src":"./assets/images/chaveiro-tnt-shopee-02.jpg","alt":"Chaveiro TNT na palma da mão, com corrente e argola metálica, em foto do anúncio","label":"Foto real · na mão"},
+        {"src":"./assets/images/chaveiro-tnt-shopee-03.jpg","alt":"Chaveiro TNT sobre uma mesa branca com corrente e argola metálica","label":"Foto real · com argola"},
+        {"src":"./assets/images/chaveiro-tnt-shopee-04.jpg","alt":"Bloco TNT segurado entre os dedos, mostrando os detalhes pixelados em relevo","label":"Foto real · detalhes"},
+        {"src":"./assets/images/chaveiro-tnt-shopee-05.jpg","alt":"Chaveiro TNT individual com corrente e argola metálica sobre uma mesa branca","label":"Chaveiro individual"},
+        {"src":"./assets/images/chaveiro-tnt-shopee-06.jpg","alt":"Três peças TNT empilhadas sobre fundo branco","label":"Peças empilhadas"},
+        {"src":"./assets/images/chaveiro-tnt-shopee-07.jpg","alt":"Cinco peças TNT agrupadas sobre fundo branco","label":"Conjunto de peças"}
       ],
       features: [
         "Chaveiro em impressão 3D com visual de bloco TNT.",
