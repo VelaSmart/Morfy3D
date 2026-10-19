@@ -1,29 +1,71 @@
 # Protocolo DECKRA
 
-**Status: rascunho de requisitos.** Ainda não há estrutura de pacote oficial. Não implementar um protocolo definitivo com base em exemplos presumidos.
+**Versão do protótipo:** 0.1  
+**Transporte:** USB Serial/CDC.  
+**Framing inicial:** uma mensagem JSON por linha (JSON Lines, LF).  
+**Status:** proposta inicial a validar com hardware real.
 
-## Princípios
-- Mensagens versionadas.
-- Identificação estável dos controles, sem depender da posição física no layout da interface.
-- Capacidade de descobrir firmware, recursos disponíveis e versão do protocolo.
-- Respostas explícitas de sucesso ou erro para comandos de configuração.
-- Validação de tipo, tamanho, intervalo e valores antes de processar qualquer mensagem.
-- Recuperação segura após timeout, reinicialização e desconexão.
+## Regras
 
-## Famílias de mensagem a especificar
-- HELLO / HELLO_ACK: descoberta e negociação da versão.
-- DEVICE_INFO: identificador do dispositivo, versão de firmware e capacidades.
-- CONTROL_EVENT: ID do controle e valor ou estado.
-- GET_CONFIG / CONFIG_DATA: consulta de perfil/configuração.
-- SET_CONFIG / CONFIG_ACK: gravação validada e confirmação.
-- ERROR: código de erro estável e informação não sensível para diagnóstico.
+- Uma linha contém um objeto JSON UTF-8 completo terminado em LF.
+- O dispositivo envia mensagens de evento e resposta.
+- O aplicativo só envia comandos explicitamente permitidos.
+- IDs de controles devem ser estáveis e independentes do texto da interface.
+- Valores e tamanhos devem ser validados; mensagens desconhecidas devem ser ignoradas ou respondidas com erro.
+- A velocidade serial será configurada pelo firmware e aplicativo em conjunto; escolher e validar um valor ao testar o primeiro firmware.
 
-Os nomes acima são conceitos, não comandos já implementados. Codificação, delimitadores ou framing, checksums, limites e política de compatibilidade devem ser definidos e testados antes de uso.
+## Mensagens iniciais do dispositivo
 
-## Testes necessários
-- Mensagem incompleta, excedendo o tamanho máximo ou malformada.
-- Valor fora do intervalo esperado.
-- Versão de protocolo incompatível.
-- Desconexão durante operação.
-- Repetição de comando e timeout.
-- Reinicialização do microcontrolador.
+Identificação:
+
+```json
+{"type":"hello","protocol":1,"device":"deckra","firmware":"0.1.0","capabilities":["potentiometers","buttons","rgb"]}
+```
+
+Potenciômetro:
+
+```json
+{"type":"control","control":"pot_1","kind":"potentiometer","value":512,"min":0,"max":1023}
+```
+
+Botão:
+
+```json
+{"type":"control","control":"button_1","kind":"button","pressed":true}
+```
+
+Resposta genérica:
+
+```json
+{"type":"ack","id":"cmd-1","ok":true}
+```
+
+Erro:
+
+```json
+{"type":"error","code":"invalid_command","message":"Unsupported command"}
+```
+
+## Comandos do aplicativo
+
+Definir cor RGB por canal lógico:
+
+```json
+{"type":"set_rgb","id":"cmd-1","led":"rgb_1","r":0,"g":120,"b":255}
+```
+
+Desligar LED:
+
+```json
+{"type":"set_rgb","id":"cmd-2","led":"rgb_1","r":0,"g":0,"b":0}
+```
+
+Estes exemplos descrevem o contrato pretendido, não garantem que a pinagem ou os LEDs já estejam implementados. O firmware deve validar IDs, canais entre 0 e 255 e o comprimento da linha antes de alterar saídas.
+
+## Próximas decisões
+
+- Definir a taxa serial real e limites máximos da linha.
+- Definir periodicidade de amostragem e política de envio dos potenciômetros (mudança mínima/debounce).
+- Definir debounce dos botões.
+- Definir polaridade dos LEDs RGB.
+- Adicionar timeout, reconexão, compatibilidade de versões e testes com mensagens inválidas.
