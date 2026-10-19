@@ -290,10 +290,10 @@ O download aparece no início da seção de software, logo após o hero. O botã
 
 As imagens conceituais do hardware DECKRA agora usam arquivos independentes (`deckra-controller-hero.png` e `deckra-controller-detail.png`), gerados com image_gen a partir da direção visual do painel de marca. O hero mostra o dispositivo inteiro, sem ampliação de recortes do moodboard; os detalhes são uma segunda visualização conceitual. Não representam fotografia de um modelo final.
 
-Todos os acessos Shopee usam a página geral do vendedor: `https://br.shp.ee/NnJwdcc4`. O destino central fica em `marketplaces[].sellerUrl` e tem prioridade sobre os links individuais preservados no cadastro. Os botões indicam “Acessar loja”, incluindo no DECKRA.
+Os botões Shopee dos produtos abrem o anúncio específico cadastrado em `product.marketplaces.shopee`. O acesso do DECKRA, que não tem anúncio próprio configurado, abre a página geral do vendedor: `https://br.shp.ee/NnJwdcc4`.
 
 ## Porta-copos automotivo
 
-Produto cadastrado em Utilitários, com seis imagens editadas na identidade MORFY a partir das referências fornecidas. São imagens de apresentação; o copo ilustra o uso. Material ABS e finalidade de maior resistência ao calor e mecânica confirmados pelo responsável pela loja. Não foram presumidos dimensões, compatibilidade universal, temperaturas de uso ou itens inclusos. O botão Shopee abre a loja geral do vendedor. Os prompts de edição estão em `tools/porta-copos-image-prompts.txt`.
+Produto cadastrado em Utilitários, com seis imagens editadas na identidade MORFY a partir das referências fornecidas. São imagens de apresentação; o copo ilustra o uso. Material ABS e finalidade de maior resistência ao calor e mecânica confirmados pelo responsável pela loja. Não foram presumidos dimensões, compatibilidade universal, temperaturas de uso ou itens inclusos. O acesso Shopee aparece quando o anúncio específico desse produto for cadastrado. Os prompts de edição estão em `tools/porta-copos-image-prompts.txt`.
 
 A página DECKRA identifica o produto como projeto maker em evolução nas seções de apresentação, software e compra. Ela informa que bugs e falhas podem ocorrer e que os problemas identificados serão tratados o mais rápido possível.
