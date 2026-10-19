@@ -111,3 +111,16 @@
 .software-download-panel .eyebrow{font-size:9px;margin-bottom:13px}.software-download-panel h3{font-size:23px;margin-bottom:12px}.software-download-panel p:last-child{max-width:660px;color:#b0aabd;font-size:12px;line-height:1.9}
 .software-download-panel .button{flex-shrink:0}.software-download-panel button:disabled{cursor:not-allowed;opacity:.65}
 @media(max-width:700px){.software-steps{grid-template-columns:1fr;gap:25px}.software-download-panel{flex-direction:column;align-items:flex-start;padding:24px}.software-download-panel h3{font-size:21px}.software-preview figcaption{font-size:10px;padding:12px}.software-steps h3{font-size:19px}}
+
+/* Download no início da apresentação e compra padronizada. */
+.software-section{scroll-margin-top:100px}
+.software-section .software-download-panel{margin-bottom:32px;background:linear-gradient(110deg,#211831,#15131d);border-color:#66508d}
+.software-download-panel .software-download-button{min-width:250px;min-height:76px;padding:18px 26px;gap:16px;background:#7955ed;border:1px solid #b49bff;box-shadow:0 8px 28px #7955ed38;color:#fff;font-size:13px;font-weight:600;opacity:1}
+.software-download-button>span:first-child{font-size:29px}.software-download-button small{display:block;margin-top:5px;font-size:11px;font-weight:400;color:#e3d9ff}
+.deckra-page .purchase-panel{max-width:760px;margin-inline:auto;background:#10151c;border-color:#344051}
+.deckra-page .purchase-panel .marketplace-button{display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:12px;min-height:50px;padding:14px 15px;font-size:11px;border-radius:5px}
+.deckra-page .purchase-panel .marketplace-status{margin-left:auto;font-size:8px;padding:2px 6px}
+.deckra-page .purchase-panel-foot{flex-direction:column;align-items:flex-start;gap:8px}
+@media(max-width:700px){.software-download-panel .software-download-button{width:100%;min-width:0}.deckra-page .purchase-panel .marketplace-button{font-size:10px}.software-section{scroll-margin-top:80px}}
+
+.hero.hero-slicer .hero-actions{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap}.hero.hero-slicer .hero-deckra-button{min-height:64px;padding:18px 25px;border-color:#54456f;background:#15121ccc;color:#e6dcff}.hero.hero-slicer .hero-deckra-button:hover{background:#261d39;border-color:#a38ae0}@media(max-width:560px){.hero.hero-slicer .hero-actions .button{min-height:52px;padding:14px 16px;font-size:11px;gap:14px}}

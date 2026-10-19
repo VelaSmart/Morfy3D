@@ -92,7 +92,7 @@
       var buttonCount = 0;
 
       marketplaces.forEach(function (marketplace) {
-        var unavailable = marketplace.unavailable === true;
+        var unavailable = marketplace.unavailable === true || (product === config.deckra && !safeMarketplaceUrl(links[marketplace.id]));
         var url = unavailable ? null : safeMarketplaceUrl(links[marketplace.id]);
         if (!url && !unavailable && !config.demoMode) return;
         var button = createElement(url ? "a" : "button", "marketplace-button");
@@ -330,7 +330,7 @@
     var softwareDownload = document.getElementById("software-download");
     var downloadUrl = safeMarketplaceUrl(deckra.softwareDownloadUrl);
     if (softwareDownload && downloadUrl) {
-      var downloadLink = createElement("a", "button button-purple", "Baixar software");
+      var downloadLink = createElement("a", "button button-purple software-download-button", "Download do software");
       downloadLink.href = downloadUrl;
       downloadLink.target = "_blank";
       downloadLink.rel = "noopener noreferrer";

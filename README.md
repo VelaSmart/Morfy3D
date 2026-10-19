@@ -285,3 +285,5 @@ Na publicação por branch, salvar o domínio no Pages cria um arquivo `CNAME` n
 A seção `deckra.html#software` explica a associação de aplicativos do PC aos potenciômetros para controlar o volume e a atribuição de funções e atalhos às teclas. A imagem `assets/images/deckra-software-demo.png` é uma prévia ilustrativa, não uma captura do programa final.
 
 Para liberar o download, configure `deckra.softwareDownloadUrl` em `assets/js/products.js` com uma URL HTTPS real do instalador ou da página de distribuição. Enquanto o campo estiver vazio, o botão permanece desabilitado como “Download em breve”. Não há instalador, versão ou compatibilidade presumidos no projeto.
+
+O download aparece no início da seção de software, logo após o hero. O botão destacado continua sem ação enquanto não houver instalador configurado. A compra do DECKRA usa a mesma lista vertical do catálogo 3D; plataformas sem anúncio aparecem como indisponíveis, incluindo a Shopee.
