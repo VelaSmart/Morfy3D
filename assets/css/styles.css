@@ -126,4 +126,6 @@
 .hero.hero-slicer .hero-actions{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap}.hero.hero-slicer .hero-deckra-button{min-height:64px;padding:18px 25px;border-color:#a58bff;background:linear-gradient(135deg,#8465f9,#7255e9);box-shadow:0 8px 30px #7955ed30;color:#fff}.hero.hero-slicer .hero-deckra-button:hover{background:linear-gradient(135deg,#9173ff,#8062f2);box-shadow:0 10px 32px #7955ed42}@media(max-width:560px){.hero.hero-slicer .hero-actions .button{min-height:52px;padding:14px 16px;font-size:11px;gap:14px}}
 
 /* Imagens independentes do hardware, sem ampliar recortes do moodboard. */
-.deckra-main-scene.is-product-photo{background-size:contain;background-repeat:no-repeat;background-position:center;background-color:#0b0b11;filter:none}.deckra-detail-scene.is-product-photo{background-size:cover;background-position:center;filter:none}.software-preview{max-width:1200px;margin-inline:auto}
+.deckra-main-scene.is-product-photo{background-size:cover;background-repeat:no-repeat;background-position:center;background-color:#0b0b11;filter:none}.deckra-detail-scene.is-product-photo{background-size:cover;background-position:center;filter:none}.software-preview{max-width:1200px;margin-inline:auto}
+
+.deckra-main-scene.is-product-photo{transform:scale(1.08);transform-origin:center}
