@@ -148,11 +148,51 @@
       if (!dialog) return;
       lastTrigger = trigger;
       var image = document.getElementById("modal-image");
-      var firstImage = product.images && product.images[0];
-      if (image && firstImage) {
-        image.src = firstImage.src;
-        image.alt = firstImage.alt || product.name;
+      var gallery = document.getElementById("modal-thumbnails");
+      var imageCount = document.getElementById("modal-image-count");
+      var images = Array.isArray(product.images) ? product.images : [];
+
+      function selectImage(index) {
+        var selected = images[index];
+        if (!image || !selected) return;
+        image.src = selected.src;
+        image.alt = selected.alt || product.name;
+        if (imageCount) imageCount.textContent = "Imagem " + (index + 1) + " de " + images.length + " · " + (selected.label || product.name);
+        if (gallery) {
+          Array.from(gallery.children).forEach(function (button, buttonIndex) {
+            button.setAttribute("aria-pressed", String(buttonIndex === index));
+          });
+        }
       }
+
+      if (gallery) {
+        gallery.replaceChildren();
+        images.forEach(function (entry, index) {
+          var button = createElement("button", "gallery-thumbnail");
+          button.type = "button";
+          button.setAttribute("aria-label", "Ver imagem " + (index + 1) + ": " + (entry.label || entry.alt || product.name));
+          button.setAttribute("aria-pressed", String(index === 0));
+          var thumbnail = createElement("img");
+          thumbnail.src = entry.src;
+          thumbnail.alt = "";
+          thumbnail.loading = "lazy";
+          thumbnail.decoding = "async";
+          thumbnail.width = 72;
+          thumbnail.height = 72;
+          button.appendChild(thumbnail);
+          button.addEventListener("click", function () { selectImage(index); });
+          button.addEventListener("keydown", function (event) {
+            if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+            event.preventDefault();
+            var next = (index + (event.key === "ArrowRight" ? 1 : -1) + images.length) % images.length;
+            selectImage(next);
+            gallery.children[next].focus();
+          });
+          gallery.appendChild(button);
+        });
+        gallery.hidden = images.length < 2;
+      }
+      selectImage(0);
       var textFields = {
         "modal-category": categories[product.category] || product.category,
         "modal-title": product.name,

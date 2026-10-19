@@ -17,3 +17,31 @@
 .morfy-logo{background:transparent}.morfy-logo img{mix-blend-mode:normal}.product-category{display:block}.detail-button::after{content:none}.button-arrow{font-size:19px;font-weight:400;color:#8b99b0}.product-dialog .site-toast{position:sticky;left:auto;bottom:12px;transform:none;margin:0 auto 14px;width:calc(100% - 32px)}
 
 .reference-scene.is-product-photo{background-size:cover;background-position:center}
+
+/* Catálogo de produtos reais: capas inteiras e galeria acessível. */
+.catalog-section .product-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:1120px;margin-inline:auto}
+.product-visual{aspect-ratio:1;background:#fff}
+.product-visual img{object-fit:contain}
+.product-card:hover .product-visual img{transform:none}
+.hero-visual.is-product-showcase .hero-image{object-fit:contain;object-position:center;mask-image:none;border-radius:8px}
+.hero-visual.is-product-showcase .image-disclaimer{background:#0b0f14d9;padding:3px 8px;border-radius:3px}
+.product-dialog .modal-visual{display:block;min-width:0;min-height:0;height:auto;overflow:visible;padding:20px;background:#0c1016}
+.product-gallery{min-width:0}
+.gallery-stage{aspect-ratio:1;overflow:hidden;border:1px solid #2c3645;border-radius:7px;background:#fff}
+.gallery-stage #modal-image{display:block;width:100%;height:100%;object-fit:contain}
+.gallery-count{min-height:36px;padding-block:10px 6px;color:#b1bed0;font-size:9px;line-height:1.7}
+.gallery-thumbnails{display:flex;gap:8px;overflow-x:auto;padding:5px 4px 12px;scrollbar-width:thin;scrollbar-color:#455773 #111720}
+.gallery-thumbnail{flex:0 0 60px;width:60px;height:60px;padding:3px;border:1px solid #344051;border-radius:5px;background:#fff;overflow:hidden}
+.gallery-thumbnail img{display:block;width:100%;height:100%;object-fit:contain}
+.gallery-thumbnail:hover{border-color:#91b8f8}
+.gallery-thumbnail[aria-pressed=true]{border:2px solid #76aaff;box-shadow:0 0 0 2px #3b82f633}
+@media(max-width:560px){
+  .catalog-section .product-grid{grid-template-columns:1fr;max-width:440px;gap:24px}
+  .product-body{padding:22px}
+  .product-category{font-size:9px}
+  .product-body h3{font-size:23px;min-height:0}
+  .product-body p{font-size:12px;min-height:0}
+  .detail-button{font-size:12px;min-height:46px}
+  .product-dialog .modal-visual{padding:16px}
+  .gallery-thumbnail{flex-basis:55px;width:55px;height:55px}
+}

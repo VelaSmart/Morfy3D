@@ -1,6 +1,6 @@
 # MORFY / Morfy3D
 
-Vitrine de demonstração da **MORFY — Ideias que ganham forma**, com catálogo de impressão 3D e uma página dedicada ao **DECKRA — Hardware feito para você**.
+Vitrine de produtos da **MORFY — Ideias que ganham forma**, com catálogo de impressão 3D e uma página dedicada ao **DECKRA — Hardware feito para você**.
 
 O site usa HTML, CSS e JavaScript, com imagens e fontes locais. Funciona no navegador e pode ser hospedado no GitHub Pages. Não exige build, instalação de pacotes, banco de dados ou backend. A compra acontece nos anúncios específicos dos produtos na Shopee, no Mercado Livre e no TikTok Shop; o site não tem carrinho, checkout, pagamento ou cadastro de compradores.
 
@@ -8,7 +8,7 @@ Repositório: [VelaSmart/Morfy3D](https://github.com/VelaSmart/Morfy3D).
 
 Site publicado: [Abrir MORFY](https://velasmart.github.io/Morfy3D/) · [Abrir DECKRA](https://velasmart.github.io/Morfy3D/deckra.html).
 
-**Esta é uma versão de teste.** Os produtos, ilustrações e imagens conceituais permitem avaliar o visual e a navegação. Não representam estoque, preço, disponibilidade, dimensões, materiais ou compatibilidade confirmados.
+**Catálogo atual:** Gatinho Cavaleiro (versões branca e laranja) e Boneco de Neve (6 cm e 10 cm), com as imagens fornecidas pela marca. Os seis produtos provisórios foram removidos. As medidas cadastradas vêm das imagens enviadas; preço, estoque e condições devem ser consultados no anúncio. Os botões de marketplaces continuam no modo de teste enquanto seus links estiverem vazios. A apresentação DECKRA mantém suas referências conceituais.
 
 ## Páginas e recursos
 
@@ -19,7 +19,7 @@ O projeto tem exatamente duas páginas principais:
 | `index.html` | Catálogo MORFY, busca, filtros de categoria e modal de detalhes com “Onde comprar”. |
 | `deckra.html` | Apresentação DECKRA, imagens conceituais e seção de marketplaces acessível pelo hero e pelo encerramento. |
 
-A interface adapta-se a computador e celular. Inclui navegação por teclado, foco visível, textos alternativos, aviso acessível dos botões de demonstração e suporte à preferência de movimento reduzido. A busca considera nome, descrição e categoria, sem diferenciar acentos ou maiúsculas. Cada card abre os detalhes com **“Ver detalhes”**.
+A interface adapta-se a computador e celular. Inclui navegação por teclado, foco visível, textos alternativos, aviso acessível dos botões de demonstração e suporte à preferência de movimento reduzido. A busca considera nome, descrição e categoria, sem diferenciar acentos ou maiúsculas. Cada card abre os detalhes com **“Ver detalhes”**. O modal inclui uma galeria com miniaturas, indicação da imagem selecionada e navegação pelas setas esquerda/direita quando uma miniatura está em foco.
 
 ## Clonar e visualizar no computador
 
@@ -84,20 +84,21 @@ Os arquivos do site devem ficar **na raiz do repositório**, sem uma pasta `morf
 
 Edite `assets/js/products.js`. A configuração fica em `window.MORFY_CONFIG`; os cards são gerados a partir da lista `products`.
 
-Este exemplo completo usa um item demonstrativo já existente. Ao duplicá-lo, escolha outro `id` e substitua o conteúdo:
+Este exemplo usa um produto do catálogo atual. Ao duplicá-lo, escolha outro `id` e substitua os dados e as imagens:
 
 ```javascript
 {
-  id: "organizer",
-  name: "Organizador Geométrico",
-  category: "utilitarios",
-  description: "Um conceito de organização para dar lugar às pequenas coisas do dia a dia.",
+  id: "gatinho-cavaleiro",
+  name: "Gatinho Cavaleiro",
+  category: "geek",
+  description: "Escultura em impressão 3D com armadura, espada e capa rosa.",
   images: [{
-    src: "./assets/images/organizer.svg",
-    alt: "Ilustração de um organizador geométrico preto"
+    src: "./assets/images/gatinho-cavaleiro-capa.png",
+    alt: "Gatinho Cavaleiro laranja com espada e capa rosa em cenário de jardim",
+    label: "Apresentação"
   }],
-  features: [],
-  demo: true,
+  features: ["Versões branca e laranja."],
+  demo: false,
   marketplaces: {
     shopee: "",
     mercadoLivre: "",
@@ -112,7 +113,7 @@ Este exemplo completo usa um item demonstrativo já existente. Ao duplicá-lo, e
 | `name` | Nome exibido no card e no modal. |
 | `category` | Identificador de uma categoria cadastrada. |
 | `description` | Texto de apresentação do produto. |
-| `images` | Lista de objetos com caminho `src` e descrição alternativa `alt`. O catálogo e o modal exibem a primeira imagem. |
+| `images` | Lista de objetos com `src`, `alt` e rótulo opcional `label`. O card usa a primeira imagem; o modal exibe todas as imagens em uma galeria, na ordem da lista. |
 | `features` | Lista de textos com características confirmadas. Deixe vazia enquanto não houver informações verificadas. |
 | `demo` | `true` identifica um conceito; `false` remove o selo “Conceito” e o aviso de demonstração nos detalhes do item real. |
 | `marketplaces` | Links separados por produto e por plataforma. |
@@ -123,7 +124,7 @@ Não acrescente dimensões, materiais, resistência, quantidade de controles ou 
 
 ### Categorias e filtros
 
-As categorias atuais são `utilitarios`, `decoracao` e `geek`. O filtro `todos` reúne todos os itens.
+O catálogo atual usa `decoracao` (Boneco de Neve) e `geek` (Gatinho Cavaleiro). O filtro `todos` reúne os dois itens. O rótulo `utilitarios` continua disponível no JavaScript para produtos futuros; seu filtro foi retirado enquanto não houver itens dessa categoria.
 
 Para adicionar outra categoria:
 
@@ -133,11 +134,13 @@ Para adicionar outra categoria:
 
 ### Imagens e textos alternativos
 
-Coloque novas imagens em `assets/images/` e atualize o caminho na configuração. Use nomes simples, preferencialmente sem espaços, e preserve maiúsculas e minúsculas. Por exemplo, `./assets/images/organizer.svg` é um caminho relativo válido; `/assets/images/organizer.svg` começa na raiz do domínio e quebra a hospedagem em subdiretório.
+Coloque novas imagens em `assets/images/` e atualize o caminho na configuração. Use nomes simples, preferencialmente sem espaços, e preserve maiúsculas e minúsculas. Por exemplo, `./assets/images/gatinho-cavaleiro-capa.png` é um caminho relativo válido; `/assets/images/gatinho-cavaleiro-capa.png` começa na raiz do domínio e quebra a hospedagem em subdiretório.
 
 Use `alt` para descrever o objeto e o que a imagem mostra. Para fotos reais, substitua descrições como “ilustração” por uma descrição adequada da foto. WebP, JPG e PNG podem ser usados. Redimensione e comprima as imagens antes de adicioná-las para manter o carregamento leve.
 
 ## Atualizar o DECKRA
+
+As 13 imagens dos produtos estão em `assets/images/`, com os prefixos `gatinho-cavaleiro-` e `boneco-de-neve-`. São cópias dos arquivos fornecidos, com nomes organizados para publicação. A imagem repetida do gatinho não foi duplicada. Para alterar a capa, mova a imagem desejada para a primeira posição de `images`. Para incluir outra cor, medida ou vista, acrescente um objeto com `src`, `alt` e `label`. Não crie outro produto apenas para uma foto adicional.
 
 No mesmo arquivo, edite o objeto `deckra`. Mantenha `name: "DECKRA"`, atualize `description`, inclua apenas características confirmadas em `features` e configure os anúncios em `marketplaces`.
 
@@ -203,7 +206,7 @@ demoMode: false
 
 Nesse modo, links vazios ou inválidos não geram botões. O produto continua disponível para consulta e, se não houver nenhum link, os detalhes informam que os anúncios ainda não foram configurados. A seção DECKRA usa a mesma regra.
 
-`demoMode` controla a presença dos botões de demonstração. Ao cadastrar produtos reais, altere também `demo: false` em cada objeto correspondente. Revise os textos gerais de demonstração em `index.html` e `deckra.html` antes de apresentar a vitrine como catálogo comercial.
+`demoMode` controla apenas a presença dos botões de demonstração sem links. Os dois produtos atuais já têm `demo: false`; isso remove os selos e avisos de produto provisório mesmo com os botões de marketplaces em teste. Ao cadastrar outros produtos reais, use também `demo: false`. Revise os textos gerais de demonstração em `index.html` e `deckra.html` antes de apresentar a vitrine como catálogo comercial.
 
 Os botões identificam a plataforma e abrem os anúncios com `target="_blank"` e `rel="noopener noreferrer"`, preservando o site MORFY. O site usa **“Consultar preço na plataforma”**; preço, disponibilidade, frete e condições são definidos no marketplace.
 
@@ -225,7 +228,7 @@ A MORFY usa base escura, azul e a fonte Montserrat. O DECKRA usa base escura, ro
 
 As fontes estão hospedadas localmente. Preserve suas licenças ao distribuir o projeto: [Montserrat — SIL OFL](assets/fonts/Montserrat-OFL.txt) e [Sora — SIL OFL](assets/fonts/Sora-OFL.txt).
 
-O logo MORFY e o painel DECKRA vieram das referências fornecidas. As seis imagens do catálogo são ilustrações SVG de conceitos. A imagem principal `assets/images/morfy-hero.png` foi criada com a ferramenta integrada ImageGen; o registro do prompt está em `tools/hero-image-prompt.txt`. Para a vitrine comercial, use fotos dos produtos reais e atualize os respectivos textos e avisos.
+As logos oficiais MORFY, o painel DECKRA e as imagens dos dois produtos foram fornecidos pela marca. A abertura do catálogo usa a capa do Gatinho Cavaleiro. As seis ilustrações SVG dos produtos provisórios foram removidas. A antiga imagem conceitual `assets/images/morfy-hero.png` e o registro `tools/hero-image-prompt.txt` permanecem arquivados e não são exibidos no catálogo.
 
 ## Verificar alterações
 
