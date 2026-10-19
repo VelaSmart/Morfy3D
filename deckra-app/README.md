@@ -1,56 +1,33 @@
 # DECKRA App
 
-Aplicativo em planejamento para configurar e utilizar o controlador físico DECKRA, parte do universo MORFY.
+Aplicativo desktop para configurar o controlador físico DECKRA no Windows 10/11.
 
-> **Estado atual:** planejamento. Este repositório ainda não contém um firmware confirmado, protocolo serial definido ou instalador funcional. A interface conceitual do site não deve ser tratada como software já implementado.
+**Branch de desenvolvimento:** `deckra-app`  
+**Estado:** scaffold inicial; comunicação e UI em desenvolvimento.  
+**Hardware alvo:** Arduino Leonardo ou Arduino Micro.  
+**Transporte inicial:** USB Serial (CDC).
 
-## Objetivo
+## Arquitetura escolhida
 
-Criar um aplicativo para configurar o hardware DECKRA conectado a um computador e, em uma fase posterior, disponibilizar o firmware para a placa Arduino escolhida.
+- **Desktop:** Tauri 2 + React + TypeScript + Vite.
+- **Comunicação serial:** módulo Rust no backend Tauri, usando uma biblioteca serialport, sem acesso serial direto no frontend.
+- **Firmware:** C/C++ para Arduino Leonardo/Micro, com eventos serializados em JSON Lines durante o protótipo.
+- **Testes:** parser de protocolo com testes unitários e um modo de demonstração sem hardware.
 
-O site público de apresentação é [DECKRA](https://velasmart.github.io/Morfy3D/deckra.html). O aplicativo será desenvolvido nesta branch de forma independente da vitrine comercial.
+Leonardo e Micro usam ATmega32U4 e podem oferecer USB nativo, mas a primeira versão usará a interface USB Serial para manter a comunicação simples. Não assumir que a porta COM terá o mesmo número em todos os PCs.
 
-## Funcionalidades previstas
+## Funcionalidades do primeiro protótipo
 
-- Detectar e selecionar a porta de comunicação do dispositivo.
-- Exibir o estado da conexão e orientar a recuperação quando desconectado.
-- Descobrir e configurar os controles físicos depois que o hardware for definido.
-- Mapear potenciômetros para funções, incluindo volume por aplicativo quando o sistema operacional e a integração escolhida permitirem.
-- Atribuir teclas a ações ou atalhos configuráveis.
-- Salvar e carregar perfis de configuração.
-- Atualizar firmware somente depois de definir a placa, o processo seguro de atualização e os mecanismos de recuperação.
-- Fornecer diagnóstico básico e registros úteis para suporte.
+1. Mostrar o estado da conexão serial.
+2. Permitir selecionar uma porta COM e conectar/desconectar.
+3. Receber identificação e eventos dos potenciômetros e botões.
+4. Mostrar valores recebidos para diagnóstico.
+5. Enviar comandos limitados para controlar LEDs RGB.
+6. Simular dados sem hardware para desenvolver a interface.
 
-Esses itens são metas, não funcionalidades já implementadas.
+Perfis persistentes, mapeamento de atalhos globais, volume por aplicativo e atualização de firmware serão etapas posteriores. Controle de volume por aplicativo exige integração própria com o Windows; não é garantido pelo Arduino nem pelo protocolo serial isoladamente.
 
-## Arquitetura proposta
-
-Separar o projeto em três partes:
-
-1. **Aplicativo desktop:** interface de configuração, perfis, estado da conexão e integração com o sistema operacional.
-2. **Protocolo do dispositivo:** mensagens versionadas para handshake, identificação, leitura de controles e gravação de configuração.
-3. **Firmware:** leitura dos controles e envio de eventos, executado no microcontrolador escolhido.
-
-Começar com limites bem definidos entre a interface e a comunicação USB/serial facilita trocar a placa ou o transporte sem reescrever a interface inteira.
-
-### Stack a validar
-
-Ainda não há stack fixada. Uma opção inicial é **Tauri + TypeScript** para a interface desktop e um módulo de comunicação serial apropriado ao sistema operacional. O firmware poderá ser feito em C/C++ no Arduino IDE ou PlatformIO, conforme a placa selecionada. Validar as dependências e as permissões do sistema operacional antes de tomar a decisão definitiva.
-
-## Protocolo de comunicação: requisitos iniciais
-
-O formato final deve ser documentado e versionado antes da implementação. No mínimo, precisa considerar:
-
-- Identificação do dispositivo e versão do protocolo.
-- Mensagem de inicialização/handshake e resposta de capacidades.
-- Eventos de controles identificados por ID estável.
-- Comandos de configuração e confirmação de sucesso/erro.
-- Limites de tamanho, validação das mensagens e tratamento de dados incompletos.
-- Reconexão, timeout e comportamento seguro após perda de conexão.
-
-Não assumir ainda IDs, quantidade de botões/potenciômetros, baud rate ou formato definitivo das mensagens.
-
-## Estrutura sugerida
+## Estrutura
 
 ```text
 deckra-app/
@@ -59,40 +36,35 @@ deckra-app/
 │   ├── PRODUCT_SCOPE.md
 │   ├── HARDWARE_DECISIONS.md
 │   └── PROTOCOL.md
-├── app/                 # interface desktop (a definir)
-├── firmware/            # firmware do microcontrolador (a definir)
-└── tests/               # testes de protocolo e lógica
+├── app/                 # Tauri + React + TypeScript
+├── firmware/
+│   └── deckra_controller/
+└── tests/
 ```
 
-## Decisões necessárias antes de implementar
+## Rodar o frontend
 
-1. **Placa exata:** modelo de Arduino/microcontrolador e tensão lógica.
-2. **Controles físicos:** quantos potenciômetros, botões, encoders, LEDs ou outros componentes.
-3. **Conexão com o PC:** USB serial, USB HID nativo ou outra opção. Nem toda placa Arduino oferece HID nativo sem bibliotecas ou firmware específicos.
-4. **Sistemas operacionais:** Windows primeiro ou suporte desde o início a Windows, Linux e macOS.
-5. **Volume por aplicativo:** escolher a integração com o sistema operacional, pois enviar um comando genérico pelo Arduino não garante controle de volume de um aplicativo específico.
-6. **Ações de teclas:** definir se serão teclas HID, atalhos, macros ou ações tratadas pelo aplicativo.
-7. **Distribuição:** assinatura, instalador, atualização e canal para downloads.
+Requisitos: Node.js LTS, npm, Rust toolchain e dependências de compilação do Tauri para Windows.
 
-## Segurança e confiabilidade
+```powershell
+cd deckra-app/app
+npm install
+npm run dev
+```
 
-- Nunca aplicar tensão desconhecida aos pinos da placa; validar datasheet e esquema elétrico do hardware real.
-- Validar todas as mensagens recebidas antes de alterar a configuração.
+Para iniciar o shell desktop, após instalar os pré-requisitos do Tauri:
+
+```powershell
+npm run tauri dev
+```
+
+O acesso à porta serial é planejado para o backend Rust. O scaffold da interface não representa ainda uma conexão serial validada em hardware.
+
+## Segurança elétrica e operacional
+
+- Verificar o esquema elétrico real antes de conectar potenciômetros e LEDs.
+- Usar resistores limitadores de corrente nos LEDs RGB; confirmar se são anodo comum ou catodo comum.
+- Conectar potenciômetros aos pinos analógicos apenas depois de confirmar o circuito e os limites de tensão.
+- Não alimentar LEDs de alta corrente diretamente pelos pinos do microcontrolador.
+- Validar todos os dados serializados antes de executar ações.
 - Não executar comandos arbitrários recebidos pela porta serial.
-- Separar a configuração da interface dos dados recebidos do hardware.
-- Criar testes de reconexão, mensagens inválidas, desconexão durante gravação e perfis corrompidos.
-- Manter firmware e aplicativo versionados e compatíveis de forma explícita.
-
-## Próximas etapas sugeridas
-
-1. Confirmar a placa Arduino e o esquema elétrico.
-2. Inventariar os controles e definir quais eventos precisam ser enviados ao PC.
-3. Fazer uma prova de conceito mínima de conexão, identificação e leitura.
-4. Especificar e testar o protocolo versionado.
-5. Criar a primeira tela do aplicativo e a persistência de perfis.
-6. Implementar as integrações de atalhos e volume por aplicativo.
-7. Empacotar e testar o instalador antes de publicar um link no site.
-
-## Relação com o site MORFY
-
-O site em `main` continua sendo a vitrine comercial. Esta branch é destinada ao futuro aplicativo e à documentação técnica. O botão de download em `deckra.html` deve permanecer indisponível até existir um pacote real, testado e publicado.
