@@ -33,6 +33,8 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
       - name: Generate launcher icons from official MORFY logo
         run: |
@@ -40,22 +42,21 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           from urllib.request import urlopen
-          from PIL import Image, ImageOps, ImageDraw
+          from PIL import Image, ImageOps
           import io
           url = "https://raw.githubusercontent.com/VelaSmart/Morfy3D/main/assets/images/morfy-official-logo-transparent.png"
           source = Image.open(io.BytesIO(urlopen(url, timeout=30).read())).convert("RGBA")
-          # Crop transparent margins, preserve the official artwork and fit it on the brand's dark tile.
-          alpha = source.getchannel("A")
-          bbox = alpha.getbbox()
-          if bbox: source = source.crop(bbox)
+          bbox = source.getchannel("A").getbbox()
+          if bbox:
+              source = source.crop(bbox)
           sizes = {"mdpi":48,"hdpi":72,"xhdpi":96,"xxhdpi":144,"xxxhdpi":192}
           for density, size in sizes.items():
-              canvas = Image.new("RGBA",(size,size),(11,15,20,255))
-              artwork = ImageOps.contain(source,(int(size*.82),int(size*.82)),Image.Resampling.LANCZOS)
-              canvas.alpha_composite(artwork,((size-artwork.width)//2,(size-artwork.height)//2))
-              out = Path("app/src/main/res/mipmap-"+density)
-              out.mkdir(parents=True,exist_ok=True)
-              canvas.save(out/"ic_launcher.png", optimize=True)
+              canvas = Image.new("RGBA", (size, size), (11, 15, 20, 255))
+              artwork = ImageOps.contain(source, (int(size * .82), int(size * .82)), Image.Resampling.LANCZOS)
+              canvas.alpha_composite(artwork, ((size-artwork.width)//2, (size-artwork.height)//2))
+              out = Path("app/src/main/res/mipmap-" + density)
+              out.mkdir(parents=True, exist_ok=True)
+              canvas.save(out / "ic_launcher.png", optimize=True)
           PY
 
       - name: Build debug APK
