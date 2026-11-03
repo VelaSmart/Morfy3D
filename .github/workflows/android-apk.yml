@@ -1,0 +1,70 @@
+name: Build MORFY 3D APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "app/**"
+      - "*.gradle.kts"
+      - "gradle.properties"
+      - ".github/workflows/android-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Generate launcher icons from official MORFY logo
+        run: |
+          python3 -m pip install --user pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.request import urlopen
+          from PIL import Image, ImageOps, ImageDraw
+          import io
+          url = "https://raw.githubusercontent.com/VelaSmart/Morfy3D/main/assets/images/morfy-official-logo-transparent.png"
+          source = Image.open(io.BytesIO(urlopen(url, timeout=30).read())).convert("RGBA")
+          # Crop transparent margins, preserve the official artwork and fit it on the brand's dark tile.
+          alpha = source.getchannel("A")
+          bbox = alpha.getbbox()
+          if bbox: source = source.crop(bbox)
+          sizes = {"mdpi":48,"hdpi":72,"xhdpi":96,"xxhdpi":144,"xxxhdpi":192}
+          for density, size in sizes.items():
+              canvas = Image.new("RGBA",(size,size),(11,15,20,255))
+              artwork = ImageOps.contain(source,(int(size*.82),int(size*.82)),Image.Resampling.LANCZOS)
+              canvas.alpha_composite(artwork,((size-artwork.width)//2,(size-artwork.height)//2))
+              out = Path("app/src/main/res/mipmap-"+density)
+              out.mkdir(parents=True,exist_ok=True)
+              canvas.save(out/"ic_launcher.png", optimize=True)
+          PY
+
+      - name: Build debug APK
+        run: gradle --no-daemon --stacktrace assembleDebug
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MORFY-3D-Android-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
