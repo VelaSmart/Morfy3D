@@ -15,6 +15,28 @@ window.MORFY_CONFIG = {
   ],
   products: [
     {
+      id: "eevee-evolucoes",
+      name: "Eevee e suas evoluções",
+      category: "geek",
+      description: "Coleção de miniaturas Pokémon em impressão 3D. Escolha entre Eevee, Flareon, Jolteon e Umbreon, com aproximadamente 10 a 12 cm.",
+      images: [
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820md-muy7kiypfzsz68", alt: "Apresentação da coleção Eeveevolutions com quatro miniaturas em uma floresta", label: "Apresentação" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820l8-muy7pthj2yv484", alt: "Miniatura Eevee amarela com colar de pelos branco", label: "Eevee" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lk-muy7pthj5s0092", alt: "Miniatura Flareon laranja com crista amarela", label: "Flareon" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820mg-muy7pthj8l4wb2", alt: "Miniatura Jolteon amarela com gola branca", label: "Jolteon" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lj-muy7pthjbe9s2b", alt: "Miniatura Umbreon preta com detalhes amarelos e olhos vermelhos", label: "Umbreon" }
+      ],
+      features: [
+        "Miniaturas decorativas em impressão 3D.",
+        "Modelos disponíveis: Eevee, Flareon, Jolteon e Umbreon.",
+        "Altura aproximada de 10 a 12 cm, conforme o anúncio.",
+        "Consulte na Shopee a variação desejada, preço e disponibilidade."
+      ],
+      demo: false,
+      marketplaces: { shopee: "https://shopee.com.br/Miniatura-Pok%C3%A9mon-Eevee-Flareon-Jolteon-Umbreon-10-a-12-cm-Impress%C3%A3o-3D-i.1934551108.58221929934?extraParams=%7B%22display_model_id%22%3A219628939954%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820md-muy7kiypfzsz68", mercadoLivre: "", tiktokShop: "" }
+    },
+
+    {
       id: "gatinho-cavaleiro",
       name: "Gatinho Cavaleiro",
       category: "geek",
