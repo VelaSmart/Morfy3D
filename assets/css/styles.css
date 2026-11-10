@@ -138,3 +138,13 @@
 .deckra-page .maker-note{margin-top:16px;padding:10px 14px;border-left:2px solid #8c78ff;background:#8c78ff0d;color:#c6badb;font-size:11px;line-height:1.75;max-width:580px}
 .deckra-page .maker-note-software{margin-top:18px}
 .deckra-page .maker-note-purchase{max-width:none;margin:0 0 20px}
+
+
+/* Navegação discreta das fotos diretamente nos cartões do catálogo. */
+.product-visual .product-image-controls{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 9px;pointer-events:none;opacity:.72;transition:opacity .18s ease}
+.product-card:hover .product-image-controls,.product-visual:focus-within .product-image-controls{opacity:1}
+.product-image-arrow{pointer-events:auto;display:grid;place-items:center;width:29px;height:29px;padding:0;border:1px solid #ffffff8c;border-radius:50%;background:#10151c66;color:#fff;font-size:23px;line-height:1;box-shadow:0 1px 8px #0003;backdrop-filter:blur(4px);cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.product-image-arrow:hover,.product-image-arrow:focus-visible{background:#172a47d9;border-color:#b9d4ff;transform:scale(1.06);outline:none}
+.product-image-position{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);padding:3px 7px;border:1px solid #ffffff66;border-radius:20px;background:#10151c70;color:#fff;font-size:9px;line-height:1.2;letter-spacing:.04em;pointer-events:none;backdrop-filter:blur(4px)}
+@media(hover:none){.product-visual .product-image-controls{opacity:.82}}
+@media(prefers-reduced-motion:reduce){.product-visual .product-image-controls,.product-image-arrow{transition:none}}
