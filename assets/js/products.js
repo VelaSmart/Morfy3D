@@ -172,6 +172,23 @@ window.MORFY_CONFIG = {
       marketplaces: { shopee: "https://shopee.com.br/Enfeite-Canto-de-Porta-de-Natal-Placa-Decorativa-Natalina-para-Batente-e-Moldura-de-Porta-Decora%C3%A7%C3%A3o-de-Natal-i.1934551108.58272582107?extraParams=%7B%22display_model_id%22%3A219629304462%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820lw-mvatmngdeyo1dc", mercadoLivre: "", tiktokShop: "" }
     }
   ],
+    {
+      id: "action-figures-dragon-ball",
+      name: "Action Figures Dragon Ball",
+      category: "geek",
+      description: "Figuras colecionáveis de Dragon Ball com personagens variados, em tamanhos de aproximadamente 20 a 25 cm. Escolha seu personagem favorito entre as opções do anúncio.",
+      images: [
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820la-mvc9yrc289hc23", alt: "Action figure colecionável de Dragon Ball, imagem principal do anúncio da Shopee", label: "Apresentação" }
+      ],
+      features: [
+        "Action figures inspiradas no universo Dragon Ball.",
+        "Tamanho anunciado: aproximadamente 20 a 25 cm.",
+        "Vários personagens colecionáveis, conforme as variações disponíveis no anúncio.",
+        "Confira na Shopee o personagem, dimensões, material, preço e disponibilidade."
+      ],
+      demo: false,
+      marketplaces: { shopee: "https://shopee.com.br/Action-Figures-Dragon-Ball-20-25cm-%E2%80%94-V%C3%A1rios-Personagens-Colecion%C3%A1veis-i.1934551108.58222630052?extraParams=%7B%22display_model_id%22%3A189196906743%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820la-mvc9yrc289hc23", mercadoLivre: "", tiktokShop: "" }
+    },
   deckra: {
     name: "DECKRA",
     softwareDownloadUrl: "",
