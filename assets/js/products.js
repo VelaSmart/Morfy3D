@@ -161,7 +161,9 @@ window.MORFY_CONFIG = {
       category: "decoracao",
       description: "Placa decorativa natalina para batente e moldura de porta. Consulte as imagens do anúncio para conferir o formato, as medidas e as opções disponíveis.",
       images: [
-        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lw-mvatmngdeyo1dc", alt: "Enfeite natalino para canto de porta, conforme imagem do anúncio da Shopee", label: "Imagem do anúncio" }
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lw-mvatmngdeyo1dc", alt: "Enfeite natalino de canto de porta com árvore de Natal, presentes e meia", label: "Árvore e presentes" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lb-mvatmngdgd8h80", alt: "Enfeite natalino para canto superior de porta com árvore, presentes e meia vermelha", label: "Modelo árvore" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lq-mvatmngdhrsx17", alt: "Enfeite natalino para canto de porta com trenó, meia e presentes", label: "Modelo trenó" }
       ],
       features: [
         "Enfeite decorativo com tema natalino.",
