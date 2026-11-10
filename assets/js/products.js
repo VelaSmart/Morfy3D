@@ -154,9 +154,8 @@ window.MORFY_CONFIG = {
         "mercadoLivre": "",
         "tiktokShop": ""
       }
-    }
-  ],
-    ,{
+    },
+    {
       id: "enfeite-canto-porta-natal",
       name: "Enfeite Canto de Porta de Natal",
       category: "decoracao",
@@ -171,8 +170,8 @@ window.MORFY_CONFIG = {
       ],
       demo: false,
       marketplaces: { shopee: "https://shopee.com.br/Enfeite-Canto-de-Porta-de-Natal-Placa-Decorativa-Natalina-para-Batente-e-Moldura-de-Porta-Decora%C3%A7%C3%A3o-de-Natal-i.1934551108.58272582107?extraParams=%7B%22display_model_id%22%3A219629304462%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820lw-mvatmngdeyo1dc", mercadoLivre: "", tiktokShop: "" }
-    },
-
+    }
+  ],
   deckra: {
     name: "DECKRA",
     softwareDownloadUrl: "",
