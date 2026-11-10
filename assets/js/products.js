@@ -156,6 +156,23 @@ window.MORFY_CONFIG = {
       }
     }
   ],
+    ,{
+      id: "enfeite-canto-porta-natal",
+      name: "Enfeite Canto de Porta de Natal",
+      category: "decoracao",
+      description: "Placa decorativa natalina para batente e moldura de porta. Consulte as imagens do anúncio para conferir o formato, as medidas e as opções disponíveis.",
+      images: [
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lw-mvatmngdeyo1dc", alt: "Enfeite natalino para canto de porta, conforme imagem do anúncio da Shopee", label: "Imagem do anúncio" }
+      ],
+      features: [
+        "Enfeite decorativo com tema natalino.",
+        "Indicado para decorar o canto, batente ou moldura de porta, conforme o anúncio.",
+        "Confira na Shopee as dimensões, material, variações, preço e disponibilidade."
+      ],
+      demo: false,
+      marketplaces: { shopee: "https://shopee.com.br/Enfeite-Canto-de-Porta-de-Natal-Placa-Decorativa-Natalina-para-Batente-e-Moldura-de-Porta-Decora%C3%A7%C3%A3o-de-Natal-i.1934551108.58272582107?extraParams=%7B%22display_model_id%22%3A219629304462%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820lw-mvatmngdeyo1dc", mercadoLivre: "", tiktokShop: "" }
+    },
+
   deckra: {
     name: "DECKRA",
     softwareDownloadUrl: "",
