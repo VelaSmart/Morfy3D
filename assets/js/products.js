@@ -65,7 +65,7 @@ window.MORFY_CONFIG = {
       category: "decoracao",
       description: "Um toque de Natal para a sua decoração. Boneco de neve em impressão 3D com textura em relevo, gorro e cachecol vermelhos, em versões de 6 e 10 cm.",
       images: [
-        { src: "./assets/images/boneco-de-neve-capa.png", alt: "Apresentação natalina do Boneco de Neve com gorro e cachecol vermelhos e detalhes da textura em relevo", label: "Apresentação" },
+        { src: "./assets/images/boneco-de-neve-capa.jpg", alt: "Apresentação natalina do Boneco de Neve com gorro e cachecol vermelhos e detalhes da textura em relevo", label: "Apresentação" },
         { src: "./assets/images/boneco-de-neve-detalhe.png", alt: "Boneco de Neve visto de frente e de lado, com corpo branco, nariz laranja e detalhes pretos", label: "Detalhes" },
         { src: "./assets/images/boneco-de-neve-lateral.png", alt: "Vista lateral direita do Boneco de Neve com textura em relevo e cachecol vermelho", label: "Lateral direita" },
         { src: "./assets/images/boneco-de-neve-outro-angulo.png", alt: "Vista lateral esquerda do Boneco de Neve mostrando o gorro, o nariz e os botões", label: "Lateral esquerda" },
