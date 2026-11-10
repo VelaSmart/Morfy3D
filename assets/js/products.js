@@ -194,7 +194,11 @@ window.MORFY_CONFIG = {
       category: "utilitarios",
       description: "Organizador adesivo de parede para pendurar toalhas, bolsas, mochilas e acessórios. Uma solução prática para aproveitar melhor os espaços.",
       images: [
-        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lc-mv4rqt6g2iv5cd", alt: "Gancho de parede adesivo decorativo, imagem principal do anúncio da Shopee", label: "Apresentação" }
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lc-mv4rqt6g2iv5cd", alt: "Gancho marrom instalado na parede segurando a alça de uma bolsa", label: "Marrom" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820m4-mv4rqt6g5c0132", alt: "Gancho marrom com bolsa pendurada, vista aproximada", label: "Detalhe marrom" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820m6-mv4rqt6g6qkhc7", alt: "Gancho rosa instalado na parede segurando uma bolsa", label: "Rosa" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820l4-mv4rqt6g854x85", alt: "Gancho branco instalado na parede segurando uma bolsa", label: "Branco" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lr-mv4rqt6g9jpd49", alt: "Gancho branco com bolsa pendurada, vista alternativa", label: "Detalhe branco" }
       ],
       features: [
         "Gancho adesivo para organização e decoração.",
