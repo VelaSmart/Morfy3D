@@ -243,6 +243,8 @@
       var visual = createElement("div", "product-visual");
       var firstImage = product.images && product.images[0];
       if (firstImage) {
+        var cardImages = Array.isArray(product.images) ? product.images : [];
+        var imageIndex = 0;
         var image = createElement("img");
         image.src = firstImage.src;
         image.alt = firstImage.alt || product.name;
@@ -251,6 +253,52 @@
         image.width = 600;
         image.height = 480;
         visual.appendChild(image);
+
+        if (cardImages.length > 1) {
+          var imageControls = createElement("div", "product-image-controls");
+          imageControls.setAttribute("role", "group");
+          imageControls.setAttribute("aria-label", "Fotos de " + product.name);
+          var previous = createElement("button", "product-image-arrow product-image-previous", "‹");
+          var next = createElement("button", "product-image-arrow product-image-next", "›");
+          var imagePosition = createElement("span", "product-image-position", "1 / " + cardImages.length);
+          [previous, next].forEach(function (control) {
+            control.type = "button";
+            control.tabIndex = 0;
+          });
+          previous.setAttribute("aria-label", "Foto anterior de " + product.name);
+          next.setAttribute("aria-label", "Próxima foto de " + product.name);
+
+          function showCardImage(nextIndex) {
+            imageIndex = (nextIndex + cardImages.length) % cardImages.length;
+            var selected = cardImages[imageIndex];
+            image.src = selected.src;
+            image.alt = selected.alt || product.name;
+            imagePosition.textContent = (imageIndex + 1) + " / " + cardImages.length;
+          }
+          previous.addEventListener("click", function (event) {
+            event.stopPropagation();
+            showCardImage(imageIndex - 1);
+          });
+          next.addEventListener("click", function (event) {
+            event.stopPropagation();
+            showCardImage(imageIndex + 1);
+          });
+          imageControls.appendChild(previous);
+          imageControls.appendChild(imagePosition);
+          imageControls.appendChild(next);
+          visual.appendChild(imageControls);
+
+          var touchStartX = null;
+          visual.addEventListener("touchstart", function (event) {
+            if (event.touches.length === 1) touchStartX = event.touches[0].clientX;
+          }, { passive: true });
+          visual.addEventListener("touchend", function (event) {
+            if (touchStartX === null || !event.changedTouches.length) return;
+            var delta = event.changedTouches[0].clientX - touchStartX;
+            if (Math.abs(delta) > 45) showCardImage(imageIndex + (delta < 0 ? 1 : -1));
+            touchStartX = null;
+          }, { passive: true });
+        }
       }
       if (product.demo) visual.appendChild(createElement("span", "product-tag", "Conceito"));
       var body = createElement("div", "product-body");
