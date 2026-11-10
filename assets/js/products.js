@@ -179,6 +179,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Figuras colecionáveis de Dragon Ball com personagens variados, em tamanhos de aproximadamente 20 a 25 cm. Escolha seu personagem favorito entre as opções do anúncio.",
       images: [
+        { src: "./assets/images/action-figures-dragon-ball-capa.jpg", alt: "Goku Super Saiyajin 3 e Black Freeza lado a lado", label: "Capa" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820la-mvc9yrc289hc23", alt: "Apresentação das action figures de Dragon Ball", label: "Apresentação" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820m1-mvc9yrbxb94ya0@resize_w450_nl.webp", alt: "Action figure de personagem Dragon Ball com cabelo dourado e roupa laranja", label: "Personagem 1" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820mh-mvc9yrbxcnpe11.webp", alt: "Action figure de personagem Dragon Ball com armadura preta e detalhes roxos", label: "Personagem 2" }
