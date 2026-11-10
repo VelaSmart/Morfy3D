@@ -188,6 +188,22 @@ window.MORFY_CONFIG = {
       demo: false,
       marketplaces: { shopee: "https://shopee.com.br/Action-Figures-Dragon-Ball-20-25cm-%E2%80%94-V%C3%A1rios-Personagens-Colecion%C3%A1veis-i.1934551108.58222630052?extraParams=%7B%22display_model_id%22%3A189196906743%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820la-mvc9yrc289hc23", mercadoLivre: "", tiktokShop: "" }
     }
+    ,{
+      id: "gancho-parede-adesivo",
+      name: "Gancho de Parede Adesivo",
+      category: "utilitarios",
+      description: "Organizador adesivo de parede para pendurar toalhas, bolsas, mochilas e acessórios. Uma solução prática para aproveitar melhor os espaços.",
+      images: [
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lc-mv4rqt6g2iv5cd", alt: "Gancho de parede adesivo decorativo, imagem principal do anúncio da Shopee", label: "Apresentação" }
+      ],
+      features: [
+        "Gancho adesivo para organização e decoração.",
+        "Indicado para toalhas, bolsas, mochilas e acessórios, conforme o anúncio.",
+        "Confira na Shopee o material, capacidade de carga, dimensões e superfícies compatíveis antes da instalação."
+      ],
+      demo: false,
+      marketplaces: { shopee: "https://shopee.com.br/Gancho-de-Parede-Adesivo-Decorativo-Resistente-Organizador-para-Toalhas-Bolsas-Mochilas-e-Acess%C3%B3rios-i.1934551108.58222257842?extraParams=%7B%22display_model_id%22%3A239453531704%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820lc-mv4rqt6g2iv5cd", mercadoLivre: "", tiktokShop: "" }
+    }
   ],
   deckra: {
     name: "DECKRA",
