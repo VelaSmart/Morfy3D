@@ -6,3 +6,4 @@
 *.ttf binary
 *.woff binary
 *.woff2 binary
+*.exe binary
