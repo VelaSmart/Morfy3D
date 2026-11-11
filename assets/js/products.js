@@ -42,7 +42,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Um pequeno herói cheio de personalidade. Escultura em impressão 3D com armadura, espada e capa rosa, nas versões branca e laranja.",
       images: [
-        { src: "./assets/images/catalogo-gatinho.jpg", alt: "Gatinho Cavaleiro laranja com espada e capa rosa em cenário de jardim", label: "Apresentação" },
+        { src: "./assets/images/catalogo-gatinho.jpg?v=2", alt: "Gatinho Cavaleiro laranja com espada e capa rosa em cenário de jardim", label: "Apresentação" },
         { src: "./assets/images/gatinho-cavaleiro-laranja.png", alt: "Vista frontal do Gatinho Cavaleiro laranja, com armadura cinza, espada e laço rosa", label: "Laranja" },
         { src: "./assets/images/gatinho-cavaleiro-branco.png", alt: "Vista frontal do Gatinho Cavaleiro branco, com armadura cinza, espada e laço rosa", label: "Branco" },
         { src: "./assets/images/gatinho-cavaleiro-lateral.png", alt: "Vista lateral do Gatinho Cavaleiro laranja mostrando a armadura e a capa rosa", label: "Lateral" },
