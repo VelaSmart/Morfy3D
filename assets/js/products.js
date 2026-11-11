@@ -42,7 +42,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Um pequeno herói cheio de personalidade. Escultura em impressão 3D com armadura, espada e capa rosa, nas versões branca e laranja.",
       images: [
-        { src: "./assets/images/gatinho-cavaleiro-capa.png", alt: "Gatinho Cavaleiro laranja com espada e capa rosa em cenário de jardim", label: "Apresentação" },
+        { src: "./assets/images/catalogo-gatinho.jpg", alt: "Gatinho Cavaleiro laranja com espada e capa rosa em cenário de jardim", label: "Apresentação" },
         { src: "./assets/images/gatinho-cavaleiro-laranja.png", alt: "Vista frontal do Gatinho Cavaleiro laranja, com armadura cinza, espada e laço rosa", label: "Laranja" },
         { src: "./assets/images/gatinho-cavaleiro-branco.png", alt: "Vista frontal do Gatinho Cavaleiro branco, com armadura cinza, espada e laço rosa", label: "Branco" },
         { src: "./assets/images/gatinho-cavaleiro-lateral.png", alt: "Vista lateral do Gatinho Cavaleiro laranja mostrando a armadura e a capa rosa", label: "Lateral" },
@@ -87,7 +87,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Um detalhe pixelado para levar com você. Chaveiro em impressão 3D com visual de bloco TNT, cores vermelha, branca e preta e argola metálica.",
       images: [
-        {"src":"./assets/images/chaveiro-tnt-shopee-01.jpg","alt":"Arte do anúncio com o Chaveiro TNT, argola metálica, diferentes ângulos e detalhes da peça","label":"Apresentação"},
+        {"src": "./assets/images/catalogo-chaveiro-tnt.jpg","alt":"Arte do anúncio com o Chaveiro TNT, argola metálica, diferentes ângulos e detalhes da peça","label":"Apresentação"},
         {"src":"./assets/images/chaveiro-tnt-shopee-02.jpg","alt":"Chaveiro TNT na palma da mão, com corrente e argola metálica, em foto do anúncio","label":"Foto real · na mão"},
         {"src":"./assets/images/chaveiro-tnt-shopee-03.jpg","alt":"Chaveiro TNT sobre uma mesa branca com corrente e argola metálica","label":"Foto real · com argola"},
         {"src":"./assets/images/chaveiro-tnt-shopee-04.jpg","alt":"Bloco TNT segurado entre os dedos, mostrando os detalhes pixelados em relevo","label":"Foto real · detalhes"},
@@ -161,7 +161,7 @@ window.MORFY_CONFIG = {
       category: "decoracao",
       description: "Placa decorativa natalina para batente e moldura de porta. Consulte as imagens do anúncio para conferir o formato, as medidas e as opções disponíveis.",
       images: [
-        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lw-mvatmngdeyo1dc", alt: "Enfeite natalino de canto de porta com árvore de Natal, presentes e meia", label: "Árvore e presentes" },
+        { src: "./assets/images/catalogo-natal-porta.jpg", alt: "Enfeite natalino de canto de porta com árvore de Natal, presentes e meia", label: "Árvore e presentes" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820lb-mvatmngdgd8h80", alt: "Enfeite natalino para canto superior de porta com árvore, presentes e meia vermelha", label: "Modelo árvore" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820lq-mvatmngdhrsx17", alt: "Enfeite natalino para canto de porta com trenó, meia e presentes", label: "Modelo trenó" }
       ],
@@ -179,7 +179,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Figuras colecionáveis de Dragon Ball com personagens variados, em tamanhos de aproximadamente 20 a 25 cm. Escolha seu personagem favorito entre as opções do anúncio.",
       images: [
-        { src: "./assets/images/action-figures-dragon-ball-capa.jpg", alt: "Goku Super Saiyajin 3 e Black Freeza lado a lado", label: "Capa" },
+        { src: "./assets/images/catalogo-black-freeza.jpg", alt: "Goku Super Saiyajin 3 e Black Freeza lado a lado", label: "Capa" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820la-mvc9yrc289hc23", alt: "Apresentação das action figures de Dragon Ball", label: "Apresentação" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820m1-mvc9yrbxb94ya0@resize_w450_nl.webp", alt: "Action figure de personagem Dragon Ball com cabelo dourado e roupa laranja", label: "Personagem 1" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820mh-mvc9yrbxcnpe11.webp", alt: "Action figure de personagem Dragon Ball com armadura preta e detalhes roxos", label: "Personagem 2" }
@@ -199,7 +199,7 @@ window.MORFY_CONFIG = {
       category: "utilitarios",
       description: "Organizador adesivo de parede para pendurar toalhas, bolsas, mochilas e acessórios. Uma solução prática para aproveitar melhor os espaços.",
       images: [
-        { src: "https://down-br.img.susercontent.com/file/br-11134207-820lc-mv4rqt6g2iv5cd", alt: "Gancho marrom instalado na parede segurando a alça de uma bolsa", label: "Marrom" },
+        { src: "./assets/images/catalogo-ganchos.jpg", alt: "Gancho marrom instalado na parede segurando a alça de uma bolsa", label: "Marrom" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820m4-mv4rqt6g5c0132", alt: "Gancho marrom com bolsa pendurada, vista aproximada", label: "Detalhe marrom" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820m6-mv4rqt6g6qkhc7", alt: "Gancho rosa instalado na parede segurando uma bolsa", label: "Rosa" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820l4-mv4rqt6g854x85", alt: "Gancho branco instalado na parede segurando uma bolsa", label: "Branco" },
