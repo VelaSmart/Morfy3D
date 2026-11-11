@@ -320,6 +320,32 @@
       return article;
     }
 
+    function updateCatalogScroll() {
+      if (!grid) return;
+      var cards = Array.prototype.slice.call(grid.children);
+      if (cards.length <= 6) {
+        grid.style.maxHeight = "none";
+        grid.style.overflowY = "visible";
+        grid.classList.remove("catalog-scroll");
+        return;
+      }
+      grid.classList.add("catalog-scroll");
+      grid.style.maxHeight = "none";
+      grid.style.overflowY = "auto";
+      var gridTop = grid.getBoundingClientRect().top;
+      var rowTops = [];
+      cards.forEach(function (card) {
+        var top = Math.round(card.getBoundingClientRect().top - gridTop);
+        if (rowTops.indexOf(top) === -1) rowTops.push(top);
+      });
+      rowTops.sort(function (a, b) { return a - b; });
+      if (rowTops.length > 2) {
+        var styles = window.getComputedStyle(grid);
+        var gap = parseFloat(styles.rowGap || styles.gap) || 0;
+        grid.style.maxHeight = Math.max(240, rowTops[2] - gap) + "px";
+      }
+    }
+
     function renderProducts() {
       if (!grid) return;
       var query = normalize(search ? search.value : "");
@@ -329,7 +355,10 @@
         return categoryMatch && (!query || searchable.indexOf(query) !== -1);
       });
       grid.replaceChildren();
+      grid.style.maxHeight = "none";
+      grid.style.overflowY = "visible";
       visible.forEach(function (product) { grid.appendChild(productCard(product)); });
+      updateCatalogScroll();
       if (count) count.textContent = visible.length + (visible.length === 1 ? " produto" : " produtos");
       if (emptyState) emptyState.hidden = visible.length !== 0;
       filterButtons.forEach(function (button) {
@@ -356,6 +385,7 @@
       renderProducts();
     });
     renderProducts();
+    window.addEventListener("resize", updateCatalogScroll);
 
     if (dialog) {
       dialog.querySelectorAll("[data-close-dialog]").forEach(function (button) {
