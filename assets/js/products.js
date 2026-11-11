@@ -21,6 +21,7 @@ window.MORFY_CONFIG = {
       description: "Coleção de miniaturas Pokémon em impressão 3D. Escolha entre Eevee, Flareon, Jolteon e Umbreon, com aproximadamente 10 a 12 cm.",
       images: [
         { src: "./assets/images/Gemini_Generated_Image_hs4xxohs4xxohs4x.jpg", alt: "Apresentação da coleção Eeveevolutions com quatro miniaturas em uma floresta", label: "Apresentação" },
+        { src: "./assets/images/c111d909-fc02-44e2-a972-8a2886706b8f.jpg", alt: "Miniatura rosa de Espeon com joia vermelha na testa", label: "Espeon" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820l8-muy7pthj2yv484", alt: "Miniatura Eevee amarela com colar de pelos branco", label: "Eevee" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820lk-muy7pthj5s0092", alt: "Miniatura Flareon laranja com crista amarela", label: "Flareon" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820mg-muy7pthj8l4wb2", alt: "Miniatura Jolteon amarela com gola branca", label: "Jolteon" },
@@ -180,6 +181,8 @@ window.MORFY_CONFIG = {
       description: "Action figure do Goku na transformação Super Saiyajin 3, com cabelo dourado característico e uniforme laranja e azul. Confira as dimensões e opções disponíveis no anúncio.",
       images: [
         { src: "./assets/images/goku_1254x1254.png", alt: "Action figure de Goku Super Saiyajin 3 com cabelo dourado e uniforme laranja e azul", label: "Goku SSJ3" },
+        { src: "./assets/images/bdcb5f41-429c-4a81-97ab-d94a12657e69.jpg", alt: "Action figure de Goku Super Saiyajin 3 em vista frontal", label: "Vista frontal" },
+        { src: "./assets/images/8f31a41e-cb50-4f0c-9172-f39806dc6a2b.jpg", alt: "Action figure de Goku Super Saiyajin 3 ao lado de régua indicando aproximadamente 25 cm", label: "Medidas · 25 cm" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820m1-mvc9yrbxb94ya0@resize_w450_nl.webp", alt: "Action figure de Goku com cabelo dourado e roupa laranja", label: "Detalhe do Goku" }
       ],
       features: [
@@ -197,6 +200,8 @@ window.MORFY_CONFIG = {
       description: "Action figure de Black Freeza, com acabamento escuro e detalhes roxos. Confira as dimensões e opções disponíveis no anúncio.",
       images: [
         { src: "./assets/images/blackfreeza_1254x1254.png", alt: "Action figure de Black Freeza com corpo escuro e detalhes roxos", label: "Black Freeza" },
+        { src: "./assets/images/91fd5fb8-36d7-4af3-9991-f5393aa1d223.jpg", alt: "Action figure de Black Freeza em vista frontal", label: "Vista frontal" },
+        { src: "./assets/images/8948c455-5c5b-4c6c-8b25-f012909d150a.jpg", alt: "Action figure de Black Freeza ao lado de régua indicando aproximadamente 21 cm", label: "Medidas · 21 cm" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820mh-mvc9yrbxcnpe11.webp", alt: "Action figure de Black Freeza com acabamento escuro e detalhes roxos", label: "Detalhe do Freeza" }
       ],
       features: [
