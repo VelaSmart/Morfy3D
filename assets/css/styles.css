@@ -154,3 +154,17 @@
 .catalog-section .product-visual{display:flex;align-items:center;justify-content:center;aspect-ratio:1;overflow:hidden;background:#10151c}
 .catalog-section .product-visual>img{display:block;width:100%;height:100%;object-fit:contain!important;object-position:center;transform:none!important}
 .product-dialog .gallery-stage #modal-image{width:100%;height:100%;object-fit:contain!important;object-position:center}
+
+/* Catálogo em vitrine: duas fileiras visíveis e rolagem para os demais produtos. */
+.catalog-section .product-grid.catalog-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #3478ee #151b24;
+  padding-right: 9px;
+  align-content: start;
+}
+.catalog-section .product-grid.catalog-scroll::-webkit-scrollbar { width: 9px; }
+.catalog-section .product-grid.catalog-scroll::-webkit-scrollbar-track { background: #151b24; border-radius: 8px; }
+.catalog-section .product-grid.catalog-scroll::-webkit-scrollbar-thumb { background: #3478ee; border: 2px solid #151b24; border-radius: 8px; }
