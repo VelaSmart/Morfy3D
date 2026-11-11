@@ -148,3 +148,9 @@
 .product-image-position{position:absolute;left:50%;bottom:9px;transform:translateX(-50%);padding:3px 7px;border:1px solid #ffffff66;border-radius:20px;background:#10151c70;color:#fff;font-size:9px;line-height:1.2;letter-spacing:.04em;pointer-events:none;backdrop-filter:blur(4px)}
 @media(hover:none){.product-visual .product-image-controls{opacity:.82}}
 @media(prefers-reduced-motion:reduce){.product-visual .product-image-controls,.product-image-arrow{transition:none}}
+
+
+/* Capas do catálogo: preservar a proporção original, sem cortes ou deformação. */
+.catalog-section .product-visual{display:flex;align-items:center;justify-content:center;aspect-ratio:1;overflow:hidden;background:#10151c}
+.catalog-section .product-visual>img{display:block;width:100%;height:100%;object-fit:contain!important;object-position:center;transform:none!important}
+.product-dialog .gallery-stage #modal-image{width:100%;height:100%;object-fit:contain!important;object-position:center}
