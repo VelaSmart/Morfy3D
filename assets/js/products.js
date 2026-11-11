@@ -174,22 +174,35 @@ window.MORFY_CONFIG = {
       marketplaces: { shopee: "https://shopee.com.br/Enfeite-Canto-de-Porta-de-Natal-Placa-Decorativa-Natalina-para-Batente-e-Moldura-de-Porta-Decora%C3%A7%C3%A3o-de-Natal-i.1934551108.58272582107?extraParams=%7B%22display_model_id%22%3A219629304462%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820lw-mvatmngdeyo1dc", mercadoLivre: "", tiktokShop: "" }
     },
     {
-      id: "action-figures-dragon-ball",
-      name: "Action Figures Dragon Ball",
+      id: "goku-super-saiyajin-3",
+      name: "Goku Super Saiyajin 3",
       category: "geek",
-      description: "Figuras colecionáveis de Dragon Ball com personagens variados, em tamanhos de aproximadamente 20 a 25 cm. Escolha seu personagem favorito entre as opções do anúncio.",
+      description: "Action figure do Goku na transformação Super Saiyajin 3, com cabelo dourado característico e uniforme laranja e azul. Confira as dimensões e opções disponíveis no anúncio.",
       images: [
-        { src: "./assets/images/blackfreeza_1254x1254.png", alt: "Goku Super Saiyajin 3 e Black Freeza lado a lado", label: "Capa" },
-        { src: "./assets/images/goku_1254x1254.png", alt: "Action figure de Goku em pose de combate", label: "Goku" },
-        { src: "https://down-br.img.susercontent.com/file/br-11134207-820la-mvc9yrc289hc23", alt: "Apresentação das action figures de Dragon Ball", label: "Apresentação" },
-        { src: "https://down-br.img.susercontent.com/file/br-11134207-820m1-mvc9yrbxb94ya0@resize_w450_nl.webp", alt: "Action figure de personagem Dragon Ball com cabelo dourado e roupa laranja", label: "Personagem 1" },
-        { src: "https://down-br.img.susercontent.com/file/br-11134207-820mh-mvc9yrbxcnpe11.webp", alt: "Action figure de personagem Dragon Ball com armadura preta e detalhes roxos", label: "Personagem 2" }
+        { src: "./assets/images/goku_1254x1254.png", alt: "Action figure de Goku Super Saiyajin 3 com cabelo dourado e uniforme laranja e azul", label: "Goku SSJ3" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820m1-mvc9yrbxb94ya0@resize_w450_nl.webp", alt: "Action figure de Goku com cabelo dourado e roupa laranja", label: "Detalhe do Goku" }
       ],
       features: [
-        "Action figures inspiradas no universo Dragon Ball.",
-        "Tamanho anunciado: aproximadamente 20 a 25 cm.",
-        "Vários personagens colecionáveis, conforme as variações disponíveis no anúncio.",
-        "Confira na Shopee o personagem, dimensões, material, preço e disponibilidade."
+        "Action figure inspirada em Goku Super Saiyajin 3.",
+        "Cabelo dourado, uniforme laranja e detalhes azuis.",
+        "Confira no anúncio da Shopee as dimensões, material, preço e disponibilidade."
+      ],
+      demo: false,
+      marketplaces: { shopee: "https://shopee.com.br/Action-Figures-Dragon-Ball-20-25cm-%E2%80%94-V%C3%A1rios-Personagens-Colecion%C3%A1veis-i.1934551108.58222630052?extraParams=%7B%22display_model_id%22%3A189196906743%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820la-mvc9yrc289hc23", mercadoLivre: "", tiktokShop: "" }
+    },
+    {
+      id: "black-freeza",
+      name: "Black Freeza",
+      category: "geek",
+      description: "Action figure de Black Freeza, com acabamento escuro e detalhes roxos. Confira as dimensões e opções disponíveis no anúncio.",
+      images: [
+        { src: "./assets/images/blackfreeza_1254x1254.png", alt: "Action figure de Black Freeza com corpo escuro e detalhes roxos", label: "Black Freeza" },
+        { src: "https://down-br.img.susercontent.com/file/br-11134207-820mh-mvc9yrbxcnpe11.webp", alt: "Action figure de Black Freeza com acabamento escuro e detalhes roxos", label: "Detalhe do Freeza" }
+      ],
+      features: [
+        "Action figure inspirada em Black Freeza.",
+        "Acabamento escuro com detalhes roxos.",
+        "Confira no anúncio da Shopee as dimensões, material, preço e disponibilidade."
       ],
       demo: false,
       marketplaces: { shopee: "https://shopee.com.br/Action-Figures-Dragon-Ball-20-25cm-%E2%80%94-V%C3%A1rios-Personagens-Colecion%C3%A1veis-i.1934551108.58222630052?extraParams=%7B%22display_model_id%22%3A189196906743%2C%22model_selection_logic%22%3A3%7D&image_ids=br-11134207-820la-mvc9yrc289hc23", mercadoLivre: "", tiktokShop: "" }
