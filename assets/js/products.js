@@ -20,7 +20,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Coleção de miniaturas Pokémon em impressão 3D. Escolha entre Eevee, Flareon, Jolteon e Umbreon, com aproximadamente 10 a 12 cm.",
       images: [
-        { src: "https://down-br.img.susercontent.com/file/br-11134207-820md-muy7kiypfzsz68", alt: "Apresentação da coleção Eeveevolutions com quatro miniaturas em uma floresta", label: "Apresentação" },
+        { src: "./assets/images/Gemini_Generated_Image_hs4xxohs4xxohs4x.jpg", alt: "Apresentação da coleção Eeveevolutions com quatro miniaturas em uma floresta", label: "Apresentação" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820l8-muy7pthj2yv484", alt: "Miniatura Eevee amarela com colar de pelos branco", label: "Eevee" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820lk-muy7pthj5s0092", alt: "Miniatura Flareon laranja com crista amarela", label: "Flareon" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820mg-muy7pthj8l4wb2", alt: "Miniatura Jolteon amarela com gola branca", label: "Jolteon" },
@@ -42,7 +42,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Um pequeno herói cheio de personalidade. Escultura em impressão 3D com armadura, espada e capa rosa, nas versões branca e laranja.",
       images: [
-        { src: "./assets/images/catalogo-gatinho.jpg?v=2", alt: "Gatinho Cavaleiro laranja com espada e capa rosa em cenário de jardim", label: "Apresentação" },
+        { src: "./assets/images/Gatinho Cavaleiro no Castelo.png", alt: "Gatinho Cavaleiro laranja com espada e capa rosa em cenário de jardim", label: "Apresentação" },
         { src: "./assets/images/gatinho-cavaleiro-laranja.png", alt: "Vista frontal do Gatinho Cavaleiro laranja, com armadura cinza, espada e laço rosa", label: "Laranja" },
         { src: "./assets/images/gatinho-cavaleiro-branco.png", alt: "Vista frontal do Gatinho Cavaleiro branco, com armadura cinza, espada e laço rosa", label: "Branco" },
         { src: "./assets/images/gatinho-cavaleiro-lateral.png", alt: "Vista lateral do Gatinho Cavaleiro laranja mostrando a armadura e a capa rosa", label: "Lateral" },
@@ -65,7 +65,7 @@ window.MORFY_CONFIG = {
       category: "decoracao",
       description: "Um toque de Natal para a sua decoração. Boneco de neve em impressão 3D com textura em relevo, gorro e cachecol vermelhos, em versões de 6 e 10 cm.",
       images: [
-        { src: "./assets/images/boneco-de-neve-capa.jpg", alt: "Apresentação natalina do Boneco de Neve com gorro e cachecol vermelhos e detalhes da textura em relevo", label: "Apresentação" },
+        { src: "./assets/images/bde461da-810e-4b8f-9f49-cec25967e84c.png", alt: "Apresentação natalina do Boneco de Neve com gorro e cachecol vermelhos e detalhes da textura em relevo", label: "Apresentação" },
         { src: "./assets/images/boneco-de-neve-detalhe.png", alt: "Boneco de Neve visto de frente e de lado, com corpo branco, nariz laranja e detalhes pretos", label: "Detalhes" },
         { src: "./assets/images/boneco-de-neve-lateral.png", alt: "Vista lateral direita do Boneco de Neve com textura em relevo e cachecol vermelho", label: "Lateral direita" },
         { src: "./assets/images/boneco-de-neve-outro-angulo.png", alt: "Vista lateral esquerda do Boneco de Neve mostrando o gorro, o nariz e os botões", label: "Lateral esquerda" },
@@ -87,7 +87,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Um detalhe pixelado para levar com você. Chaveiro em impressão 3D com visual de bloco TNT, cores vermelha, branca e preta e argola metálica.",
       images: [
-        {"src": "./assets/images/catalogo-chaveiro-tnt.jpg","alt":"Arte do anúncio com o Chaveiro TNT, argola metálica, diferentes ângulos e detalhes da peça","label":"Apresentação"},
+        {"src": "./assets/images/a_high_detail_photorealistic_cgi_product_render_i.png","alt":"Arte do anúncio com o Chaveiro TNT, argola metálica, diferentes ângulos e detalhes da peça","label":"Apresentação"},
         {"src":"./assets/images/chaveiro-tnt-shopee-02.jpg","alt":"Chaveiro TNT na palma da mão, com corrente e argola metálica, em foto do anúncio","label":"Foto real · na mão"},
         {"src":"./assets/images/chaveiro-tnt-shopee-03.jpg","alt":"Chaveiro TNT sobre uma mesa branca com corrente e argola metálica","label":"Foto real · com argola"},
         {"src":"./assets/images/chaveiro-tnt-shopee-04.jpg","alt":"Bloco TNT segurado entre os dedos, mostrando os detalhes pixelados em relevo","label":"Foto real · detalhes"},
@@ -111,7 +111,7 @@ window.MORFY_CONFIG = {
       "description": "Mais praticidade para o seu carro. Suporte para copos feito em ABS, com aro aberto, base circular e encaixe, apresentado em preto.",
       "images": [
         {
-          "src": "./assets/images/porta-copos-capa.png",
+          "src": "./assets/images/Suporte Térmico com Fluxo de Ar.png",
           "alt": "Porta-copos automotivo preto com aro superior aberto, base circular e estrutura vertical",
           "label": "Apresentação"
         },
@@ -161,7 +161,7 @@ window.MORFY_CONFIG = {
       category: "decoracao",
       description: "Placa decorativa natalina para batente e moldura de porta. Consulte as imagens do anúncio para conferir o formato, as medidas e as opções disponíveis.",
       images: [
-        { src: "./assets/images/catalogo-natal-porta.jpg", alt: "Enfeite natalino de canto de porta com árvore de Natal, presentes e meia", label: "Árvore e presentes" },
+        { src: "./assets/images/a_crisp_high_detail_cozy_holiday_product_adverti.png", alt: "Enfeite natalino de canto de porta com árvore de Natal, presentes e meia", label: "Árvore e presentes" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820lb-mvatmngdgd8h80", alt: "Enfeite natalino para canto superior de porta com árvore, presentes e meia vermelha", label: "Modelo árvore" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820lq-mvatmngdhrsx17", alt: "Enfeite natalino para canto de porta com trenó, meia e presentes", label: "Modelo trenó" }
       ],
@@ -179,7 +179,7 @@ window.MORFY_CONFIG = {
       category: "geek",
       description: "Figuras colecionáveis de Dragon Ball com personagens variados, em tamanhos de aproximadamente 20 a 25 cm. Escolha seu personagem favorito entre as opções do anúncio.",
       images: [
-        { src: "./assets/images/catalogo-black-freeza.jpg", alt: "Goku Super Saiyajin 3 e Black Freeza lado a lado", label: "Capa" },
+        { src: "./assets/images/blackfreeza_1254x1254.png", alt: "Goku Super Saiyajin 3 e Black Freeza lado a lado", label: "Capa" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820la-mvc9yrc289hc23", alt: "Apresentação das action figures de Dragon Ball", label: "Apresentação" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820m1-mvc9yrbxb94ya0@resize_w450_nl.webp", alt: "Action figure de personagem Dragon Ball com cabelo dourado e roupa laranja", label: "Personagem 1" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820mh-mvc9yrbxcnpe11.webp", alt: "Action figure de personagem Dragon Ball com armadura preta e detalhes roxos", label: "Personagem 2" }
@@ -199,7 +199,7 @@ window.MORFY_CONFIG = {
       category: "utilitarios",
       description: "Organizador adesivo de parede para pendurar toalhas, bolsas, mochilas e acessórios. Uma solução prática para aproveitar melhor os espaços.",
       images: [
-        { src: "./assets/images/catalogo-ganchos.jpg", alt: "Gancho marrom instalado na parede segurando a alça de uma bolsa", label: "Marrom" },
+        { src: "./assets/images/Ganchos adesivos em tons neutros.png", alt: "Gancho marrom instalado na parede segurando a alça de uma bolsa", label: "Marrom" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820m4-mv4rqt6g5c0132", alt: "Gancho marrom com bolsa pendurada, vista aproximada", label: "Detalhe marrom" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820m6-mv4rqt6g6qkhc7", alt: "Gancho rosa instalado na parede segurando uma bolsa", label: "Rosa" },
         { src: "https://down-br.img.susercontent.com/file/br-11134207-820l4-mv4rqt6g854x85", alt: "Gancho branco instalado na parede segurando uma bolsa", label: "Branco" },
