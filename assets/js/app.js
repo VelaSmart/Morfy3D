@@ -339,10 +339,12 @@
         if (rowTops.indexOf(top) === -1) rowTops.push(top);
       });
       rowTops.sort(function (a, b) { return a - b; });
-      if (rowTops.length > 2) {
+      var columns = window.getComputedStyle(grid).gridTemplateColumns.split(" ").length || 3;
+      var visibleRows = Math.ceil(6 / columns);
+      if (rowTops.length > visibleRows) {
         var styles = window.getComputedStyle(grid);
         var gap = parseFloat(styles.rowGap || styles.gap) || 0;
-        grid.style.maxHeight = Math.max(240, rowTops[2] - gap) + "px";
+        grid.style.maxHeight = Math.max(240, rowTops[visibleRows] - gap) + "px";
       }
     }
 
