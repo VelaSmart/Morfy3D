@@ -179,7 +179,7 @@ static object GetState(MMDeviceEnumerator e)
             var id=s.GetProcessID;
             if (id == 0) continue;
             var process=System.Diagnostics.Process.GetProcessById((int)id);
-            apps.Add(new { processId=id, name=process.ProcessName, volume=s.SimpleAudioVolume.Volume, mute=s.SimpleAudioVolume.Mute });
+            apps.Add(new { processId=id, name=process.ProcessName, volume=s.SimpleAudioVolume.Volume, mute=s.SimpleAudioVolume.Mute, level=s.AudioMeterInformation.MasterPeakValue });
         } catch { }
     }
     return new {
