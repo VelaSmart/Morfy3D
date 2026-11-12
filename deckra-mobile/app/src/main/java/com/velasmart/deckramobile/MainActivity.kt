@@ -54,12 +54,11 @@ class MainActivity : Activity() {
         applyTheme()
         buildShell()
         renderPage()
-        checkForUpdates()
     }
 
     private fun buildShell() {
         val d=resources.displayMetrics.density
-        root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(Color.rgb(9,10,16)); setPadding((4*d).toInt(),(4*d).toInt(),(4*d).toInt(),(4*d).toInt()) }
+        root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(bg); setPadding((4*d).toInt(),(4*d).toInt(),(4*d).toInt(),(4*d).toInt()) }
         val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((12*d).toInt(),0,(10*d).toInt(),0); background=rounded(surface,9,stroke) }
         val logo=ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType=ImageView.ScaleType.FIT_CENTER; adjustViewBounds=true; contentDescription="DECKRA" }
         header.addView(logo,LinearLayout.LayoutParams((82*d).toInt(),(34*d).toInt()))
@@ -80,7 +79,7 @@ class MainActivity : Activity() {
         connectionPanel.addView(action("PAREAR") { connectPc() },LinearLayout.LayoutParams((82*d).toInt(),(34*d).toInt()).apply { leftMargin=(5*d).toInt() })
         root.addView(connectionPanel,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(5*d).toInt() })
         val body=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL }
-        val sidebar=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((3*d).toInt(),(8*d).toInt(),(3*d).toInt(),(4*d).toInt()); background=rounded(Color.rgb(16,18,27),9,Color.rgb(36,38,51)) }
+        val sidebar=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((3*d).toInt(),(8*d).toInt(),(3*d).toInt(),(4*d).toInt()); background=rounded(surface,9,stroke) }
         navBar=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
         sidebar.addView(navBar,LinearLayout.LayoutParams(-1,0,1f))
         sidebar.addView(label("DECKRA MOBILE",8,muted).apply { gravity=Gravity.CENTER })
@@ -278,14 +277,14 @@ class MainActivity : Activity() {
         if(stroke!=Color.TRANSPARENT) setStroke((1*resources.displayMetrics.density).toInt().coerceAtLeast(1),stroke)
     }
     private fun createCard(icon:String,title:String,density:Float):Pair<LinearLayout,LinearLayout> {
-        val card=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; background=rounded(card,11,stroke) }
+        val cardView=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; background=rounded(this@MainActivity.card,11,stroke) }
         val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((10*density).toInt(),0,(8*density).toInt(),0) }
         header.addView(label(icon,20,Color.rgb(143,112,255)))
         header.addView(label(title,14,Color.rgb(238,238,246)),LinearLayout.LayoutParams(0,-2,1f).apply { leftMargin=(8*density).toInt() })
-        card.addView(header,LinearLayout.LayoutParams(-1,(43*density).toInt()))
+        cardView.addView(header,LinearLayout.LayoutParams(-1,(43*density).toInt()))
         val body=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((10*density).toInt(),(7*density).toInt(),(10*density).toInt(),(9*density).toInt()) }
-        card.addView(body)
-        return Pair(card,body)
+        cardView.addView(body)
+        return Pair(cardView,body)
     }
 
     private fun addPanel(title:String, build:LinearLayout.()->Unit) {
