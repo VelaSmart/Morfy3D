@@ -1,7 +1,7 @@
 {
-  "versao": "1.0",
+  "versao": "1.1",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "d7bbb66dbd0ab1cd5e6a3f44512d1cd67c018ec4aede90ccea9f2480a08d1df1",
-  "tamanho": 30180257,
-  "notas": "Primeira versão oficial do DECKRA. Novo: central de notificações (sino no canto superior esquerdo)."
+  "sha256": "4107f0710aa0af7b011709e4ed27bc09400487d7f00adda37941d41938cd6137",
+  "tamanho": 30181236,
+  "notas": "Controle de volume pela tela funciona mesmo sem o DECKRA físico conectado. Microfone muta sozinho em 0% e volta ao subir o volume. Potenciômetro sem saltos: ele só assume o volume quando alcança o valor atual."
 }
