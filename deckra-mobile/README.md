@@ -36,3 +36,8 @@ Na primeira execução da Bridge, abra o terminal como administrador se necessá
 ## Limitações conhecidas
 
 Este MVP cobre conexão e comandos multimídia básicos. Ainda não existe integração com o backend interno do DECKRA Desktop, gestão de perfis, mapeamento de potenciômetros/teclas, volume por aplicativo, TLS nem pareamento persistente. Use apenas em rede privada confiável. A descoberta por broadcast pode ser bloqueada por isolamento de clientes do roteador.
+
+
+## Preparação da Bridge no Windows
+
+Na primeira execução, use PowerShell como Administrador e execute `Install-Bridge.ps1` para registrar a URL ACL e criar regras de Firewall TCP 37892 e UDP 37891 restritas ao perfil Privado e à sub-rede local. Depois abra `DeckraBridge.exe`. Não exponha as portas à internet: o pareamento atual usa WebSocket sem TLS e foi projetado para uma rede local confiável.

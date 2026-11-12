@@ -26,7 +26,7 @@ class MainActivity : Activity() {
     private var socket: WebSocket? = null
     private var host = ""
     private var paired = false
-    private var currentPage = "Início"
+    private var currentPage = "Configuração"
     private lateinit var root: LinearLayout
     private lateinit var content: LinearLayout
     private lateinit var status: TextView
@@ -79,19 +79,27 @@ class MainActivity : Activity() {
         content.removeAllViews()
         content.addView(label(currentPage,29,Color.WHITE))
         content.addView(label(when(currentPage) {
-            "Início" -> "Tudo do seu DECKRA em um só lugar."
+            "Configuração" -> "Configure seu controle e os canais de áudio do PC."
             "Aplicativos" -> "Controle o áudio de cada aplicativo do Windows."
             "Microfone" -> "Gerencie o dispositivo de entrada padrão."
             "Equalizador" -> "Estado do processamento de áudio."
             else -> "Conexão e dispositivos do seu DECKRA."
         },13,muted))
         when(currentPage) {
-            "Início" -> {
+            "Configuração" -> {
                 val s=latestState
                 addPanel("Canais") {
                     addView(label("Saída de áudio",16,Color.WHITE))
                     addView(label(s?.optJSONObject("output")?.optString("name") ?: "Aguardando conexão",13,muted))
-                    addView(label("Volume geral: "+((s?.optJSONObject("output")?.optDouble("volume",0.0) ?: 0.0)*100).toInt()+"%",22,Color.WHITE))
+                    val outputVolume=((s?.optJSONObject("output")?.optDouble("volume",0.0) ?: 0.0)*100).toInt()
+                    addView(label("Volume geral: $outputVolume%",22,Color.WHITE))
+                    val masterSeek=SeekBar(this@MainActivity).apply { max=100; progress=outputVolume }
+                    masterSeek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
+                        override fun onProgressChanged(b:SeekBar?,v:Int,u:Boolean) {}
+                        override fun onStartTrackingTouch(b:SeekBar?) {}
+                        override fun onStopTrackingTouch(b:SeekBar?) { send("set_master_volume",JSONObject().put("value",(b?.progress ?: 0)/100f)) }
+                    })
+                    addView(masterSeek)
                     addView(action("Volume +") { send("volume_up") })
                     addView(action("Volume −") { send("volume_down") })
                     addView(action("Mutar / ativar") { send("volume_mute") })
@@ -103,9 +111,27 @@ class MainActivity : Activity() {
                     val mic=s?.optJSONObject("microphone")
                     addView(label(mic?.optString("name") ?: "Não conectado",13,muted))
                     addView(label("Volume: "+((mic?.optDouble("volume",0.0) ?: 0.0)*100).toInt()+"%",20,Color.WHITE))
+                    val micSeek=SeekBar(this@MainActivity).apply { max=100; progress=((mic?.optDouble("volume",0.0) ?: 0.0)*100).toInt() }
+                    micSeek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
+                        override fun onProgressChanged(b:SeekBar?,v:Int,u:Boolean) {}
+                        override fun onStartTrackingTouch(b:SeekBar?) {}
+                        override fun onStopTrackingTouch(b:SeekBar?) { send("set_mic_volume",JSONObject().put("value",(b?.progress ?: 0)/100f)) }
+                    })
+                    addView(micSeek)
                     addView(action(if(mic?.optBoolean("mute")==true) "Ativar microfone" else "Silenciar microfone") { send("set_mic_mute",JSONObject().put("value",mic?.optBoolean("mute")!=true)) })
                 }
+                addPanel("Equalizador") {
+                    val eq=s?.optJSONObject("equalizer")
+                    addView(label(if(eq?.optBoolean("available")==true) "Disponível" else "Indisponível",15,Color.WHITE))
+                    addView(label(eq?.optString("reason") ?: "Requer driver APO ou dispositivo virtual com processamento no Windows.",12,muted))
+                }
                 addPanel("Dispositivos") { addView(label(if(paired) "Conectado a $host" else "Procurando o DECKRA...",14,if(paired) Color.GREEN else muted)) }
+            }
+            "Teclas" -> {
+                addPanel("Atalhos das teclas") {
+                    addView(label("A interface segue a organização do DECKRA Desktop.",14,Color.WHITE))
+                    addView(label("O serviço Bridge atual ainda não recebe configurações de teclas do controlador. Atribuições serão habilitadas quando o protocolo do firmware estiver integrado. Nenhuma tecla é simulada.",13,muted))
+                }
             }
             "Aplicativos" -> {
                 val apps=latestState?.optJSONArray("applications") ?: JSONArray()
@@ -165,7 +191,7 @@ class MainActivity : Activity() {
     private fun renderNavigation() {
         if(!::navBar.isInitialized) return
         navBar.removeAllViews()
-        listOf("Início","Aplicativos","Microfone","Equalizador","Configurações").forEach { page ->
+        listOf("Configuração","Aplicativos","Teclas").forEach { page ->
             val selected=page==currentPage
             val tab=TextView(this).apply {
                 text=page
