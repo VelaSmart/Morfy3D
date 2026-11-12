@@ -8,6 +8,7 @@ import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.provider.Settings
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
 import android.widget.*
@@ -32,6 +33,7 @@ class MainActivity : Activity() {
     private lateinit var pin: EditText
     private lateinit var hostInput: EditText
     private lateinit var updateButton: Button
+    private lateinit var navBar: LinearLayout
     private var latestState: JSONObject? = null
     private val bg = Color.rgb(14,15,24)
     private val panel = Color.rgb(23,25,39)
@@ -62,11 +64,9 @@ class MainActivity : Activity() {
         connectRow.addView(action("CONECTAR") { connectPc() }, LinearLayout.LayoutParams(0,52,1f).apply { leftMargin=8 })
         root.addView(connectRow)
         val navScroll=HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled=false }
-        val nav=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; setPadding(0,14,0,14) }
-        listOf("Início","Aplicativos","Microfone","Equalizador","Configurações").forEach { page ->
-            nav.addView(action(page) { currentPage=page; renderPage() }, LinearLayout.LayoutParams(-2,46).apply { rightMargin=7 })
-        }
-        navScroll.addView(nav); root.addView(navScroll)
+        navBar=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; setPadding(0,12,0,12) }
+        navScroll.addView(navBar); root.addView(navScroll)
+        renderNavigation()
         val scroll=ScrollView(this)
         content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding(0,8,0,20) }
         scroll.addView(content); root.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
@@ -162,14 +162,43 @@ class MainActivity : Activity() {
         if(!paired) content.addView(label("Para usar os controles, execute DeckraBridge.exe no Windows e conecte os dois dispositivos à mesma rede local.",13,Color.rgb(255,190,90)))
     }
 
+    private fun renderNavigation() {
+        if(!::navBar.isInitialized) return
+        navBar.removeAllViews()
+        listOf("Início","Aplicativos","Microfone","Equalizador","Configurações").forEach { page ->
+            val selected=page==currentPage
+            val tab=TextView(this).apply {
+                text=page
+                textSize=12f
+                gravity=Gravity.CENTER
+                setTextColor(if(selected) Color.WHITE else muted)
+                setPadding(14,11,14,11)
+                background=rounded(if(selected) Color.rgb(48,39,78) else panel,9,if(selected) purple else Color.rgb(43,45,61))
+                setOnClickListener { currentPage=page; renderPage() }
+            }
+            navBar.addView(tab,LinearLayout.LayoutParams(-2,42).apply { rightMargin=7 })
+        }
+    }
+    private fun rounded(color:Int,radius:Int,stroke:Int=Color.TRANSPARENT)=GradientDrawable().apply {
+        setColor(color); cornerRadius=radius*resources.displayMetrics.density
+        if(stroke!=Color.TRANSPARENT) setStroke((1*resources.displayMetrics.density).toInt().coerceAtLeast(1),stroke)
+    }
     private fun addPanel(title:String, build:LinearLayout.()->Unit) {
-        val card=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding(16,15,16,15); setBackgroundColor(panel) }
+        val card=LinearLayout(this).apply {
+            orientation=LinearLayout.VERTICAL; setPadding(16,15,16,15)
+            background=rounded(panel,12,Color.rgb(43,45,61))
+        }
         card.addView(label(title,18,Color.WHITE))
         card.build()
         content.addView(card,LinearLayout.LayoutParams(-1,-2).apply { topMargin=12; bottomMargin=4 })
     }
     private fun label(value:String,size:Int,color:Int)=TextView(this).apply { text=value; textSize=size.toFloat(); setTextColor(color); setPadding(3,7,3,7) }
-    private fun action(value:String, run:()->Unit)=Button(this).apply { text=value; setTextColor(Color.WHITE); setBackgroundTintList(android.content.res.ColorStateList.valueOf(purple)); setOnClickListener { run() } }
+    private fun action(value:String, run:()->Unit)=Button(this).apply {
+        text=value; isAllCaps=false; textSize=14f; minHeight=48; minWidth=0
+        setPadding(12,8,12,8); setTextColor(Color.WHITE)
+        background=rounded(purple,9)
+        setOnClickListener { run() }
+    }
 
     @Suppress("DEPRECATION")
     private fun installedVersionCode():Long=packageManager.getPackageInfo(packageName,0).versionCode.toLong()
