@@ -9,8 +9,8 @@ android {
         applicationId = "com.velasmart.deckramobile"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = providers.gradleProperty("deckraVersionCode").orElse("1").get().toInt()
+        versionName = providers.gradleProperty("deckraVersionName").orElse("0.1.0").get()
     }
 }
 dependencies {
