@@ -1,7 +1,7 @@
 {
-  "versao": "1.4",
+  "versao": "1.5",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "2543183e366d45e2772916513dc3d778827c8ca48e05f83a9a9a1937ec3b896f",
-  "tamanho": 30189006,
-  "notas": "Atalho de teclado para abrir o DECKRA de qualquer lugar (padrão Ctrl + Alt + D, configurável em Configurações). Medidor de áudio estilo OBS no fundo de cada canal na aba Aplicativos (liga/desliga em Configurações). Na lista de aplicativos, SISTEMA agora vem antes de EM SEGUNDO PLANO."
+  "sha256": "ca9d65c05de707e944036ec7f3fbb3b17687fd1858dbf8edea0626adfe49902b",
+  "tamanho": 30190992,
+  "notas": "Novo: Modo claro e Modo escuro em Configurações > Tema (o escuro continua padrão). O medidor de áudio nos canais foi removido."
 }
