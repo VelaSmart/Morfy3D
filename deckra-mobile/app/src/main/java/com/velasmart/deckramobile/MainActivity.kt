@@ -280,7 +280,7 @@ class MainActivity : Activity() {
         val cardView=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; background=rounded(this@MainActivity.card,11,stroke) }
         val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((10*density).toInt(),0,(8*density).toInt(),0) }
         header.addView(label(icon,20,Color.rgb(143,112,255)))
-        header.addView(label(title,14,Color.rgb(238,238,246)),LinearLayout.LayoutParams(0,-2,1f).apply { leftMargin=(8*density).toInt() })
+        header.addView(label(title,14,primaryText),LinearLayout.LayoutParams(0,-2,1f).apply { leftMargin=(8*density).toInt() })
         cardView.addView(header,LinearLayout.LayoutParams(-1,(43*density).toInt()))
         val body=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((10*density).toInt(),(7*density).toInt(),(10*density).toInt(),(9*density).toInt()) }
         cardView.addView(body)
