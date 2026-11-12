@@ -6,6 +6,8 @@ import android.content.Intent
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -30,6 +32,11 @@ class MainActivity : Activity() {
     private var themeMode = "system"
     private lateinit var root: LinearLayout
     private lateinit var content: LinearLayout
+    private lateinit var pageScroll: ScrollView
+    private val audioMeters = mutableMapOf<Int, AudioActivityIndicatorView>()
+    private val audioHandler = Handler(Looper.getMainLooper())
+    private val audioPoll = object : Runnable { override fun run() { if (paired && currentPage == "Início") { send("get_state"); audioHandler.postDelayed(this, 350) } } }
+    private var pendingUpdateUrl: String? = null
     private lateinit var status: TextView
     private lateinit var pin: EditText
     private lateinit var hostInput: EditText
@@ -86,7 +93,9 @@ class MainActivity : Activity() {
         body.addView(sidebar,LinearLayout.LayoutParams((94*d).toInt(),-1).apply { rightMargin=(8*d).toInt() })
         val pageFrame=FrameLayout(this).apply { clipChildren=true; clipToPadding=true }
         content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((5*d).toInt(),(7*d).toInt(),(5*d).toInt(),(5*d).toInt()) }
-        pageFrame.addView(content,FrameLayout.LayoutParams(-1,-1))
+        pageScroll=ScrollView(this).apply { isFillViewport=true; isVerticalScrollBarEnabled=false; overScrollMode=View.OVER_SCROLL_NEVER }
+        pageScroll.addView(content,ScrollView.LayoutParams(-1,-1))
+        pageFrame.addView(pageScroll,FrameLayout.LayoutParams(-1,-1))
         body.addView(pageFrame,LinearLayout.LayoutParams(0,-1,1f))
         root.addView(body,LinearLayout.LayoutParams(-1,0,1f).apply { topMargin=(7*d).toInt() })
         renderNavigation()
@@ -95,7 +104,12 @@ class MainActivity : Activity() {
 
     private fun renderPage() {
         content.removeAllViews()
+        audioMeters.clear()
         val d=resources.displayMetrics.density
+        pageScroll.isVerticalScrollBarEnabled = currentPage != "Início"
+        content.layoutParams = content.layoutParams.apply { height = if(currentPage == "Início") ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT }
+        pageScroll.scrollTo(0,0)
+        refreshAudioPolling()
         if(currentPage!="Início") content.addView(label(currentPage,23,primaryText).apply { typeface=android.graphics.Typeface.DEFAULT_BOLD })
         when(currentPage) {
             "Início" -> renderHome(d)
@@ -104,7 +118,6 @@ class MainActivity : Activity() {
             "Teclas" -> renderKeys(d)
             else -> renderSettings(d)
         }
-        if(!paired) content.addView(label("Conecte o DECKRA Bridge no Windows e pareie pelo cabeçalho.",10,Color.rgb(255,170,65)))
     }
 
     private fun renderHome(d:Float) {
@@ -112,11 +125,14 @@ class MainActivity : Activity() {
         val channels=createCard("♫","Canais de áudio",d)
         channels.first.getChildAt(0).layoutParams=channels.first.getChildAt(0).layoutParams.apply { height=(34*d).toInt() }
         channels.second.setPadding((7*d).toInt(),(3*d).toInt(),(7*d).toInt(),(4*d).toInt())
+        channels.second.layoutParams = LinearLayout.LayoutParams(-1,0,1f)
         channels.second.addView(label("Controle individual dos aplicativos ativos",9,secondaryText))
         if(apps.length()==0) {
             channels.second.addView(label("Nenhum aplicativo com áudio ativo. Abra um programa no PC para controlá-lo aqui.",11,secondaryText))
         } else {
-            val grid=GridLayout(this).apply { columnCount=4; rowCount=(apps.length()+3)/4; useDefaultMargins=false }
+            val rows=(apps.length()+3)/4
+            val grid=GridLayout(this).apply { columnCount=4; rowCount=rows; useDefaultMargins=false }
+            grid.layoutParams=LinearLayout.LayoutParams(-1,0,1f)
             for(i in 0 until apps.length()) {
                 val app=apps.optJSONObject(i) ?: continue
                 val tile=LinearLayout(this).apply {
@@ -126,9 +142,13 @@ class MainActivity : Activity() {
                     background=rounded(surface,10,stroke)
                 }
                 val initial=(app.optDouble("volume",1.0)*100).toInt().coerceIn(0,100)
+                val pid=app.optInt("processId")
+                val meter=AudioActivityIndicatorView(this,app.optDouble("level",0.0).toFloat())
+                audioMeters[pid]=meter
+                tile.addView(meter,LinearLayout.LayoutParams((74*d).toInt(),(27*d).toInt()))
                 tile.addView(RotaryDialView(this,initial) { volume ->
-                    send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",volume/100f))
-                },LinearLayout.LayoutParams((58*d).toInt(),(58*d).toInt()))
+                    send("set_app_volume",JSONObject().put("processId",pid).put("value",volume/100f))
+                },LinearLayout.LayoutParams((74*d).toInt(),(74*d).toInt()))
                 tile.addView(label(app.optString("name","Aplicativo"),10,primaryText).apply {
                     gravity=Gravity.CENTER
                     maxLines=1
@@ -140,14 +160,15 @@ class MainActivity : Activity() {
                     LinearLayout.LayoutParams(-1,(23*d).toInt()).apply { topMargin=(2*d).toInt() })
                 grid.addView(tile,GridLayout.LayoutParams().apply {
                     width=0
-                    height=(91*d).toInt()
+                    height=0
                     columnSpec=GridLayout.spec(GridLayout.UNDEFINED,1f)
-                    setMargins((2*d).toInt(),(3*d).toInt(),(2*d).toInt(),(3*d).toInt())
+                    rowSpec=GridLayout.spec(GridLayout.UNDEFINED,1f)
+                    setMargins((3*d).toInt(),(3*d).toInt(),(3*d).toInt(),(3*d).toInt())
                 })
             }
             channels.second.addView(grid)
         }
-        content.addView(channels.first)
+        content.addView(channels.first,LinearLayout.LayoutParams(-1,-1))
     }
 
     private fun renderApplications(d:Float) {
@@ -472,21 +493,70 @@ class MainActivity : Activity() {
                 try {
                     val msg=JSONObject(text)
                     when(msg.optString("type")) {
-                        "pair_result" -> { paired=msg.optBoolean("paired"); runOnUiThread { status.text=if(paired) "●  Conectado ao DECKRA • $host" else "●  PIN incorreto"; if(paired) send("get_state") } }
+                        "pair_result" -> { paired=msg.optBoolean("paired"); runOnUiThread { status.text=if(paired) "●  Conectado ao DECKRA • $host" else "●  PIN incorreto"; refreshAudioPolling(); if(paired) send("get_state") } }
                         "state" -> { latestState=msg.optJSONObject("data"); runOnUiThread { renderPage() } }
-                        "result" -> { val data=msg.optJSONObject("data"); if(data!=null && data.has("applications")) latestState=data; runOnUiThread { renderPage() } }
+                        "result" -> {
+                            val data=msg.optJSONObject("data")
+                            if(data!=null && data.has("applications")) latestState=data
+                            runOnUiThread {
+                                if(currentPage=="Início" && data?.has("applications")==true) updateAudioMeters(data)
+                                else if(data?.has("applications")==true) renderPage()
+                            }
+                        }
                         "error" -> runOnUiThread { Toast.makeText(this@MainActivity,msg.optString("message"),Toast.LENGTH_LONG).show() }
                     }
                 } catch(_:Exception) {}
             }
-            override fun onFailure(webSocket:WebSocket,t:Throwable,response:Response?){ paired=false; runOnUiThread { status.text="●  Falha na conexão"; Toast.makeText(this@MainActivity,t.message ?: "Erro de rede",Toast.LENGTH_LONG).show() } }
-            override fun onClosed(webSocket:WebSocket,code:Int,reason:String){ paired=false; runOnUiThread { status.text="●  PC desconectado" } }
+            override fun onFailure(webSocket:WebSocket,t:Throwable,response:Response?){ paired=false; runOnUiThread { refreshAudioPolling(); status.text="●  Falha na conexão"; Toast.makeText(this@MainActivity,t.message ?: "Erro de rede",Toast.LENGTH_LONG).show() } }
+            override fun onClosed(webSocket:WebSocket,code:Int,reason:String){ paired=false; runOnUiThread { refreshAudioPolling(); status.text="●  PC desconectado" } }
         })
     }
+    private fun refreshAudioPolling() {
+        audioHandler.removeCallbacks(audioPoll)
+        if(paired && currentPage=="Início") audioHandler.postDelayed(audioPoll,350)
+    }
+
+    private fun updateAudioMeters(data:JSONObject) {
+        val apps=data.optJSONArray("applications") ?: return
+        for(i in 0 until apps.length()) {
+            val app=apps.optJSONObject(i) ?: continue
+            audioMeters[app.optInt("processId")]?.setLevel(app.optDouble("level",0.0).toFloat())
+        }
+    }
+
+    private inner class AudioActivityIndicatorView(context:Context, level:Float):View(context) {
+        private var peak=level.coerceIn(0f,1f)
+        private val d=resources.displayMetrics.density
+        private val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
+        fun setLevel(value:Float) { peak=value.coerceIn(0f,1f); invalidate() }
+        override fun onDraw(canvas:android.graphics.Canvas) {
+            super.onDraw(canvas)
+            val active=peak>0.018f
+            val count=5
+            val barWidth=5f*d
+            val gap=4f*d
+            val total=count*barWidth+(count-1)*gap
+            val start=(width-total)/2f
+            val base=height-3f*d
+            val maxHeight=height-7f*d
+            for(i in 0 until count) {
+                val fraction=(0.22f+peak*(0.55f+0.09f*i)).coerceIn(0.18f,1f)
+                val h=maxHeight*fraction
+                paint.color=if(active) Color.rgb(90,210,150) else if(isLightTheme) Color.rgb(185,185,198) else Color.rgb(72,72,88)
+                canvas.drawRoundRect(start+i*(barWidth+gap),base-h,start+i*(barWidth+gap)+barWidth,base,barWidth/2,barWidth/2,paint)
+            }
+        }
+    }
+
     private fun send(command:String,extra:JSONObject=JSONObject()) {
         if(!paired){ Toast.makeText(this,"Conecte ao PC primeiro.",Toast.LENGTH_SHORT).show(); return }
         extra.put("type","command").put("command",command)
         if(socket?.send(extra.toString())!=true) Toast.makeText(this,"Falha ao enviar comando.",Toast.LENGTH_SHORT).show()
     }
-    override fun onDestroy(){ socket?.close(1000,"app closed"); client.dispatcher.executorService.shutdown(); super.onDestroy() }
+    override fun onResume() {
+        super.onResume()
+        val cached=File(cacheDir,"deckra-mobile-update.apk")
+        if(packageManager.canRequestPackageInstalls() && cached.exists() && cached.length()>0L) installDownloadedUpdate(cached)
+    }
+    override fun onDestroy(){ audioHandler.removeCallbacks(audioPoll); socket?.close(1000,"app closed"); client.dispatcher.executorService.shutdown(); super.onDestroy() }
 }
