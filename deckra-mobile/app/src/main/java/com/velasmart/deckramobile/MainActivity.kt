@@ -84,10 +84,10 @@ class MainActivity : Activity() {
         sidebar.addView(navBar,LinearLayout.LayoutParams(-1,0,1f))
         sidebar.addView(label("DECKRA MOBILE",8,muted).apply { gravity=Gravity.CENTER })
         body.addView(sidebar,LinearLayout.LayoutParams((94*d).toInt(),-1).apply { rightMargin=(8*d).toInt() })
-        val scroll=ScrollView(this).apply { clipToPadding=false; isFillViewport=true }
-        content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((5*d).toInt(),(7*d).toInt(),(5*d).toInt(),(8*d).toInt()) }
-        scroll.addView(content)
-        body.addView(scroll,LinearLayout.LayoutParams(0,-1,1f))
+        val pageFrame=FrameLayout(this).apply { clipChildren=true; clipToPadding=true }
+        content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((5*d).toInt(),(7*d).toInt(),(5*d).toInt(),(5*d).toInt()) }
+        pageFrame.addView(content,FrameLayout.LayoutParams(-1,-1))
+        body.addView(pageFrame,LinearLayout.LayoutParams(0,-1,1f))
         root.addView(body,LinearLayout.LayoutParams(-1,0,1f).apply { topMargin=(7*d).toInt() })
         renderNavigation()
         setContentView(root)
@@ -110,49 +110,43 @@ class MainActivity : Activity() {
     private fun renderHome(d:Float) {
         val apps=latestState?.optJSONArray("applications") ?: JSONArray()
         val channels=createCard("♫","Canais de áudio",d)
-        channels.second.addView(label("Volume individual dos aplicativos ativos",10,secondaryText))
-        if(apps.length()==0) channels.second.addView(label("Nenhuma sessão de áudio ativa. Abra um aplicativo e reproduza áudio no Windows.",11,secondaryText))
-        else {
-            val scroll=HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled=false }
-            val row=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL }
+        channels.second.addView(label("Controle individual dos aplicativos ativos",10,secondaryText))
+        if(apps.length()==0) {
+            channels.second.addView(label("Nenhum aplicativo com áudio ativo. Abra um programa no PC para controlá-lo aqui.",11,secondaryText))
+        } else {
+            val grid=GridLayout(this).apply { columnCount=4; rowCount=(apps.length()+3)/4; useDefaultMargins=false }
             for(i in 0 until apps.length()) {
                 val app=apps.optJSONObject(i) ?: continue
-                val tile=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; gravity=Gravity.CENTER; setPadding((5*d).toInt(),(5*d).toInt(),(5*d).toInt(),(5*d).toInt()); background=rounded(surface,9,stroke) }
-                tile.addView(label("◖))",20,purple))
-                val value=(app.optDouble("volume",0.0)*100).toInt().coerceIn(0,100)
-                tile.addView(label("$value%",10,primaryText))
-                val frame=FrameLayout(this)
-                val bar=SeekBar(this).apply { max=100; progress=value; rotation=270f; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(purple) }
-                frame.addView(bar,FrameLayout.LayoutParams((112*d).toInt(),(28*d).toInt(),Gravity.CENTER))
-                tile.addView(frame,LinearLayout.LayoutParams((44*d).toInt(),(116*d).toInt()))
-                bar.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(seek:SeekBar?,v:Int,user:Boolean) {}
-                    override fun onStartTrackingTouch(seek:SeekBar?) {}
-                    override fun onStopTrackingTouch(seek:SeekBar?) { send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",(seek?.progress ?: 0)/100f)) }
+                val tile=LinearLayout(this).apply {
+                    orientation=LinearLayout.VERTICAL
+                    gravity=Gravity.CENTER
+                    setPadding((4*d).toInt(),(3*d).toInt(),(4*d).toInt(),(3*d).toInt())
+                    background=rounded(surface,10,stroke)
+                }
+                val initial=(app.optDouble("volume",1.0)*100).toInt().coerceIn(0,100)
+                tile.addView(RotaryDialView(this,initial) { volume ->
+                    send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",volume/100f))
+                },LinearLayout.LayoutParams((76*d).toInt(),(76*d).toInt()))
+                tile.addView(label(app.optString("name","Aplicativo"),10,primaryText).apply {
+                    gravity=Gravity.CENTER
+                    maxLines=1
+                    ellipsize=android.text.TextUtils.TruncateAt.END
+                },LinearLayout.LayoutParams(-1,-2).apply { topMargin=(2*d).toInt() })
+                tile.addView(action(if(app.optBoolean("mute")) "ATIVAR SOM" else "MUTAR") {
+                    send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute")))
+                }.apply { textSize=9f; minHeight=(28*d).toInt(); setPadding(3,0,3,0) },
+                    LinearLayout.LayoutParams(-1,(28*d).toInt()).apply { topMargin=(3*d).toInt() })
+                grid.addView(tile,GridLayout.LayoutParams().apply {
+                    width=0
+                    height=(116*d).toInt()
+                    columnSpec=GridLayout.spec(GridLayout.UNDEFINED,1f)
+                    setMargins((2*d).toInt(),(3*d).toInt(),(2*d).toInt(),(3*d).toInt())
                 })
-                tile.addView(label(app.optString("name","Aplicativo"),9,secondaryText).apply { gravity=Gravity.CENTER; maxLines=2; ellipsize=android.text.TextUtils.TruncateAt.END })
-                tile.addView(action(if(app.optBoolean("mute")) "ATIVAR" else "MUTAR") { send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute"))) }.apply { textSize=9f; minHeight=(30*d).toInt() })
-                row.addView(tile,LinearLayout.LayoutParams((100*d).toInt(),(200*d).toInt()).apply { rightMargin=(6*d).toInt() })
             }
-            scroll.addView(row); channels.second.addView(scroll)
+            channels.second.addView(grid)
         }
         channels.second.addView(action("ATUALIZAR CANAIS") { send("get_state") })
         content.addView(channels.first)
-        val output=latestState?.optJSONObject("output")
-        val volume=((output?.optDouble("volume",0.0) ?: 0.0)*100).toInt().coerceIn(0,100)
-        val master=createCard("◖))","Saída principal",d)
-        master.second.addView(label(output?.optString("name") ?: "Dispositivo de saída",10,secondaryText))
-        master.second.addView(label("Volume geral: $volume%",11,primaryText))
-        val seek=SeekBar(this).apply { max=100; progress=volume; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(purple) }
-        seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(bar:SeekBar?,v:Int,user:Boolean) {}
-            override fun onStartTrackingTouch(bar:SeekBar?) {}
-            override fun onStopTrackingTouch(bar:SeekBar?) { send("set_master_volume",JSONObject().put("value",(bar?.progress ?: 0)/100f)) }
-        })
-        master.second.addView(seek)
-        master.second.addView(actionRow("VOLUME +",{send("volume_up")},"VOLUME −",{send("volume_down")}))
-        master.second.addView(actionRow("MUTAR",{send("volume_mute")},"PLAY / PAUSE",{send("media_play_pause")}))
-        content.addView(master.first,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(8*d).toInt() })
     }
 
     private fun renderApplications(d:Float) {
@@ -161,17 +155,14 @@ class MainActivity : Activity() {
         for(i in 0 until apps.length()) {
             val app=apps.optJSONObject(i) ?: continue
             val item=createCard("♫",app.optString("name","Aplicativo"),d)
-            val value=(app.optDouble("volume",0.0)*100).toInt().coerceIn(0,100)
-            item.second.addView(label("VOLUME $value%",10,purple))
-            val seek=SeekBar(this).apply { max=100; progress=value; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(purple) }
-            seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(bar:SeekBar?,v:Int,user:Boolean) {}
-                override fun onStartTrackingTouch(bar:SeekBar?) {}
-                override fun onStopTrackingTouch(bar:SeekBar?) { send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",bar?.progress?.div(100f) ?: 0f)) }
+            val volume=(app.optDouble("volume",1.0)*100).toInt().coerceIn(0,100)
+            item.second.addView(RotaryDialView(this,volume) { value ->
+                send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",value/100f))
+            },LinearLayout.LayoutParams((88*d).toInt(),(88*d).toInt()).apply { gravity=Gravity.CENTER_HORIZONTAL })
+            item.second.addView(action(if(app.optBoolean("mute")) "ATIVAR SOM" else "SILENCIAR") {
+                send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute")))
             })
-            item.second.addView(seek)
-            item.second.addView(action(if(app.optBoolean("mute")) "ATIVAR SOM" else "SILENCIAR") { send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute"))) })
-            content.addView(item.first,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(7*d).toInt() })
+            content.addView(item.first,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(5*d).toInt() })
         }
         content.addView(action("ATUALIZAR LISTA") { send("get_state") })
     }
@@ -180,20 +171,14 @@ class MainActivity : Activity() {
         val mic=latestState?.optJSONObject("microphone")
         val item=createCard("♩","Entrada de áudio",d)
         item.second.addView(label(mic?.optString("name") ?: "Microfone não identificado",11,secondaryText))
-        val value=(mic?.optDouble("volume",0.0)?.times(100.0) ?: 0.0).toInt().coerceIn(0,100)
-        val caption=label("Volume: $value%",12,primaryText); item.second.addView(caption)
-        val seek=SeekBar(this).apply { max=100; progress=value; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(purple) }
-        seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(bar:SeekBar?,v:Int,user:Boolean) { if(user) caption.text="Volume: $v%" }
-            override fun onStartTrackingTouch(bar:SeekBar?) {}
-            override fun onStopTrackingTouch(bar:SeekBar?) { send("set_mic_volume",JSONObject().put("value",(bar?.progress ?: 0)/100f)) }
+        val volume=((mic?.optDouble("volume",0.0) ?: 0.0)*100).toInt().coerceIn(0,100)
+        item.second.addView(RotaryDialView(this,volume) { value ->
+            send("set_mic_volume",JSONObject().put("value",value/100f))
+        },LinearLayout.LayoutParams((100*d).toInt(),(100*d).toInt()).apply { gravity=Gravity.CENTER_HORIZONTAL })
+        item.second.addView(action(if(mic?.optBoolean("mute")==true) "ATIVAR MICROFONE" else "SILENCIAR MICROFONE") {
+            send("set_mic_mute",JSONObject().put("value",mic?.optBoolean("mute")!=true))
         })
-        item.second.addView(seek)
-        item.second.addView(action(if(mic?.optBoolean("mute")==true) "ATIVAR MICROFONE" else "SILENCIAR MICROFONE") { send("set_mic_mute",JSONObject().put("value",mic?.optBoolean("mute")!=true)) })
         content.addView(item.first)
-        val info=createCard("⚙","Opções do microfone",d)
-        info.second.addView(label("O controle de volume e mute utiliza a DECKRA Bridge. Opções adicionais dependem dos recursos do dispositivo.",10,secondaryText))
-        content.addView(info.first)
     }
 
     private fun renderKeys(d:Float) {
@@ -279,6 +264,83 @@ class MainActivity : Activity() {
         }
         if(::connectionPanel.isInitialized) connectionPanel.background=rounded(surface,9,stroke)
     }
+    private inner class RotaryDialView(
+        context:Context,
+        initialValue:Int,
+        private val onCommit:(Int)->Unit
+    ):View(context) {
+        private var value=initialValue.coerceIn(0,100)
+        private val density=resources.displayMetrics.density
+        private val track=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            style=android.graphics.Paint.Style.STROKE
+            strokeWidth=5.5f*density
+            strokeCap=android.graphics.Paint.Cap.ROUND
+            color=if(isLightTheme) Color.rgb(215,211,229) else Color.rgb(54,53,72)
+        }
+        private val active=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            style=android.graphics.Paint.Style.STROKE
+            strokeWidth=5.5f*density
+            strokeCap=android.graphics.Paint.Cap.ROUND
+            color=purple
+        }
+        private val pointer=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            color=purple
+            strokeWidth=3.5f*density
+            strokeCap=android.graphics.Paint.Cap.ROUND
+        }
+        private val center=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { color=if(isLightTheme) Color.rgb(235,232,244) else Color.rgb(35,34,48) }
+        private val text=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+            color=primaryText
+            textAlign=android.graphics.Paint.Align.CENTER
+            textSize=15f*density
+            typeface=android.graphics.Typeface.create("sans-serif-medium",android.graphics.Typeface.NORMAL)
+        }
+        private val bounds=android.graphics.RectF()
+
+        override fun onDraw(canvas:android.graphics.Canvas) {
+            super.onDraw(canvas)
+            val cx=width/2f
+            val cy=height/2f
+            val radius=(minOf(width,height)*0.37f)
+            bounds.set(cx-radius,cy-radius,cx+radius,cy+radius)
+            canvas.drawArc(bounds,135f,270f,false,track)
+            canvas.drawArc(bounds,135f,270f*value/100f,false,active)
+            val angle=Math.toRadians((135.0+270.0*value/100.0))
+            val px=cx+ kotlin.math.cos(angle).toFloat()*(radius-1f*density)
+            val py=cy+ kotlin.math.sin(angle).toFloat()*(radius-1f*density)
+            canvas.drawLine(cx,cy,px,py,pointer)
+            canvas.drawCircle(cx,cy,5f*density,center)
+            canvas.drawText("$value%",cx,cy+5f*density,text)
+        }
+
+        override fun onTouchEvent(event:android.view.MotionEvent):Boolean {
+            when(event.action) {
+                android.view.MotionEvent.ACTION_DOWN,android.view.MotionEvent.ACTION_MOVE -> {
+                    val dx=event.x-width/2f
+                    val dy=event.y-height/2f
+                    var angle=Math.toDegrees(kotlin.math.atan2(dy.toDouble(),dx.toDouble()))
+                    if(angle<135.0) angle+=360.0
+                    value=(((angle-135.0)/270.0)*100.0).toInt().coerceIn(0,100)
+                    invalidate()
+                    return true
+                }
+                android.view.MotionEvent.ACTION_UP -> {
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                    onCommit(value)
+                    performClick()
+                    return true
+                }
+                android.view.MotionEvent.ACTION_CANCEL -> return true
+            }
+            return true
+        }
+
+        override fun performClick():Boolean {
+            super.performClick()
+            return true
+        }
+    }
+
     private fun rounded(color:Int,radius:Int,stroke:Int=Color.TRANSPARENT)=GradientDrawable().apply {
         setColor(color); cornerRadius=radius*resources.displayMetrics.density
         if(stroke!=Color.TRANSPARENT) setStroke((1*resources.displayMetrics.density).toInt().coerceAtLeast(1),stroke)
