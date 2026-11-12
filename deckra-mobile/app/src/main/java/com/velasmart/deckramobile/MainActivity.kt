@@ -96,7 +96,7 @@ class MainActivity : Activity() {
     private fun renderPage() {
         content.removeAllViews()
         val d=resources.displayMetrics.density
-        content.addView(label(currentPage,23,primaryText).apply { typeface=android.graphics.Typeface.DEFAULT_BOLD })
+        if(currentPage!="Início") content.addView(label(currentPage,23,primaryText).apply { typeface=android.graphics.Typeface.DEFAULT_BOLD })
         when(currentPage) {
             "Início" -> renderHome(d)
             "Aplicativos" -> renderApplications(d)
@@ -110,7 +110,9 @@ class MainActivity : Activity() {
     private fun renderHome(d:Float) {
         val apps=latestState?.optJSONArray("applications") ?: JSONArray()
         val channels=createCard("♫","Canais de áudio",d)
-        channels.second.addView(label("Controle individual dos aplicativos ativos",10,secondaryText))
+        channels.first.getChildAt(0).layoutParams=channels.first.getChildAt(0).layoutParams.apply { height=(34*d).toInt() }
+        channels.second.setPadding((7*d).toInt(),(3*d).toInt(),(7*d).toInt(),(4*d).toInt())
+        channels.second.addView(label("Controle individual dos aplicativos ativos",9,secondaryText))
         if(apps.length()==0) {
             channels.second.addView(label("Nenhum aplicativo com áudio ativo. Abra um programa no PC para controlá-lo aqui.",11,secondaryText))
         } else {
@@ -126,7 +128,7 @@ class MainActivity : Activity() {
                 val initial=(app.optDouble("volume",1.0)*100).toInt().coerceIn(0,100)
                 tile.addView(RotaryDialView(this,initial) { volume ->
                     send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",volume/100f))
-                },LinearLayout.LayoutParams((76*d).toInt(),(76*d).toInt()))
+                },LinearLayout.LayoutParams((58*d).toInt(),(58*d).toInt()))
                 tile.addView(label(app.optString("name","Aplicativo"),10,primaryText).apply {
                     gravity=Gravity.CENTER
                     maxLines=1
@@ -134,11 +136,11 @@ class MainActivity : Activity() {
                 },LinearLayout.LayoutParams(-1,-2).apply { topMargin=(2*d).toInt() })
                 tile.addView(action(if(app.optBoolean("mute")) "ATIVAR SOM" else "MUTAR") {
                     send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute")))
-                }.apply { textSize=9f; minHeight=(28*d).toInt(); setPadding(3,0,3,0) },
-                    LinearLayout.LayoutParams(-1,(28*d).toInt()).apply { topMargin=(3*d).toInt() })
+                }.apply { textSize=9f; minHeight=(23*d).toInt(); setPadding(2,0,2,0) },
+                    LinearLayout.LayoutParams(-1,(23*d).toInt()).apply { topMargin=(2*d).toInt() })
                 grid.addView(tile,GridLayout.LayoutParams().apply {
                     width=0
-                    height=(116*d).toInt()
+                    height=(91*d).toInt()
                     columnSpec=GridLayout.spec(GridLayout.UNDEFINED,1f)
                     setMargins((2*d).toInt(),(3*d).toInt(),(2*d).toInt(),(3*d).toInt())
                 })
