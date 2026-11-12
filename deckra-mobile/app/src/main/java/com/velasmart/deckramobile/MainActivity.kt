@@ -13,6 +13,7 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.FileProvider
 import okhttp3.*
@@ -94,7 +95,7 @@ class MainActivity : Activity() {
         val pageFrame=FrameLayout(this).apply { clipChildren=true; clipToPadding=true }
         content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((5*d).toInt(),(7*d).toInt(),(5*d).toInt(),(5*d).toInt()) }
         pageScroll=ScrollView(this).apply { isFillViewport=true; isVerticalScrollBarEnabled=false; overScrollMode=View.OVER_SCROLL_NEVER }
-        pageScroll.addView(content,ScrollView.LayoutParams(-1,-1))
+        pageScroll.addView(content,FrameLayout.LayoutParams(-1,-1))
         pageFrame.addView(pageScroll,FrameLayout.LayoutParams(-1,-1))
         body.addView(pageFrame,LinearLayout.LayoutParams(0,-1,1f))
         root.addView(body,LinearLayout.LayoutParams(-1,0,1f).apply { topMargin=(7*d).toInt() })
