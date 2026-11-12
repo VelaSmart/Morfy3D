@@ -48,23 +48,24 @@ static async Task Handle(HttpListenerContext context, string expectedPin) {
             } else if (type == "command" && paired) {
                 var command = root.TryGetProperty("command", out var commandValue) ? commandValue.GetString() ?? "" : "";
                 var ok = command switch {
-                    "volume_up" => Native.keybd_event(0xAF, 0, 0, UIntPtr.Zero) == 0,
-                    "volume_down" => Native.keybd_event(0xAE, 0, 0, UIntPtr.Zero) == 0,
-                    "volume_mute" => Native.keybd_event(0xAD, 0, 0, UIntPtr.Zero) == 0,
-                    "media_play_pause" => Native.keybd_event(0xB3, 0, 0, UIntPtr.Zero) == 0,
-                    "media_next" => Native.keybd_event(0xB0, 0, 0, UIntPtr.Zero) == 0,
-                    "media_previous" => Native.keybd_event(0xB1, 0, 0, UIntPtr.Zero) == 0,
+                    "volume_up" => SendMediaKey(0xAF),
+                    "volume_down" => SendMediaKey(0xAE),
+                    "volume_mute" => SendMediaKey(0xAD),
+                    "media_play_pause" => SendMediaKey(0xB3),
+                    "media_next" => SendMediaKey(0xB0),
+                    "media_previous" => SendMediaKey(0xB1),
                     _ => false
                 };
                 await Reply(ws, new { ok, command, message = ok ? "Comando enviado ao Windows." : "Comando não permitido." });
-                if (ok) {
-                    var releaseKey = command switch { "volume_up"=>0xAF, "volume_down"=>0xAE, "volume_mute"=>0xAD, "media_play_pause"=>0xB3, "media_next"=>0xB0, "media_previous"=>0xB1, _=>0 };
-                    Native.keybd_event((byte)releaseKey, 0, 2, UIntPtr.Zero);
-                }
             }
         }
     } catch (Exception ex) { Console.WriteLine("Conexão encerrada: " + ex.Message); }
     finally { if (ws != null) ws.Dispose(); }
+}
+static bool SendMediaKey(byte key) {
+    Native.keybd_event(key, 0, 0, UIntPtr.Zero);
+    Native.keybd_event(key, 0, 2, UIntPtr.Zero);
+    return true;
 }
 static async Task Reply(WebSocket ws, object value) {
     var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value));
@@ -72,5 +73,5 @@ static async Task Reply(WebSocket ws, object value) {
 }
 static class Native {
     [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-    internal static extern int keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+    internal static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 }
