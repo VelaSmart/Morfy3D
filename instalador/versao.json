@@ -1,7 +1,7 @@
 {
-  "versao": "1.8",
+  "versao": "1.9",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "5910818f73076e83446ff1b60b0a7cf2a965d84aaf950312f708c881651f4489",
-  "tamanho": 30205238,
-  "notas": "Mostrador na tela claro quando o DECKRA está no Modo claro. Novo som de mute, mais suave e sempre na mesma altura (não muda com os outros volumes). Medidor de áudio acompanha o volume do canal e se mexe com a música."
+  "sha256": "e8e88542e1f7ca5752b9b650b3e490dc483c3c6303ac5f5d6b9389ef1460a8e8",
+  "tamanho": 31141395,
+  "notas": "Novo: canais extras (até 4) só no computador, na aba Aplicativos. Novo: botões de voltar, tocar/pausar e avançar para Spotify, YouTube e outros players. Corrigido: volume que \"travava\" (Spotify, microfone) quando era mudado fora do DECKRA. Círculo de volume só responde com o mouse perto dele e não pula mais de 100% para 0%. Instalador espera o antivírus antes de abrir o DECKRA."
 }
