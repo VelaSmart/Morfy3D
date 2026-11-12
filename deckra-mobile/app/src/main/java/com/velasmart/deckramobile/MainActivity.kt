@@ -111,7 +111,7 @@ class MainActivity : Activity() {
                     val app=apps.optJSONObject(i) ?: continue
                     addPanel(app.optString("name","Aplicativo")) {
                         addView(label("Volume: "+(app.optDouble("volume",0.0)*100).toInt()+"%",15,Color.WHITE))
-                        val seek=SeekBar(this).apply { max=100; progress=(app.optDouble("volume",0.0)*100).toInt() }
+                        val seek=SeekBar(this@MainActivity).apply { max=100; progress=(app.optDouble("volume",0.0)*100).toInt() }
                         seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
                             override fun onProgressChanged(b:SeekBar?,v:Int,u:Boolean) {}
                             override fun onStartTrackingTouch(b:SeekBar?) {}
@@ -128,7 +128,7 @@ class MainActivity : Activity() {
                 addPanel("Dispositivo de entrada") {
                     addView(label(mic?.optString("name") ?: "Conecte o PC para consultar",14,muted))
                     addView(label("Volume: "+((mic?.optDouble("volume",0.0) ?: 0.0)*100).toInt()+"%",22,Color.WHITE))
-                    val seek=SeekBar(this).apply { max=100; progress=((mic?.optDouble("volume",0.0) ?: 0.0)*100).toInt() }
+                    val seek=SeekBar(this@MainActivity).apply { max=100; progress=((mic?.optDouble("volume",0.0) ?: 0.0)*100).toInt() }
                     seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
                         override fun onProgressChanged(b:SeekBar?,v:Int,u:Boolean) {}
                         override fun onStartTrackingTouch(b:SeekBar?) {}
