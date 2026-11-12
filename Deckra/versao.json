@@ -1,7 +1,7 @@
 {
-  "versao": "1.3",
+  "versao": "1.4",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "3371bb2c485b24853111899980f2517c59cb64cb729621177e8c4610b5efc8b8",
-  "tamanho": 30189636,
-  "notas": "Lista de aplicativos com o ícone de cada app e jogo. Jogos reconhecidos pelo nome certo: Minecraft (Java, Lunar, Badlion), Fortnite, VALORANT, FiveM, PUBG, Palworld e outros da Unreal Engine. Nomes estranhos de alguns apps na lista foram corrigidos."
+  "sha256": "2543183e366d45e2772916513dc3d778827c8ca48e05f83a9a9a1937ec3b896f",
+  "tamanho": 30189006,
+  "notas": "Atalho de teclado para abrir o DECKRA de qualquer lugar (padrão Ctrl + Alt + D, configurável em Configurações). Medidor de áudio estilo OBS no fundo de cada canal na aba Aplicativos (liga/desliga em Configurações). Na lista de aplicativos, SISTEMA agora vem antes de EM SEGUNDO PLANO."
 }
