@@ -1,7 +1,7 @@
 {
-  "versao": "1.11",
+  "versao": "1.11.1",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "c6589272caf5f2faf6bee4599cddd52d2fb9b21336bb0b23f6647b2a35ff8837",
-  "tamanho": 31156928,
-  "notas": "Novo: escolha em qual canto da tela o mostrador aparece. Novo: opção para ligar/desligar a mudança de volume pela roda do mouse. Novo: mudar a ordem dos canais extras pelas setinhas. Notas de atualização e painel de notificações mais legíveis. Medidor de áudio mais vivo. Atualização instala na mesma pasta e modo da instalação (ex.: outro HD)."
+  "sha256": "c258413c662eb4aa36acf5ef674b5df0b97a4da11ff7c46e20b7262c0801d7d8",
+  "tamanho": 31157216,
+  "notas": "Medidor de áudio com muito mais movimento: acompanha as batidas da música. Seletor de posição do mostrador com visual novo."
 }
