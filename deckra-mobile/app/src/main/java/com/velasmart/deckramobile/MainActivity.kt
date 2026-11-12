@@ -1,6 +1,12 @@
 package com.velasmart.deckramobile
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import androidx.core.content.FileProvider
+import java.io.File
 import android.os.Bundle
 import android.graphics.Color
 import android.widget.*
@@ -19,6 +25,7 @@ class MainActivity : Activity() {
     private lateinit var log: TextView
     private lateinit var pin: EditText
     private lateinit var root: LinearLayout
+    private lateinit var updateButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +49,99 @@ class MainActivity : Activity() {
         root.addView(Button(this).apply { text="Faixa anterior"; setOnClickListener { send("media_previous") } })
         log = text("Aguardando conexão com o DECKRA Bridge no Windows.", 12f, Color.LTGRAY)
         root.addView(log)
+        updateButton = Button(this).apply { text="VERIFICAR ATUALIZAÇÃO"; setOnClickListener { checkForUpdates() } }
+        root.addView(updateButton, 5)
         setContentView(ScrollView(this).apply { addView(root) })
+        checkForUpdates()
+    }
+
+
+    private fun checkForUpdates() {
+        runOnUiThread { updateButton.isEnabled = false; updateButton.text = "VERIFICANDO ATUALIZAÇÕES..." }
+        val request = Request.Builder()
+            .url("https://api.github.com/repos/VelaSmart/Morfy3D/releases/tags/deckra-mobile-latest")
+            .header("Accept", "application/vnd.github+json")
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                runOnUiThread { updateButton.isEnabled = true; updateButton.text = "VERIFICAR ATUALIZAÇÃO"; log.text = "Não foi possível consultar atualizações." }
+            }
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    val release = it.body?.string()
+                    if (!it.isSuccessful || release == null) {
+                        runOnUiThread { updateButton.isEnabled = true; updateButton.text = "VERIFICAR ATUALIZAÇÃO"; log.text = "Atualizações indisponíveis no momento." }
+                        return
+                    }
+                    try {
+                        val json = JSONObject(release)
+                        val body = json.optString("body")
+                        val remoteCode = Regex("versionCode=(\\d+)").find(body)?.groupValues?.get(1)?.toLongOrNull() ?: 0L
+                        val currentCode = if (Build.VERSION.SDK_INT >= 28) packageManager.getPackageInfo(packageName, 0).longVersionCode else @Suppress("DEPRECATION") packageManager.getPackageInfo(packageName, 0).versionCode.toLong()
+                        val apkUrl = json.getJSONArray("assets").let { assets ->
+                            (0 until assets.length()).map { index -> assets.getJSONObject(index) }
+                                .firstOrNull { asset -> asset.optString("name") == "deckra-mobile.apk" }
+                                ?.optString("browser_download_url")
+                        }
+                        if (remoteCode > currentCode && !apkUrl.isNullOrBlank()) {
+                            runOnUiThread {
+                                updateButton.isEnabled = true
+                                updateButton.text = "ATUALIZAR PARA A VERSÃO $remoteCode"
+                                log.text = "Nova versão disponível. Toque em ATUALIZAR para baixar e instalar."
+                                updateButton.setOnClickListener { downloadAndInstall(apkUrl) }
+                            }
+                        } else {
+                            runOnUiThread {
+                                updateButton.isEnabled = true
+                                updateButton.text = "SEU APP ESTÁ ATUALIZADO"
+                                updateButton.setOnClickListener { checkForUpdates() }
+                            }
+                        }
+                    } catch (_: Exception) {
+                        runOnUiThread { updateButton.isEnabled = true; updateButton.text = "VERIFICAR ATUALIZAÇÃO"; log.text = "Não foi possível interpretar a versão publicada." }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun downloadAndInstall(url: String) {
+        updateButton.isEnabled = false
+        updateButton.text = "BAIXANDO ATUALIZAÇÃO..."
+        val request = Request.Builder().url(url).build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                runOnUiThread { updateButton.isEnabled = true; updateButton.text = "TENTAR ATUALIZAR NOVAMENTE"; log.text = "Falha ao baixar o APK." }
+            }
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!it.isSuccessful) {
+                        runOnUiThread { updateButton.isEnabled = true; updateButton.text = "TENTAR ATUALIZAR NOVAMENTE"; log.text = "Download da atualização falhou." }
+                        return
+                    }
+                    val apk = File(cacheDir, "deckra-mobile-update.apk")
+                    it.body?.byteStream()?.use { input -> apk.outputStream().use(input::copyTo) }
+                    runOnUiThread {
+                        if (!packageManager.canRequestPackageInstalls()) {
+                            startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                            updateButton.isEnabled = true
+                            updateButton.text = "TOQUE PARA INSTALAR APÓS AUTORIZAR"
+                            log.text = "Permita instalações para DECKRA Mobile e toque novamente em atualizar."
+                            updateButton.setOnClickListener { downloadAndInstall(url) }
+                            return@runOnUiThread
+                        }
+                        val uri = FileProvider.getUriForFile(this@MainActivity, "$packageName.fileprovider", apk)
+                        val install = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
+                            data = uri
+                            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        }
+                        startActivity(install)
+                        updateButton.isEnabled = true
+                        updateButton.text = "ATUALIZAÇÃO BAIXADA"
+                    }
+                }
+            }
+        })
     }
 
     private fun discoverPc() {
