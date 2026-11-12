@@ -56,6 +56,9 @@ class MainActivity : Activity() {
     }
 
 
+    @Suppress("DEPRECATION")
+    private fun installedVersionCode(): Long = packageManager.getPackageInfo(packageName, 0).versionCode.toLong()
+
     private fun checkForUpdates() {
         runOnUiThread { updateButton.isEnabled = false; updateButton.text = "VERIFICANDO ATUALIZAÇÕES..." }
         val request = Request.Builder()
@@ -77,7 +80,7 @@ class MainActivity : Activity() {
                         val json = JSONObject(release)
                         val body = json.optString("body")
                         val remoteCode = Regex("versionCode=(\\d+)").find(body)?.groupValues?.get(1)?.toLongOrNull() ?: 0L
-                        val currentCode = if (Build.VERSION.SDK_INT >= 28) packageManager.getPackageInfo(packageName, 0).longVersionCode else @Suppress("DEPRECATION") packageManager.getPackageInfo(packageName, 0).versionCode.toLong()
+                        val currentCode = installedVersionCode()
                         val apkUrl = json.getJSONArray("assets").let { assets ->
                             (0 until assets.length()).map { index -> assets.getJSONObject(index) }
                                 .firstOrNull { asset -> asset.optString("name") == "deckra-mobile.apk" }
@@ -120,7 +123,7 @@ class MainActivity : Activity() {
                         return
                     }
                     val apk = File(cacheDir, "deckra-mobile-update.apk")
-                    it.body?.byteStream()?.use { input -> apk.outputStream().use(input::copyTo) }
+                    it.body?.byteStream()?.use { input -> apk.outputStream().use { output -> input.copyTo(output) } }
                     runOnUiThread {
                         if (!packageManager.canRequestPackageInstalls()) {
                             startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
