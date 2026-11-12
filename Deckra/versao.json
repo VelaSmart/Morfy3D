@@ -1,7 +1,7 @@
 {
-  "versao": "1.10",
+  "versao": "1.11",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "6aeb052a5d54735580ea2bd9f39dee86cf70d0db2db97c2ebe621e837b62bb79",
-  "tamanho": 31154982,
-  "notas": "Atualização direto para a versão mais nova, de qualquer versão antiga, sem reiniciar o DECKRA (procura sozinho a cada 3 horas). Botão tocar/pausar responde na hora e controles de mídia com visual novo. Canais extras com visual novo e mudo do microfone funcionando. Barra de rolagem nas páginas Aplicativos e Configurações. Versão marcada como beta."
+  "sha256": "c6589272caf5f2faf6bee4599cddd52d2fb9b21336bb0b23f6647b2a35ff8837",
+  "tamanho": 31156928,
+  "notas": "Novo: escolha em qual canto da tela o mostrador aparece. Novo: opção para ligar/desligar a mudança de volume pela roda do mouse. Novo: mudar a ordem dos canais extras pelas setinhas. Notas de atualização e painel de notificações mais legíveis. Medidor de áudio mais vivo. Atualização instala na mesma pasta e modo da instalação (ex.: outro HD)."
 }
