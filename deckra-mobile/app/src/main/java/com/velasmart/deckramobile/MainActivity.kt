@@ -147,7 +147,6 @@ class MainActivity : Activity() {
             }
             channels.second.addView(grid)
         }
-        channels.second.addView(action("ATUALIZAR CANAIS") { send("get_state") })
         content.addView(channels.first)
     }
 
