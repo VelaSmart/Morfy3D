@@ -4,7 +4,6 @@ using System.Net.WebSockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Runtime.InteropServices;
 
 var pin = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
 Console.Title = "DECKRA Bridge";
@@ -37,23 +36,31 @@ static async Task Handle(HttpListenerContext context, string expectedPin) {
         ws = (await context.AcceptWebSocketAsync(null)).WebSocket;
         var buffer = new byte[4096]; var paired = false;
         while (ws.State == WebSocketState.Open) {
-            var result = await ws.ReceiveAsync(buffer, CancellationToken.None);
+            var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
             if (result.MessageType == WebSocketMessageType.Close) break;
             using var doc = JsonDocument.Parse(buffer.AsMemory(0, result.Count));
             var root = doc.RootElement;
-            var type = root.GetProperty("type").GetString();
+            var type = root.TryGetProperty("type", out var typeValue) ? typeValue.GetString() : null;
             if (type == "pair") {
-                paired = root.GetProperty("pin").GetString() == expectedPin;
+                paired = root.TryGetProperty("pin", out var pinValue) && pinValue.GetString() == expectedPin;
                 await Reply(ws, new { paired, message = paired ? "Dispositivo pareado." : "PIN incorreto." });
                 if (!paired) break;
             } else if (type == "command" && paired) {
-                var command = root.GetProperty("command").GetString() ?? "";
+                var command = root.TryGetProperty("command", out var commandValue) ? commandValue.GetString() ?? "" : "";
                 var ok = command switch {
-                    "volume_up" => Key(0xAF), "volume_down" => Key(0xAE), "volume_mute" => Key(0xAD),
-                    "media_play_pause" => Key(0xB3), "media_next" => Key(0xB0), "media_previous" => Key(0xB1),
+                    "volume_up" => Native.keybd_event(0xAF, 0, 0, UIntPtr.Zero) == 0,
+                    "volume_down" => Native.keybd_event(0xAE, 0, 0, UIntPtr.Zero) == 0,
+                    "volume_mute" => Native.keybd_event(0xAD, 0, 0, UIntPtr.Zero) == 0,
+                    "media_play_pause" => Native.keybd_event(0xB3, 0, 0, UIntPtr.Zero) == 0,
+                    "media_next" => Native.keybd_event(0xB0, 0, 0, UIntPtr.Zero) == 0,
+                    "media_previous" => Native.keybd_event(0xB1, 0, 0, UIntPtr.Zero) == 0,
                     _ => false
                 };
                 await Reply(ws, new { ok, command, message = ok ? "Comando enviado ao Windows." : "Comando não permitido." });
+                if (ok) {
+                    var releaseKey = command switch { "volume_up"=>0xAF, "volume_down"=>0xAE, "volume_mute"=>0xAD, "media_play_pause"=>0xB3, "media_next"=>0xB0, "media_previous"=>0xB1, _=>0 };
+                    Native.keybd_event((byte)releaseKey, 0, 2, UIntPtr.Zero);
+                }
             }
         }
     } catch (Exception ex) { Console.WriteLine("Conexão encerrada: " + ex.Message); }
@@ -61,10 +68,9 @@ static async Task Handle(HttpListenerContext context, string expectedPin) {
 }
 static async Task Reply(WebSocket ws, object value) {
     var bytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value));
-    await ws.SendAsync(bytes, WebSocketMessageType.Text, true, CancellationToken.None);
+    await ws.SendAsync(new ArraySegment<byte>(bytes), WebSocketMessageType.Text, true, CancellationToken.None);
 }
-static bool Key(byte key) {
-    keybd_event(key, 0, 0, UIntPtr.Zero); keybd_event(key, 0, 2, UIntPtr.Zero); return true;
+static class Native {
+    [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+    internal static extern int keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
 }
-[DllImport("user32.dll")]
-static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
