@@ -26,7 +26,8 @@ class MainActivity : Activity() {
     private var socket: WebSocket? = null
     private var host = ""
     private var paired = false
-    private var currentPage = "Configuração"
+    private var currentPage = "Início"
+    private var themeMode = "system"
     private lateinit var root: LinearLayout
     private lateinit var content: LinearLayout
     private lateinit var status: TextView
@@ -36,15 +37,21 @@ class MainActivity : Activity() {
     private lateinit var navBar: LinearLayout
     private lateinit var connectionPanel: LinearLayout
     private var latestState: JSONObject? = null
-    private val bg = Color.rgb(14,15,24)
-    private val panel = Color.rgb(23,25,39)
-    private val purple = Color.rgb(137,101,255)
-    private val muted = Color.rgb(157,160,184)
+    private var bg = Color.rgb(14,15,24)
+    private var surface = Color.rgb(16,18,27)
+    private var panel = Color.rgb(23,25,39)
+    private var card = Color.rgb(18,20,29)
+    private var stroke = Color.rgb(43,45,61)
+    private var primaryText = Color.rgb(241,241,248)
+    private var secondaryText = Color.rgb(157,160,184)
+    private var purple = Color.rgb(137,101,255)
+    private var muted = Color.rgb(157,160,184)
+    private var isLightTheme = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = bg
-        window.navigationBarColor = bg
+        loadThemePreference()
+        applyTheme()
         buildShell()
         renderPage()
         checkForUpdates()
@@ -53,8 +60,8 @@ class MainActivity : Activity() {
     private fun buildShell() {
         val d=resources.displayMetrics.density
         root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(Color.rgb(9,10,16)); setPadding((4*d).toInt(),(4*d).toInt(),(4*d).toInt(),(4*d).toInt()) }
-        val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((12*d).toInt(),0,(10*d).toInt(),0); background=rounded(Color.rgb(16,17,25),9,Color.rgb(53,53,67)) }
-        val logo=ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType=ImageView.ScaleType.FIT_START; contentDescription="DECKRA" }
+        val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((12*d).toInt(),0,(10*d).toInt(),0); background=rounded(surface,9,stroke) }
+        val logo=ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType=ImageView.ScaleType.FIT_CENTER; adjustViewBounds=true; contentDescription="DECKRA" }
         header.addView(logo,LinearLayout.LayoutParams((82*d).toInt(),(34*d).toInt()))
         val divider=View(this).apply { setBackgroundColor(Color.rgb(65,65,81)) }
         header.addView(divider,LinearLayout.LayoutParams((1*d).toInt(),(24*d).toInt()).apply { leftMargin=(12*d).toInt(); rightMargin=(12*d).toInt() })
@@ -64,8 +71,8 @@ class MainActivity : Activity() {
         val toggle=action("CONECTAR") { connectionPanel.visibility=if(connectionPanel.visibility==View.VISIBLE) View.GONE else View.VISIBLE }
         header.addView(toggle,LinearLayout.LayoutParams((72*d).toInt(),(32*d).toInt()).apply { leftMargin=(8*d).toInt() })
         root.addView(header,LinearLayout.LayoutParams(-1,(44*d).toInt()))
-        connectionPanel=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((8*d).toInt(),(3*d).toInt(),(8*d).toInt(),(3*d).toInt()); background=rounded(Color.rgb(18,20,29),9,Color.rgb(37,38,50)); visibility=View.GONE }
-        hostInput=EditText(this).apply { hint="IP do PC"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI; setSingleLine(true); textSize=12f }
+        connectionPanel=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((8*d).toInt(),(3*d).toInt(),(8*d).toInt(),(3*d).toInt()); background=rounded(surface,9,stroke); visibility=View.GONE }
+        hostInput=EditText(this).apply { hint="IP do PC"; setTextColor(primaryText); setHintTextColor(secondaryText); inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI; setSingleLine(true); textSize=12f }
         connectionPanel.addView(hostInput,LinearLayout.LayoutParams(0,(40*d).toInt(),1f))
         pin=EditText(this).apply { hint="PIN de 6 dígitos"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=2; setSingleLine(true); textSize=12f }
         connectionPanel.addView(pin,LinearLayout.LayoutParams(0,(40*d).toInt(),1f).apply { leftMargin=(7*d).toInt() })
@@ -83,8 +90,6 @@ class MainActivity : Activity() {
         scroll.addView(content)
         body.addView(scroll,LinearLayout.LayoutParams(0,-1,1f))
         root.addView(body,LinearLayout.LayoutParams(-1,0,1f).apply { topMargin=(7*d).toInt() })
-        updateButton=action("VERIFICAR ATUALIZAÇÃO") { checkForUpdates() }.apply { textSize=9f }
-        root.addView(updateButton,LinearLayout.LayoutParams(-1,(28*d).toInt()).apply { topMargin=(5*d).toInt() })
         renderNavigation()
         setContentView(root)
     }
@@ -92,127 +97,188 @@ class MainActivity : Activity() {
     private fun renderPage() {
         content.removeAllViews()
         val d=resources.displayMetrics.density
-        val pageTitle=label(when(currentPage) {
-            "Configuração" -> "Configure seu controle"
-            "Aplicativos" -> "Aplicativos"
-            else -> "Atalhos das teclas"
-        },23,Color.rgb(241,241,248))
-        pageTitle.typeface=android.graphics.Typeface.create("sans-serif",android.graphics.Typeface.BOLD)
-        content.addView(pageTitle)
+        content.addView(label(currentPage,23,primaryText).apply { typeface=android.graphics.Typeface.DEFAULT_BOLD })
         when(currentPage) {
-            "Configuração" -> {
-                val columns=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.TOP }
-                val left=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
-                val right=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
-                columns.addView(left,LinearLayout.LayoutParams(0,-2,1f).apply { rightMargin=(7*d).toInt() })
-                columns.addView(right,LinearLayout.LayoutParams(0,-2,1f).apply { leftMargin=(7*d).toInt() })
-                val state=latestState
-                val output=state?.optJSONObject("output")
-                val volume=((output?.optDouble("volume",0.0) ?: 0.0)*100).toInt().coerceIn(0,100)
-                val vol=createCard("◖))","Volume por aplicativo",d)
-                vol.second.addView(label("VOLUME GERAL",10,Color.rgb(155,122,255)))
-                vol.second.addView(label(output?.optString("name") ?: "Aguardando conexão",10,muted))
-                val dial=TextView(this).apply { text=volume.toString()+"%"; textSize=27f; gravity=Gravity.CENTER; setTextColor(Color.WHITE); typeface=android.graphics.Typeface.DEFAULT_BOLD; background=rounded(Color.rgb(39,34,64),70,purple) }
-                vol.second.addView(dial,LinearLayout.LayoutParams((88*d).toInt(),(88*d).toInt()).apply { gravity=Gravity.CENTER; topMargin=(4*d).toInt(); bottomMargin=(4*d).toInt() })
-                val master=SeekBar(this).apply { max=100; progress=volume; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(Color.rgb(162,138,255)) }
-                master.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(bar:SeekBar?,value:Int,user:Boolean) { dial.text=value.toString()+"%" }
-                    override fun onStartTrackingTouch(bar:SeekBar?) {}
-                    override fun onStopTrackingTouch(bar:SeekBar?) { send("set_master_volume",JSONObject().put("value",(bar?.progress ?: 0)/100f)) }
-                })
-                vol.second.addView(master)
-                vol.second.addView(label("Arraste para ajustar o volume",9,muted).apply { gravity=Gravity.CENTER })
-                vol.second.addView(actionRow("VOLUME +",{ send("volume_up") },"VOLUME −",{ send("volume_down") }))
-                vol.second.addView(actionRow("MUTAR",{ send("volume_mute") },"PLAY / PAUSE",{ send("media_play_pause") }))
-                vol.second.addView(actionRow("PRÓXIMA",{ send("media_next") },"ANTERIOR",{ send("media_previous") }))
-                left.addView(vol.first)
-
-                val mic=state?.optJSONObject("microphone")
-                val micCard=createCard("◖))","Microfone",d)
-                micCard.second.addView(label(mic?.optString("name") ?: "Entrada não conectada",10,muted))
-                val micVolume=((mic?.optDouble("volume",0.0) ?: 0.0)*100).toInt().coerceIn(0,100)
-                micCard.second.addView(label("Volume: "+micVolume+"%",11,Color.WHITE))
-                val micSeek=SeekBar(this).apply { max=100; progress=micVolume; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(Color.rgb(162,138,255)) }
-                micSeek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-                    override fun onProgressChanged(bar:SeekBar?,value:Int,user:Boolean) {}
-                    override fun onStartTrackingTouch(bar:SeekBar?) {}
-                    override fun onStopTrackingTouch(bar:SeekBar?) { send("set_mic_volume",JSONObject().put("value",(bar?.progress ?: 0)/100f)) }
-                })
-                micCard.second.addView(micSeek)
-                micCard.second.addView(action(if(mic?.optBoolean("mute")==true) "ATIVAR MICROFONE" else "SILENCIAR MICROFONE") { send("set_mic_mute",JSONObject().put("value",mic?.optBoolean("mute")!=true)) })
-                left.addView(micCard.first,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(7*d).toInt() })
-
-                val keys=createCard("▦","Atalhos das teclas",d)
-                val keyGrid=GridLayout(this).apply { columnCount=3; rowCount=2 }
-                for(i in 1..6) {
-                    val key=TextView(this).apply { text=i.toString().padStart(2,'0'); gravity=Gravity.CENTER; textSize=13f; setTextColor(muted); background=rounded(Color.rgb(35,37,49),9,Color.rgb(52,54,66)) }
-                    keyGrid.addView(key,GridLayout.LayoutParams().apply { width=0; height=(42*d).toInt(); columnSpec=GridLayout.spec(GridLayout.UNDEFINED,1f); setMargins((3*d).toInt(),(3*d).toInt(),(3*d).toInt(),(3*d).toInt()) })
-                }
-                keys.second.addView(keyGrid)
-                keys.second.addView(label("CONTROLADOR NÃO INTEGRADO",10,Color.rgb(162,138,255)))
-                keys.second.addView(label("As atribuições serão habilitadas após a integração do firmware e do protocolo do controlador. Estes elementos são apenas indicadores visuais.",10,muted))
-                val eq=state?.optJSONObject("equalizer")
-                keys.second.addView(label("EQUALIZADOR",10,Color.rgb(155,122,255)))
-                keys.second.addView(label(if(eq?.optBoolean("available")==true) "Disponível" else "Requer driver APO ou dispositivo virtual no Windows.",9,muted))
-                right.addView(keys.first)
-                content.addView(columns,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(8*d).toInt() })
-            }
-            "Aplicativos" -> {
-                val apps=latestState?.optJSONArray("applications") ?: JSONArray()
-                if(apps.length()==0) {
-                    val empty=createCard("♫","Volume por aplicativo",d)
-                    empty.second.addView(label("Nenhuma sessão de áudio ativa foi encontrada. Abra um aplicativo e reproduza algum áudio no Windows.",11,muted))
-                    content.addView(empty.first)
-                }
-                for(i in 0 until apps.length()) {
-                    val app=apps.optJSONObject(i) ?: continue
-                    val card=createCard("♫",app.optString("name","Aplicativo"),d)
-                    card.second.addView(label("VOLUME "+(app.optDouble("volume",0.0)*100).toInt()+"%",10,Color.rgb(155,122,255)))
-                    val seek=SeekBar(this).apply { max=100; progress=(app.optDouble("volume",0.0)*100).toInt(); progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(Color.rgb(162,138,255)) }
-                    seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
-                        override fun onProgressChanged(bar:SeekBar?,value:Int,user:Boolean) {}
-                        override fun onStartTrackingTouch(bar:SeekBar?) {}
-                        override fun onStopTrackingTouch(bar:SeekBar?) { send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",bar?.progress?.div(100f) ?: 0f)) }
-                    })
-                    card.second.addView(seek)
-                    card.second.addView(action(if(app.optBoolean("mute")) "ATIVAR SOM" else "SILENCIAR") { send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute"))) })
-                    content.addView(card.first,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(7*d).toInt() })
-                }
-                content.addView(action("ATUALIZAR LISTA") { send("get_state") })
-            }
-            else -> {
-                val card=createCard("▦","Configuração das teclas",d)
-                card.second.addView(label("O firmware e o protocolo do controlador ainda não estão integrados à Bridge Windows. A configuração de teclas será habilitada quando essa integração estiver disponível.",11,muted))
-                content.addView(card.first)
-            }
+            "Início" -> renderHome(d)
+            "Aplicativos" -> renderApplications(d)
+            "Microfone" -> renderMicrophone(d)
+            "Teclas" -> renderKeys(d)
+            else -> renderSettings(d)
         }
-        if(!paired) content.addView(label("Conecte o DECKRA Bridge no Windows e pareie pelo cabeçalho.",10,Color.rgb(255,190,90)))
+        if(!paired) content.addView(label("Conecte o DECKRA Bridge no Windows e pareie pelo cabeçalho.",10,Color.rgb(255,170,65)))
+    }
+
+    private fun renderHome(d:Float) {
+        val apps=latestState?.optJSONArray("applications") ?: JSONArray()
+        val channels=createCard("♫","Canais de áudio",d)
+        channels.second.addView(label("Volume individual dos aplicativos ativos",10,secondaryText))
+        if(apps.length()==0) channels.second.addView(label("Nenhuma sessão de áudio ativa. Abra um aplicativo e reproduza áudio no Windows.",11,secondaryText))
+        else {
+            val scroll=HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled=false }
+            val row=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL }
+            for(i in 0 until apps.length()) {
+                val app=apps.optJSONObject(i) ?: continue
+                val tile=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; gravity=Gravity.CENTER; setPadding((5*d).toInt(),(5*d).toInt(),(5*d).toInt(),(5*d).toInt()); background=rounded(surface,9,stroke) }
+                tile.addView(label("◖))",20,purple))
+                val value=(app.optDouble("volume",0.0)*100).toInt().coerceIn(0,100)
+                tile.addView(label("$value%",10,primaryText))
+                val frame=FrameLayout(this)
+                val bar=SeekBar(this).apply { max=100; progress=value; rotation=270f; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(purple) }
+                frame.addView(bar,FrameLayout.LayoutParams((112*d).toInt(),(28*d).toInt(),Gravity.CENTER))
+                tile.addView(frame,LinearLayout.LayoutParams((44*d).toInt(),(116*d).toInt()))
+                bar.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
+                    override fun onProgressChanged(seek:SeekBar?,v:Int,user:Boolean) {}
+                    override fun onStartTrackingTouch(seek:SeekBar?) {}
+                    override fun onStopTrackingTouch(seek:SeekBar?) { send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",(seek?.progress ?: 0)/100f)) }
+                })
+                tile.addView(label(app.optString("name","Aplicativo"),9,secondaryText).apply { gravity=Gravity.CENTER; maxLines=2; ellipsize=android.text.TextUtils.TruncateAt.END })
+                tile.addView(action(if(app.optBoolean("mute")) "ATIVAR" else "MUTAR") { send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute"))) }.apply { textSize=9f; minHeight=(30*d).toInt() })
+                row.addView(tile,LinearLayout.LayoutParams((100*d).toInt(),(200*d).toInt()).apply { rightMargin=(6*d).toInt() })
+            }
+            scroll.addView(row); channels.second.addView(scroll)
+        }
+        channels.second.addView(action("ATUALIZAR CANAIS") { send("get_state") })
+        content.addView(channels.first)
+        val output=latestState?.optJSONObject("output")
+        val volume=((output?.optDouble("volume",0.0) ?: 0.0)*100).toInt().coerceIn(0,100)
+        val master=createCard("◖))","Saída principal",d)
+        master.second.addView(label(output?.optString("name") ?: "Dispositivo de saída",10,secondaryText))
+        master.second.addView(label("Volume geral: $volume%",11,primaryText))
+        val seek=SeekBar(this).apply { max=100; progress=volume; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(purple) }
+        seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar:SeekBar?,v:Int,user:Boolean) {}
+            override fun onStartTrackingTouch(bar:SeekBar?) {}
+            override fun onStopTrackingTouch(bar:SeekBar?) { send("set_master_volume",JSONObject().put("value",(bar?.progress ?: 0)/100f)) }
+        })
+        master.second.addView(seek)
+        master.second.addView(actionRow("VOLUME +",{send("volume_up")},"VOLUME −",{send("volume_down")}))
+        master.second.addView(actionRow("MUTAR",{send("volume_mute")},"PLAY / PAUSE",{send("media_play_pause")}))
+        content.addView(master.first,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(8*d).toInt() })
+    }
+
+    private fun renderApplications(d:Float) {
+        val apps=latestState?.optJSONArray("applications") ?: JSONArray()
+        if(apps.length()==0) content.addView(label("Nenhum aplicativo com áudio ativo.",11,secondaryText))
+        for(i in 0 until apps.length()) {
+            val app=apps.optJSONObject(i) ?: continue
+            val item=createCard("♫",app.optString("name","Aplicativo"),d)
+            val value=(app.optDouble("volume",0.0)*100).toInt().coerceIn(0,100)
+            item.second.addView(label("VOLUME $value%",10,purple))
+            val seek=SeekBar(this).apply { max=100; progress=value; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(purple) }
+            seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(bar:SeekBar?,v:Int,user:Boolean) {}
+                override fun onStartTrackingTouch(bar:SeekBar?) {}
+                override fun onStopTrackingTouch(bar:SeekBar?) { send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",bar?.progress?.div(100f) ?: 0f)) }
+            })
+            item.second.addView(seek)
+            item.second.addView(action(if(app.optBoolean("mute")) "ATIVAR SOM" else "SILENCIAR") { send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute"))) })
+            content.addView(item.first,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(7*d).toInt() })
+        }
+        content.addView(action("ATUALIZAR LISTA") { send("get_state") })
+    }
+
+    private fun renderMicrophone(d:Float) {
+        val mic=latestState?.optJSONObject("microphone")
+        val item=createCard("♩","Entrada de áudio",d)
+        item.second.addView(label(mic?.optString("name") ?: "Microfone não identificado",11,secondaryText))
+        val value=(mic?.optDouble("volume",0.0)?.times(100.0) ?: 0.0).toInt().coerceIn(0,100)
+        val caption=label("Volume: $value%",12,primaryText); item.second.addView(caption)
+        val seek=SeekBar(this).apply { max=100; progress=value; progressTintList=android.content.res.ColorStateList.valueOf(purple); thumbTintList=android.content.res.ColorStateList.valueOf(purple) }
+        seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(bar:SeekBar?,v:Int,user:Boolean) { if(user) caption.text="Volume: $v%" }
+            override fun onStartTrackingTouch(bar:SeekBar?) {}
+            override fun onStopTrackingTouch(bar:SeekBar?) { send("set_mic_volume",JSONObject().put("value",(bar?.progress ?: 0)/100f)) }
+        })
+        item.second.addView(seek)
+        item.second.addView(action(if(mic?.optBoolean("mute")==true) "ATIVAR MICROFONE" else "SILENCIAR MICROFONE") { send("set_mic_mute",JSONObject().put("value",mic?.optBoolean("mute")!=true)) })
+        content.addView(item.first)
+        val info=createCard("⚙","Opções do microfone",d)
+        info.second.addView(label("O controle de volume e mute utiliza a DECKRA Bridge. Opções adicionais dependem dos recursos do dispositivo.",10,secondaryText))
+        content.addView(info.first)
+    }
+
+    private fun renderKeys(d:Float) {
+        val keys=createCard("▦","Atalhos das teclas",d)
+        val grid=GridLayout(this).apply { columnCount=3; rowCount=2 }
+        for(i in 1..6) {
+            val key=TextView(this).apply { text=i.toString().padStart(2,'0'); gravity=Gravity.CENTER; textSize=15f; setTextColor(secondaryText); background=rounded(panel,9,stroke) }
+            grid.addView(key,GridLayout.LayoutParams().apply { width=0; height=(52*d).toInt(); columnSpec=GridLayout.spec(GridLayout.UNDEFINED,1f); setMargins(3,3,3,3) })
+        }
+        keys.second.addView(grid)
+        keys.second.addView(label("CONTROLADOR NÃO INTEGRADO",10,purple))
+        keys.second.addView(label("As atribuições serão habilitadas após a integração do firmware e do protocolo do controlador. Estes elementos são apenas indicadores visuais.",10,secondaryText))
+        val eq=latestState?.optJSONObject("equalizer")
+        keys.second.addView(label("EQUALIZADOR",10,purple))
+        keys.second.addView(label(if(eq?.optBoolean("available")==true) "Disponível na Bridge." else "Requer driver APO ou dispositivo virtual no Windows.",10,secondaryText))
+        content.addView(keys.first)
+    }
+
+    private fun renderSettings(d:Float) {
+        val appearance=createCard("◐","Aparência",d)
+        appearance.second.addView(label("Por padrão, o aplicativo acompanha o tema do celular.",10,secondaryText))
+        val group=RadioGroup(this).apply { orientation=RadioGroup.VERTICAL }
+        listOf("system" to "Automático (seguir sistema)","dark" to "Escuro","light" to "Claro").forEach { (mode,title) ->
+            val radio=RadioButton(this).apply { id=View.generateViewId(); tag=mode; text=title; setTextColor(primaryText); buttonTintList=android.content.res.ColorStateList.valueOf(purple) }
+            group.addView(radio); if(themeMode==mode) group.check(radio.id)
+        }
+        group.setOnCheckedChangeListener { g,id ->
+            themeMode=g.findViewById<RadioButton>(id)?.tag?.toString() ?: "system"
+            getSharedPreferences("deckra_preferences",Context.MODE_PRIVATE).edit().putString("theme_mode",themeMode).apply()
+            applyTheme(); renderNavigation(); renderPage()
+        }
+        appearance.second.addView(group); content.addView(appearance.first)
+        val updates=createCard("↻","Atualizações",d)
+        updates.second.addView(label("Verifique e instale novas versões do DECKRA Mobile.",10,secondaryText))
+        updateButton=action("VERIFICAR ATUALIZAÇÃO") { checkForUpdates() }.apply { textSize=11f }
+        updates.second.addView(updateButton); content.addView(updates.first)
+        val about=createCard("ⓘ","Sobre o aplicativo",d)
+        about.second.addView(label("DECKRA Mobile • Controle de áudio para Windows",10,secondaryText))
+        content.addView(about.first)
     }
 
     private fun renderNavigation() {
         if(!::navBar.isInitialized) return
         navBar.removeAllViews()
-        listOf("Configuração","Aplicativos","Teclas").forEachIndexed { index,page ->
+        val pages=listOf("Início","Aplicativos","Microfone","Teclas","Configurações")
+        val icons=listOf("⌂","▦","♩","▤","⚙")
+        pages.forEachIndexed { index,page ->
             val selected=page==currentPage
             val item=LinearLayout(this).apply {
-                orientation=LinearLayout.HORIZONTAL
-                gravity=Gravity.CENTER_VERTICAL
-                setPadding(9,9,5,9)
-                background=rounded(if(selected) Color.rgb(36,32,62) else Color.TRANSPARENT,8,if(selected) purple else Color.TRANSPARENT)
-                addView(label(listOf("⚙","▦","▤")[index],18,if(selected) Color.rgb(152,121,255) else muted))
-                addView(label(page,11,if(selected) Color.rgb(240,237,255) else muted),LinearLayout.LayoutParams(-1,-2).apply { leftMargin=7 })
+                orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding(8,9,4,9)
+                background=rounded(if(selected) if(isLightTheme) Color.rgb(235,228,255) else Color.rgb(36,32,62) else Color.TRANSPARENT,8,if(selected) purple else Color.TRANSPARENT)
+                addView(label(icons[index],17,purple))
+                addView(label(page,10,if(selected) primaryText else secondaryText),LinearLayout.LayoutParams(-1,-2).apply { leftMargin=6 })
                 setOnClickListener { currentPage=page; renderNavigation(); renderPage() }
             }
-            navBar.addView(item,LinearLayout.LayoutParams(-1,(47*resources.displayMetrics.density).toInt()).apply { bottomMargin=5 })
+            navBar.addView(item,LinearLayout.LayoutParams(-1,(43*resources.displayMetrics.density).toInt()).apply { bottomMargin=4 })
         }
     }
 
+    private fun loadThemePreference() {
+        themeMode=getSharedPreferences("deckra_preferences",Context.MODE_PRIVATE).getString("theme_mode","system") ?: "system"
+    }
+
+    private fun applyTheme() {
+        val night=(resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK)==android.content.res.Configuration.UI_MODE_NIGHT_YES
+        isLightTheme=when(themeMode) { "light" -> true; "dark" -> false; else -> !night }
+        if(isLightTheme) {
+            bg=Color.rgb(244,245,250); surface=Color.WHITE; panel=Color.rgb(248,248,252); card=Color.WHITE
+            stroke=Color.rgb(222,223,235); primaryText=Color.rgb(31,31,45); secondaryText=Color.rgb(105,107,128); muted=secondaryText
+        } else {
+            bg=Color.rgb(9,10,16); surface=Color.rgb(16,18,27); panel=Color.rgb(23,25,39); card=Color.rgb(18,20,29)
+            stroke=Color.rgb(43,45,61); primaryText=Color.rgb(241,241,248); secondaryText=Color.rgb(157,160,184); muted=secondaryText
+        }
+        purple=Color.rgb(137,101,255)
+        window.statusBarColor=bg; window.navigationBarColor=bg
+        if(::root.isInitialized) root.setBackgroundColor(bg)
+        if(::connectionPanel.isInitialized) connectionPanel.background=rounded(surface,9,stroke)
+    }
     private fun rounded(color:Int,radius:Int,stroke:Int=Color.TRANSPARENT)=GradientDrawable().apply {
         setColor(color); cornerRadius=radius*resources.displayMetrics.density
         if(stroke!=Color.TRANSPARENT) setStroke((1*resources.displayMetrics.density).toInt().coerceAtLeast(1),stroke)
     }
     private fun createCard(icon:String,title:String,density:Float):Pair<LinearLayout,LinearLayout> {
-        val card=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; background=rounded(Color.rgb(18,20,29),11,Color.rgb(37,38,50)) }
+        val card=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; background=rounded(card,11,stroke) }
         val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((10*density).toInt(),0,(8*density).toInt(),0) }
         header.addView(label(icon,20,Color.rgb(143,112,255)))
         header.addView(label(title,14,Color.rgb(238,238,246)),LinearLayout.LayoutParams(0,-2,1f).apply { leftMargin=(8*density).toInt() })
