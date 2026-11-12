@@ -1,7 +1,7 @@
 {
-  "versao": "1.7",
+  "versao": "1.8",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "addbea9d2a874167d43b6af25d7f52e648fe867f13503b904a7b63a341523307",
-  "tamanho": 30197974,
-  "notas": "Corrigido: erro \"Acesso negado\" ao baixar uma atualização."
+  "sha256": "5910818f73076e83446ff1b60b0a7cf2a965d84aaf950312f708c881651f4489",
+  "tamanho": 30205238,
+  "notas": "Mostrador na tela claro quando o DECKRA está no Modo claro. Novo som de mute, mais suave e sempre na mesma altura (não muda com os outros volumes). Medidor de áudio acompanha o volume do canal e se mexe com a música."
 }
