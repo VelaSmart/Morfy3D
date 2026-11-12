@@ -238,7 +238,7 @@ class MainActivity : Activity() {
                             try {
                                 val buf=ByteArray(1024); val p=DatagramPacket(buf,buf.size); ds.receive(p)
                                 val reply=String(p.data,0,p.length)
-                                if(reply.contains("DECKRA") && p.address !is Inet4Address.let { false }) found=p.address
+                                if(reply.contains("DECKRA") && reply.contains("deckra_bridge")) found=p.address
                             } catch(_:SocketTimeoutException) { break }
                         }
                         if(found!=null) return@repeat
