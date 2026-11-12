@@ -1,7 +1,7 @@
 {
-  "versao": "3.6",
+  "versao": "1.0",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "7ca14d3d32b37a4be8ca791cb4ed0ae73b77c24f5dc03962abad165e540cf2e4",
-  "tamanho": 30173408,
-  "notas": "Atualização de TESTE: reinstala a versão 3.5 para conferir o atualizador."
+  "sha256": "d7bbb66dbd0ab1cd5e6a3f44512d1cd67c018ec4aede90ccea9f2480a08d1df1",
+  "tamanho": 30180257,
+  "notas": "Primeira versão oficial do DECKRA. Novo: central de notificações (sino no canto superior esquerdo)."
 }
