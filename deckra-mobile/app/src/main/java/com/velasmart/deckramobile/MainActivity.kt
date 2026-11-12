@@ -30,6 +30,7 @@ class MainActivity : Activity() {
     private lateinit var content: LinearLayout
     private lateinit var status: TextView
     private lateinit var pin: EditText
+    private lateinit var hostInput: EditText
     private lateinit var updateButton: Button
     private var latestState: JSONObject? = null
     private val bg = Color.rgb(14,15,24)
@@ -52,6 +53,8 @@ class MainActivity : Activity() {
         root.addView(brand)
         status = label("●  PC não conectado",14,Color.rgb(255,190,80))
         root.addView(status)
+        hostInput = EditText(this).apply { hint="IP do PC (preenchido ao procurar)"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI; setSingleLine(true) }
+        root.addView(hostInput)
         pin = EditText(this).apply { hint="PIN de 6 dígitos exibido no PC"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=2; setSingleLine(true) }
         root.addView(pin)
         val connectRow = LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL }
@@ -237,8 +240,9 @@ class MainActivity : Activity() {
                         while(System.currentTimeMillis()<until && found==null) {
                             try {
                                 val buf=ByteArray(1024); val p=DatagramPacket(buf,buf.size); ds.receive(p)
-                                val reply=String(p.data,0,p.length)
-                                if(reply.contains("DECKRA") && reply.contains("deckra_bridge")) found=p.address
+                                val reply=String(p.data,0,p.length,Charsets.UTF_8)
+                                val payload=runCatching { JSONObject(reply) }.getOrNull()
+                                if(payload?.optString("type")=="deckra_bridge" && payload.optInt("port",0)==37892) found=p.address
                             } catch(_:SocketTimeoutException) { break }
                         }
                         if(found!=null) return@repeat
@@ -246,14 +250,16 @@ class MainActivity : Activity() {
                 }
             } catch(_:Exception) {} finally { try { lock.release() } catch(_:Exception) {} }
             runOnUiThread {
-                if(found!=null) { host=found!!.hostAddress ?: ""; status.text="●  PC encontrado: $host"; Toast.makeText(this,"PC encontrado. Digite o PIN.",Toast.LENGTH_LONG).show() }
+                if(found!=null) { host=found!!.hostAddress ?: ""; hostInput.setText(host); status.text="●  PC encontrado: $host"; Toast.makeText(this,"PC encontrado. Digite o PIN.",Toast.LENGTH_LONG).show() }
                 else { status.text="●  PC não encontrado"; Toast.makeText(this,"Verifique se a Bridge está aberta e se o Firewall permite UDP 37891 e TCP 37892 em rede privada.",Toast.LENGTH_LONG).show() }
             }
         }
     }
 
     private fun connectPc() {
-        if(host.isBlank()){ Toast.makeText(this,"Procure o PC primeiro.",Toast.LENGTH_SHORT).show(); return }
+        val typedHost=hostInput.text.toString().trim()
+        if(typedHost.isNotBlank()) host=typedHost
+        if(host.isBlank() || runCatching { InetAddress.getByName(host) }.isFailure){ Toast.makeText(this,"Informe um IP válido ou procure o PC primeiro.",Toast.LENGTH_SHORT).show(); return }
         val code=pin.text.toString().trim()
         if(!code.matches(Regex("\\d{6}"))){ Toast.makeText(this,"O PIN deve conter 6 dígitos.",Toast.LENGTH_SHORT).show(); return }
         socket=client.newWebSocket(Request.Builder().url("ws://$host:37892/").build(),object:WebSocketListener() {
