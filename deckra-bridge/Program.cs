@@ -12,6 +12,13 @@ Console.WriteLine("DECKRA Bridge iniciado");
 Console.WriteLine("PIN de pareamento: " + pin);
 Console.WriteLine("Descoberta UDP: 37891 | WebSocket: 37892");
 Console.WriteLine("Mantenha esta janela aberta. Celular e PC devem estar na mesma rede local.");
+foreach (var network in NetworkInterface.GetAllNetworkInterfaces())
+{
+    if (network.OperationalStatus != OperationalStatus.Up || network.NetworkInterfaceType == NetworkInterfaceType.Loopback) continue;
+    foreach (var address in network.GetIPProperties().UnicastAddresses)
+        if (address.Address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(address.Address))
+            Console.WriteLine($"IP do PC ({network.Name}): {address.Address}");
+}
 
 using var udp = new UdpClient(new IPEndPoint(IPAddress.Any, 37891));
 using var stop = new CancellationTokenSource();
