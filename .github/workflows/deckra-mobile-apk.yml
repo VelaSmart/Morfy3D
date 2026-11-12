@@ -27,3 +27,17 @@ jobs:
         with:
           name: deckra-mobile-debug-apk
           path: deckra-mobile/app/build/outputs/apk/debug/app-debug.apk
+
+  bridge-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish Windows Bridge
+        run: dotnet publish deckra-bridge/DeckraBridge.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish/bridge
+      - uses: actions/upload-artifact@v4
+        with:
+          name: deckra-bridge-windows-x64
+          path: publish/bridge/DeckraBridge.exe
