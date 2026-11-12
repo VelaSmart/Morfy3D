@@ -220,32 +220,28 @@ class MainActivity : Activity() {
             try {
                 DatagramSocket(null).use { ds ->
                     ds.reuseAddress=true; ds.broadcast=true; ds.soTimeout=650
-                    ds.bind(InetSocketAddress(0))
-                    val targets=linkedSetOf<InetAddress>(InetAddress.getByName("255.255.255.255"))
-                    try {
-                        val interfaces=NetworkInterface.getNetworkInterfaces()
-                        while(interfaces.hasMoreElements()) {
-                            val ni=interfaces.nextElement()
-                            if(!ni.isUp || ni.isLoopback) continue
-                            for(ia in ni.interfaceAddresses) {
-                                val broadcast=ia.broadcast
-                                if(broadcast is Inet4Address) targets.add(broadcast)
-                            }
-                        }
-                    } catch(_:Exception) {}
+                    val wifiAddress = NetworkInterface.getNetworkInterfaces().toList()
+                        .filter { it.isUp && !it.isLoopback && (it.name.startsWith("wlan", true) || it.name.startsWith("wifi", true)) }
+                        .flatMap { it.interfaceAddresses }
+                        .firstOrNull { it.address is Inet4Address && !it.address.isLoopbackAddress }
+                    if(wifiAddress==null) throw IllegalStateException("Wi-Fi IPv4 não disponível. Conecte o celular à mesma rede do PC.")
+                    ds.bind(InetSocketAddress(wifiAddress.address,0))
+                    val targets=linkedSetOf<InetAddress>()
+                    wifiAddress.broadcast?.let { targets.add(it) }
+                    targets.add(InetAddress.getByName("255.255.255.255"))
                     val data="DECKRA_DISCOVER_V2".toByteArray()
-                    repeat(4) {
+                    for(attempt in 1..5) {
+                        if(found!=null) break
                         for(target in targets) try { ds.send(DatagramPacket(data,data.size,target,37891)) } catch(_:Exception) {}
-                        val until=System.currentTimeMillis()+850
-                        while(System.currentTimeMillis()<until && found==null) {
+                        val deadline=System.currentTimeMillis()+900
+                        while(System.currentTimeMillis()<deadline && found==null) {
                             try {
-                                val buf=ByteArray(1024); val p=DatagramPacket(buf,buf.size); ds.receive(p)
-                                val reply=String(p.data,0,p.length,Charsets.UTF_8)
+                                val buf=ByteArray(1024); val packet=DatagramPacket(buf,buf.size); ds.receive(packet)
+                                val reply=String(packet.data,0,packet.length,Charsets.UTF_8)
                                 val payload=runCatching { JSONObject(reply) }.getOrNull()
-                                if(payload?.optString("type")=="deckra_bridge" && payload.optInt("port",0)==37892) found=p.address
+                                if(payload?.optString("type")=="deckra_bridge" && payload.optInt("port",0)==37892) found=packet.address
                             } catch(_:SocketTimeoutException) { break }
                         }
-                        if(found!=null) return@repeat
                     }
                 }
             } catch(_:Exception) {} finally { try { lock.release() } catch(_:Exception) {} }
