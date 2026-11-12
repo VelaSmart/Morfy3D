@@ -106,3 +106,30 @@ jobs:
           files: |
             release-assets/deckra-mobile.apk
             release-assets/DeckraBridge-Windows.zip
+
+  publish-preview:
+    needs:
+      - build-android
+      - bridge-windows
+    if: needs.build-android.outputs.signed != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: deckra-*
+          path: preview-assets
+          merge-multiple: true
+      - name: Publish test-only preview
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: deckra-mobile-preview
+          name: DECKRA Mobile • versão de testes ${{ github.run_number }}
+          body: |
+            Versão de testes, não indicada para atualizar instalações existentes.
+            O APK usa assinatura de depuração e pode não atualizar versões assinadas com outra chave.
+            O ZIP Windows inclui painel gráfico, serviço Bridge e script de configuração de Firewall.
+          prerelease: true
+          make_latest: false
+          files: |
+            preview-assets/deckra-mobile.apk
+            preview-assets/DeckraBridge-Windows.zip
