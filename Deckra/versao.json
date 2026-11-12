@@ -1,7 +1,7 @@
 {
-  "versao": "1.9",
+  "versao": "1.10",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "e8e88542e1f7ca5752b9b650b3e490dc483c3c6303ac5f5d6b9389ef1460a8e8",
-  "tamanho": 31141395,
-  "notas": "Novo: canais extras (até 4) só no computador, na aba Aplicativos. Novo: botões de voltar, tocar/pausar e avançar para Spotify, YouTube e outros players. Corrigido: volume que \"travava\" (Spotify, microfone) quando era mudado fora do DECKRA. Círculo de volume só responde com o mouse perto dele e não pula mais de 100% para 0%. Instalador espera o antivírus antes de abrir o DECKRA."
+  "sha256": "6aeb052a5d54735580ea2bd9f39dee86cf70d0db2db97c2ebe621e837b62bb79",
+  "tamanho": 31154982,
+  "notas": "Atualização direto para a versão mais nova, de qualquer versão antiga, sem reiniciar o DECKRA (procura sozinho a cada 3 horas). Botão tocar/pausar responde na hora e controles de mídia com visual novo. Canais extras com visual novo e mudo do microfone funcionando. Barra de rolagem nas páginas Aplicativos e Configurações. Versão marcada como beta."
 }
