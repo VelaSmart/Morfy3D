@@ -253,7 +253,7 @@ class MainActivity : Activity() {
         client.newCall(Request.Builder().url(url).build()).enqueue(object:Callback {
             override fun onFailure(call:Call,e:java.io.IOException){ runOnUiThread { updateButton.isEnabled=true; updateButton.text="TENTAR NOVAMENTE" } }
             override fun onResponse(call:Call,response:Response){ response.use {
-                if(!it.isSuccessful) return
+                if(!it.isSuccessful) { runOnUiThread { updateButton.isEnabled=true; updateButton.text="FALHA NO DOWNLOAD • TENTAR NOVAMENTE" }; return }
                 val apk=File(cacheDir,"deckra-mobile-update.apk")
                 if(apk.exists() && !apk.delete()) { runOnUiThread { updateButton.isEnabled=true; updateButton.text="LIMPAR ARQUIVO E TENTAR NOVAMENTE" }; return }
                 val body=it.body ?: run { runOnUiThread { updateButton.isEnabled=true; updateButton.text="DOWNLOAD INVÁLIDO" }; return }
