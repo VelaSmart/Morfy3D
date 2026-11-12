@@ -53,6 +53,8 @@ jobs:
           pattern: deckra-*
           path: release-assets
           merge-multiple: true
+      - name: Prepare stable APK filename
+        run: cp release-assets/app-debug.apk release-assets/deckra-mobile.apk
       - name: Publish latest DECKRA Mobile release
         uses: softprops/action-gh-release@v2
         with:
@@ -65,5 +67,5 @@ jobs:
           prerelease: true
           make_latest: false
           files: |
-            release-assets/app-debug.apk
+            release-assets/deckra-mobile.apk
             release-assets/DeckraBridge.exe
