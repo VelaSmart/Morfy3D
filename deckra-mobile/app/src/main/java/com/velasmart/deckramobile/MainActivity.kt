@@ -269,7 +269,14 @@ class MainActivity : Activity() {
         }
         purple=Color.rgb(137,101,255)
         window.statusBarColor=bg; window.navigationBarColor=bg
-        if(::root.isInitialized) root.setBackgroundColor(bg)
+        if(::root.isInitialized) {
+            root.setBackgroundColor(bg)
+            if(root.childCount>0) root.getChildAt(0).background=rounded(surface,9,stroke)
+            if(root.childCount>2) {
+                val body=root.getChildAt(2) as? LinearLayout
+                if(body!=null && body.childCount>0) body.getChildAt(0).background=rounded(surface,9,stroke)
+            }
+        }
         if(::connectionPanel.isInitialized) connectionPanel.background=rounded(surface,9,stroke)
     }
     private fun rounded(color:Int,radius:Int,stroke:Int=Color.TRANSPARENT)=GradientDrawable().apply {
