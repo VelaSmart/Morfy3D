@@ -51,8 +51,8 @@ class MainActivity : Activity() {
 
     private fun buildShell() {
         root = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(bg); setPadding(18,18,18,12) }
-        val brand = TextView(this).apply { text="◢  D E C K R A"; textSize=23f; setTextColor(Color.WHITE); setPadding(4,12,4,18) }
-        root.addView(brand)
+        val brand = ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType=ImageView.ScaleType.FIT_START; contentDescription="DECKRA"; setPadding(0,8,0,12) }
+        root.addView(brand, LinearLayout.LayoutParams((190 * resources.displayMetrics.density).toInt(), (66 * resources.displayMetrics.density).toInt()))
         status = label("●  PC não conectado",14,Color.rgb(255,190,80))
         root.addView(status)
         hostInput = EditText(this).apply { hint="IP do PC (preenchido ao procurar)"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI; setSingleLine(true) }
@@ -229,7 +229,11 @@ class MainActivity : Activity() {
             override fun onResponse(call:Call,response:Response){ response.use {
                 if(!it.isSuccessful) return
                 val apk=File(cacheDir,"deckra-mobile-update.apk")
-                it.body?.byteStream()?.use { input -> apk.outputStream().use { output -> input.copyTo(output) } }
+                if(apk.exists() && !apk.delete()) { runOnUiThread { updateButton.isEnabled=true; updateButton.text="LIMPAR ARQUIVO E TENTAR NOVAMENTE" }; return }
+                val body=it.body ?: run { runOnUiThread { updateButton.isEnabled=true; updateButton.text="DOWNLOAD INVÁLIDO" }; return }
+                val expectedLength=body.contentLength()
+                body.byteStream().use { input -> apk.outputStream().use { output -> input.copyTo(output) } }
+                if(!apk.exists() || apk.length()==0L || (expectedLength>0 && apk.length()!=expectedLength)) { apk.delete(); runOnUiThread { updateButton.isEnabled=true; updateButton.text="DOWNLOAD INCOMPLETO • TENTAR NOVAMENTE" }; return }
                 runOnUiThread {
                     if(!packageManager.canRequestPackageInstalls()) { startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:$packageName"))); updateButton.isEnabled=true; updateButton.text="AUTORIZAR E INSTALAR"; updateButton.setOnClickListener { downloadAndInstall(url) }; return@runOnUiThread }
                     val uri=FileProvider.getUriForFile(this@MainActivity,"$packageName.fileprovider",apk)

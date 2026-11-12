@@ -1,73 +1,87 @@
-name: Build DECKRA Mobile APK
+name: Build DECKRA Mobile and Windows Bridge
 on:
   workflow_dispatch:
   push:
-    paths:
-      - 'deckra-mobile/**'
-      - 'deckra-bridge/**'
-      - '.github/workflows/deckra-mobile-apk.yml'
+    paths: ['deckra-mobile/**','deckra-bridge/**','.github/workflows/deckra-mobile-apk.yml']
     branches: [main]
-permissions:
-  contents: write
+permissions: { contents: write }
 jobs:
-  build:
+  build-android:
     runs-on: ubuntu-latest
+    outputs: { signed: ${{ steps.signing.outputs.enabled }} }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+        with: { distribution: temurin, java-version: '17' }
       - uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.9'
+        with: { gradle-version: '8.9' }
       - uses: android-actions/setup-android@v3
         with:
           packages: platform-tools platforms;android-35 build-tools;35.0.0
-      - name: Build debug APK
-        run: gradle -p deckra-mobile -PdeckraVersionCode=${{ github.run_number }} -PdeckraVersionName=0.1.${{ github.run_number }} assembleDebug
+      - name: Detect stable signing key
+        id: signing
+        env: { KEYSTORE_BASE64: ${{ secrets.DECKRA_ANDROID_KEYSTORE_BASE64 }} }
+        shell: bash
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/deckra-release.jks"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Keystore ausente: APK de teste apenas; publicação bloqueada."
+          fi
+      - name: Build signed release APK
+        if: steps.signing.outputs.enabled == 'true'
+        env:
+          DECKRA_KEYSTORE_PATH: ${{ runner.temp }}/deckra-release.jks
+          DECKRA_KEYSTORE_PASSWORD: ${{ secrets.DECKRA_ANDROID_KEYSTORE_PASSWORD }}
+          DECKRA_KEY_ALIAS: ${{ secrets.DECKRA_ANDROID_KEY_ALIAS }}
+          DECKRA_KEY_PASSWORD: ${{ secrets.DECKRA_ANDROID_KEY_PASSWORD }}
+        run: |
+          gradle -p deckra-mobile -PdeckraVersionCode=${{ github.run_number }} -PdeckraVersionName=0.1.${{ github.run_number }} assembleRelease
+          cp deckra-mobile/app/build/outputs/apk/release/app-release.apk deckra-mobile.apk
+      - name: Build debug APK for testing only
+        if: steps.signing.outputs.enabled != 'true'
+        run: |
+          gradle -p deckra-mobile -PdeckraVersionCode=${{ github.run_number }} -PdeckraVersionName=0.1.${{ github.run_number }} assembleDebug
+          cp deckra-mobile/app/build/outputs/apk/debug/app-debug.apk deckra-mobile.apk
       - uses: actions/upload-artifact@v4
-        with:
-          name: deckra-mobile-debug-apk
-          path: deckra-mobile/app/build/outputs/apk/debug/app-debug.apk
-
+        with: { name: deckra-mobile-apk, path: deckra-mobile.apk }
   bridge-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-      - name: Publish Windows Bridge
-        run: dotnet publish deckra-bridge/DeckraBridge.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish/bridge
+        with: { dotnet-version: '8.0.x' }
+      - name: Publish dashboard and background service
+        shell: pwsh
+        run: |
+          dotnet publish deckra-bridge/dashboard/DeckraBridgeDashboard.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish/bridge
+          dotnet publish deckra-bridge/service/DeckraBridge.Service.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish/bridge
+          if (!(Test-Path publish/bridge/DeckraBridge.exe)) { throw "Dashboard executable not found" }
+          if (!(Test-Path publish/bridge/DeckraBridge.Service.exe)) { throw "Service executable not found" }
+          Compress-Archive -Path publish/bridge/* -DestinationPath DeckraBridge-Windows.zip -Force
       - uses: actions/upload-artifact@v4
-        with:
-          name: deckra-bridge-windows-x64
-          path: publish/bridge/DeckraBridge.exe
-
+        with: { name: deckra-bridge-windows, path: DeckraBridge-Windows.zip }
   publish-release:
-    needs: [build, bridge-windows]
+    needs: [build-android, bridge-windows]
+    if: needs.build-android.outputs.signed == 'true'
     runs-on: ubuntu-latest
     steps:
-      - name: Download APK and Windows Bridge
-        uses: actions/download-artifact@v4
-        with:
-          pattern: deckra-*
-          path: release-assets
-          merge-multiple: true
-      - name: Prepare stable APK filename
-        run: cp release-assets/app-debug.apk release-assets/deckra-mobile.apk
-      - name: Publish latest DECKRA Mobile release
+      - uses: actions/download-artifact@v4
+        with: { pattern: deckra-*, path: release-assets, merge-multiple: true }
+      - name: Publish stable signed APK and Windows app
         uses: softprops/action-gh-release@v2
         with:
           tag_name: deckra-mobile-latest
           name: DECKRA Mobile build ${{ github.run_number }}
           body: |
-            Atualização automática do DECKRA Mobile.
+            Atualização DECKRA Mobile + Bridge Windows.
             versionCode=${{ github.run_number }}
-            versionName=0.1.${{ github.run_number }}
+            APK assinado com chave estável do repositório.
+            ZIP Windows contém DeckraBridge.exe (interface) e DeckraBridge.Service.exe (serviço).
           prerelease: true
           make_latest: false
           files: |
             release-assets/deckra-mobile.apk
-            release-assets/DeckraBridge.exe
+            release-assets/DeckraBridge-Windows.zip

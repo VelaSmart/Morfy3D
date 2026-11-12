@@ -76,10 +76,10 @@ while (listener.IsListening)
 static async Task Handle(HttpListenerContext context, string expectedPin)
 {
     WebSocket? ws = null;
+    var paired = false;
     try
     {
         ws = (await context.AcceptWebSocketAsync(null)).WebSocket;
-        var paired = false;
         var buffer = new byte[8192];
         while (ws.State == WebSocketState.Open)
         {
@@ -99,6 +99,7 @@ static async Task Handle(HttpListenerContext context, string expectedPin)
                 paired = GetString(root, "pin") == expectedPin;
                 await Reply(ws, new { type="pair_result", paired, message=paired ? "Dispositivo pareado." : "PIN incorreto." });
                 if (!paired) return;
+                Console.WriteLine($"CELULAR_CONECTADO|{context.Request.RemoteEndPoint?.Address}");
                 await SendState(ws);
             }
             else if (type == "command" && paired)
@@ -114,7 +115,7 @@ static async Task Handle(HttpListenerContext context, string expectedPin)
         }
     }
     catch (Exception ex) { Console.WriteLine("Sessão: " + ex.Message); }
-    finally { ws?.Dispose(); }
+    finally { if (paired) Console.WriteLine("CELULAR_DESCONECTADO"); ws?.Dispose(); }
 }
 
 static object Execute(string command, JsonElement root)

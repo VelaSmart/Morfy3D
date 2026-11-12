@@ -4,7 +4,7 @@ Aplicativo Android nativo, independente do antigo WebView do MORFY. Descobre o D
 
 ## Atualizações pelo próprio aplicativo
 
-Cada push na branch `main` que alterar `deckra-mobile/**`, `deckra-bridge/**` ou o workflow dispara a compilação do APK e da Bridge. Após os dois builds passarem, o workflow publica/substitui os arquivos da release `deckra-mobile-latest`.
+Cada push na branch `main` que alterar `deckra-mobile/**`, `deckra-bridge/**` ou o workflow dispara a compilação do APK e da Bridge. Para publicar atualizações Android que substituam a instalação existente, configure os segredos `DECKRA_ANDROID_KEYSTORE_BASE64`, `DECKRA_ANDROID_KEYSTORE_PASSWORD`, `DECKRA_ANDROID_KEY_ALIAS` e `DECKRA_ANDROID_KEY_PASSWORD` no repositório. Sem a chave estável, o workflow gera somente APK de teste e não publica atualização Android.
 
 Ao abrir o app, ele consulta essa release pública. Quando encontra um `versionCode` superior, oferece baixar e instalar a atualização. O Android exige que o usuário autorize a instalação e confirme a substituição do aplicativo. Na primeira atualização, pode ser necessário permitir "Instalar apps desconhecidos" para DECKRA Mobile nas configurações do Android.
 
@@ -12,7 +12,7 @@ Ao abrir o app, ele consulta essa release pública. Quando encontra um `versionC
 
 Os arquivos publicados ficam em [Releases do DECKRA Mobile](https://github.com/VelaSmart/Morfy3D/releases/tag/deckra-mobile-latest):
 - `deckra-mobile.apk`: aplicativo Android.
-- `DeckraBridge.exe`: serviço de comunicação para Windows.
+- `DeckraBridge-Windows.zip`: interface Windows e serviço Bridge. Extraia os arquivos na mesma pasta e abra `DeckraBridge.exe`.
 
 O APK gerado pelo workflow é de debug e serve para testes; ainda não é uma distribuição assinada para Play Store.
 
