@@ -14,7 +14,7 @@ Aplicativo Android nativo, separado do antigo WebView do MORFY. Descobre o DECKR
 Abra deckra-mobile no Android Studio ou execute gradle assembleDebug com Android SDK e Gradle 8.9. O APK de debug não é assinado para distribuição pública.
 
 ## Bridge Windows
-Instale .NET 8 SDK/runtime, compile deckra-bridge/DeckraBridge.csproj e execute o binário no PC. Autorize TCP 37892 e UDP 37891 no Firewall do Windows apenas para rede privada.
+Compile deckra-bridge/DeckraBridge.csproj com .NET 8. Na primeira execução, abra o terminal como administrador para permitir o registro do listener HTTP e autorize TCP 37892 e UDP 37891 no Firewall do Windows somente em redes privadas. O PIN temporário de seis dígitos aparece no console do Bridge.
 
 ## Limitações conhecidas
 Este primeiro MVP cobre conexão e comandos multimídia básicos. Os comandos de volume e mídia usam teclas multimídia do Windows. Ainda não existe integração com o backend interno do DECKRA Desktop, gestão de perfis, mapeamento de potenciômetros/teclas, volume por aplicativo, TLS nem pareamento persistente. Use apenas em rede privada confiável. A descoberta por broadcast pode ser bloqueada por isolamento de clientes do roteador.
