@@ -1,7 +1,7 @@
 {
-  "versao": "1.2",
+  "versao": "1.3",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "0504c632c6723c37795df2cf20e3aeb6cddbced504751a2794be69436830fc23",
-  "tamanho": 30185704,
-  "notas": "Canal com o microfone mostra o mudo do microfone (inclusive o mudo automático em 0%). Aba Microfone acompanha o potenciômetro na hora, sem travar."
+  "sha256": "3371bb2c485b24853111899980f2517c59cb64cb729621177e8c4610b5efc8b8",
+  "tamanho": 30189636,
+  "notas": "Lista de aplicativos com o ícone de cada app e jogo. Jogos reconhecidos pelo nome certo: Minecraft (Java, Lunar, Badlion), Fortnite, VALORANT, FiveM, PUBG, Palworld e outros da Unreal Engine. Nomes estranhos de alguns apps na lista foram corrigidos."
 }
