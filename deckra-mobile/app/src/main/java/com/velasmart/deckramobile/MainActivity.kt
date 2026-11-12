@@ -34,6 +34,7 @@ class MainActivity : Activity() {
     private lateinit var hostInput: EditText
     private lateinit var updateButton: Button
     private lateinit var navBar: LinearLayout
+    private lateinit var connectionPanel: LinearLayout
     private var latestState: JSONObject? = null
     private val bg = Color.rgb(14,15,24)
     private val panel = Color.rgb(23,25,39)
@@ -50,34 +51,48 @@ class MainActivity : Activity() {
     }
 
     private fun buildShell() {
-        root = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(bg); setPadding(18,18,18,12) }
-        val brand = ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType=ImageView.ScaleType.FIT_START; contentDescription="DECKRA"; setPadding(0,8,0,12) }
-        root.addView(brand, LinearLayout.LayoutParams((190 * resources.displayMetrics.density).toInt(), (66 * resources.displayMetrics.density).toInt()))
-        status = label("●  PC não conectado",14,Color.rgb(255,190,80))
-        root.addView(status)
-        hostInput = EditText(this).apply { hint="IP do PC (preenchido ao procurar)"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI; setSingleLine(true) }
-        root.addView(hostInput)
-        pin = EditText(this).apply { hint="PIN de 6 dígitos exibido no PC"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=2; setSingleLine(true) }
-        root.addView(pin)
-        val connectRow = LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL }
-        connectRow.addView(action("PROCURAR PC") { discoverPc() }, LinearLayout.LayoutParams(0,52,1f))
-        connectRow.addView(action("CONECTAR") { connectPc() }, LinearLayout.LayoutParams(0,52,1f).apply { leftMargin=8 })
-        root.addView(connectRow)
-        val navScroll=HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled=false }
-        navBar=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; setPadding(0,12,0,12) }
-        navScroll.addView(navBar); root.addView(navScroll)
+        val d=resources.displayMetrics.density
+        root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(bg); setPadding((16*d).toInt(),(8*d).toInt(),(16*d).toInt(),(8*d).toInt()) }
+        val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL }
+        val brand=ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType=ImageView.ScaleType.FIT_START; contentDescription="DECKRA" }
+        header.addView(brand,LinearLayout.LayoutParams((148*d).toInt(),(50*d).toInt()))
+        header.addView(label("HARDWARE FEITO PARA VOCÊ",9,muted),LinearLayout.LayoutParams(0,-2,1f))
+        root.addView(header,LinearLayout.LayoutParams(-1,(52*d).toInt()))
+        val statusRow=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL }
+        status=label("●  PC não conectado",13,Color.rgb(255,190,80))
+        statusRow.addView(status,LinearLayout.LayoutParams(0,-2,1f))
+        val toggle=TextView(this).apply { text="CONECTAR PC  ▾"; textSize=11f; setTextColor(Color.WHITE); gravity=Gravity.CENTER; setPadding(12,9,12,9); background=rounded(Color.rgb(42,36,67),18,purple) }
+        statusRow.addView(toggle)
+        root.addView(statusRow)
+        connectionPanel=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding(12,6,12,12); background=rounded(panel,14,Color.rgb(43,45,61)); visibility=View.GONE }
+        hostInput=EditText(this).apply { hint="Endereço IP do computador"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI; setSingleLine(true); textSize=14f }
+        connectionPanel.addView(hostInput)
+        pin=EditText(this).apply { hint="PIN de 6 dígitos exibido no PC"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=2; setSingleLine(true); textSize=14f }
+        connectionPanel.addView(pin)
+        val connectRow=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL }
+        connectRow.addView(action("PROCURAR") { discoverPc() },LinearLayout.LayoutParams(0,(44*d).toInt(),1f))
+        connectRow.addView(action("CONECTAR") { connectPc() },LinearLayout.LayoutParams(0,(44*d).toInt(),1f).apply { leftMargin=(8*d).toInt() })
+        connectionPanel.addView(connectRow)
+        root.addView(connectionPanel,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(6*d).toInt() })
+        toggle.setOnClickListener { connectionPanel.visibility=if(connectionPanel.visibility==View.VISIBLE) View.GONE else View.VISIBLE; toggle.text=if(connectionPanel.visibility==View.VISIBLE) "FECHAR  ▴" else "CONECTAR PC  ▾" }
+        val scroll=ScrollView(this).apply { clipToPadding=false }
+        content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding(0,(8*d).toInt(),0,(14*d).toInt()) }
+        scroll.addView(content)
+        root.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
+        val navScroll=HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled=false; overScrollMode=View.OVER_SCROLL_NEVER }
+        navBar=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding(0,(6*d).toInt(),0,(6*d).toInt()) }
+        navScroll.addView(navBar)
+        root.addView(navScroll,LinearLayout.LayoutParams(-1,(50*d).toInt()))
         renderNavigation()
-        val scroll=ScrollView(this)
-        content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding(0,8,0,20) }
-        scroll.addView(content); root.addView(scroll,LinearLayout.LayoutParams(-1,0,1f))
         updateButton=action("VERIFICAR ATUALIZAÇÃO") { checkForUpdates() }
-        root.addView(updateButton)
+        updateButton.textSize=11f; updateButton.minHeight=(36*d).toInt()
+        root.addView(updateButton,LinearLayout.LayoutParams(-1,(38*d).toInt()).apply { topMargin=(3*d).toInt() })
         setContentView(root)
     }
 
     private fun renderPage() {
         content.removeAllViews()
-        content.addView(label(currentPage,29,Color.WHITE))
+        content.addView(label(if(currentPage=="Configuração") "Visão geral" else currentPage,25,Color.WHITE))
         content.addView(label(when(currentPage) {
             "Configuração" -> "Configure seu controle e os canais de áudio do PC."
             "Aplicativos" -> "Controle o áudio de cada aplicativo do Windows."
@@ -100,12 +115,9 @@ class MainActivity : Activity() {
                         override fun onStopTrackingTouch(b:SeekBar?) { send("set_master_volume",JSONObject().put("value",(b?.progress ?: 0)/100f)) }
                     })
                     addView(masterSeek)
-                    addView(action("Volume +") { send("volume_up") })
-                    addView(action("Volume −") { send("volume_down") })
-                    addView(action("Mutar / ativar") { send("volume_mute") })
-                    addView(action("Reproduzir / pausar") { send("media_play_pause") })
-                    addView(action("Próxima faixa") { send("media_next") })
-                    addView(action("Faixa anterior") { send("media_previous") })
+                    addView(actionRow("VOLUME +", { send("volume_up") }, "VOLUME −", { send("volume_down") }))
+                    addView(actionRow("MUTAR", { send("volume_mute") }, "PLAY / PAUSE", { send("media_play_pause") }))
+                    addView(actionRow("PRÓXIMA", { send("media_next") }, "ANTERIOR", { send("media_previous") }))
                 }
                 addPanel("Microfone") {
                     val mic=s?.optJSONObject("microphone")
@@ -191,18 +203,16 @@ class MainActivity : Activity() {
     private fun renderNavigation() {
         if(!::navBar.isInitialized) return
         navBar.removeAllViews()
-        listOf("Configuração","Aplicativos","Teclas").forEach { page ->
+        listOf("Configuração","Aplicativos","Microfone","Equalizador","Teclas").forEach { page ->
             val selected=page==currentPage
             val tab=TextView(this).apply {
-                text=page
-                textSize=12f
-                gravity=Gravity.CENTER
-                setTextColor(if(selected) Color.WHITE else muted)
-                setPadding(14,11,14,11)
-                background=rounded(if(selected) Color.rgb(48,39,78) else panel,9,if(selected) purple else Color.rgb(43,45,61))
-                setOnClickListener { currentPage=page; renderPage() }
+                text=when(page) { "Configuração" -> "INÍCIO"; "Aplicativos" -> "APPS"; "Microfone" -> "MIC"; "Equalizador" -> "EQ"; else -> "TECLAS" }
+                textSize=10f; letterSpacing=.04f; gravity=Gravity.CENTER
+                setTextColor(if(selected) Color.WHITE else muted); setPadding(14,10,14,10)
+                background=rounded(if(selected) Color.rgb(48,39,78) else Color.TRANSPARENT,18,if(selected) purple else Color.TRANSPARENT)
+                setOnClickListener { currentPage=page; renderNavigation(); renderPage() }
             }
-            navBar.addView(tab,LinearLayout.LayoutParams(-2,42).apply { rightMargin=7 })
+            navBar.addView(tab,LinearLayout.LayoutParams(-2,(40*resources.displayMetrics.density).toInt()).apply { rightMargin=(5*resources.displayMetrics.density).toInt() })
         }
     }
     private fun rounded(color:Int,radius:Int,stroke:Int=Color.TRANSPARENT)=GradientDrawable().apply {
@@ -210,19 +220,20 @@ class MainActivity : Activity() {
         if(stroke!=Color.TRANSPARENT) setStroke((1*resources.displayMetrics.density).toInt().coerceAtLeast(1),stroke)
     }
     private fun addPanel(title:String, build:LinearLayout.()->Unit) {
-        val card=LinearLayout(this).apply {
-            orientation=LinearLayout.VERTICAL; setPadding(16,15,16,15)
-            background=rounded(panel,12,Color.rgb(43,45,61))
-        }
-        card.addView(label(title,18,Color.WHITE))
-        card.build()
-        content.addView(card,LinearLayout.LayoutParams(-1,-2).apply { topMargin=12; bottomMargin=4 })
+        val d=resources.displayMetrics.density
+        val card=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((14*d).toInt(),(11*d).toInt(),(14*d).toInt(),(11*d).toInt()); background=rounded(panel,16,Color.rgb(43,45,61)) }
+        card.addView(label(title,17,Color.WHITE)); card.build()
+        content.addView(card,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(9*d).toInt(); bottomMargin=(3*d).toInt() })
     }
-    private fun label(value:String,size:Int,color:Int)=TextView(this).apply { text=value; textSize=size.toFloat(); setTextColor(color); setPadding(3,7,3,7) }
+    private fun actionRow(first:String, firstRun:()->Unit, second:String, secondRun:()->Unit)=LinearLayout(this).apply {
+        orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL
+        addView(action(first,firstRun),LinearLayout.LayoutParams(0,(40*resources.displayMetrics.density).toInt(),1f).apply { rightMargin=(5*resources.displayMetrics.density).toInt() })
+        addView(action(second,secondRun),LinearLayout.LayoutParams(0,(40*resources.displayMetrics.density).toInt(),1f).apply { leftMargin=(5*resources.displayMetrics.density).toInt() })
+    }
+    private fun label(value:String,size:Int,color:Int)=TextView(this).apply { text=value; textSize=size.toFloat(); setTextColor(color); setPadding(3,5,3,5) }
     private fun action(value:String, run:()->Unit)=Button(this).apply {
-        text=value; isAllCaps=false; textSize=14f; minHeight=48; minWidth=0
-        setPadding(12,8,12,8); setTextColor(Color.WHITE)
-        background=rounded(purple,9)
+        text=value; isAllCaps=false; textSize=13f; minHeight=(40*resources.displayMetrics.density).toInt(); minWidth=0
+        setPadding(8,5,8,5); setTextColor(Color.WHITE); background=rounded(purple,12); stateListAnimator=null
         setOnClickListener { run() }
     }
 
