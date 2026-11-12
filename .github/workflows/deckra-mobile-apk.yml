@@ -4,10 +4,11 @@ on:
   push:
     paths:
       - 'deckra-mobile/**'
+      - 'deckra-bridge/**'
       - '.github/workflows/deckra-mobile-apk.yml'
     branches: [main]
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,7 +23,7 @@ jobs:
           gradle-version: '8.9'
       - uses: android-actions/setup-android@v3
       - name: Build debug APK
-        run: gradle -p deckra-mobile assembleDebug
+        run: gradle -p deckra-mobile -PdeckraVersionCode=${{ github.run_number }} -PdeckraVersionName=0.1.${{ github.run_number }} assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: deckra-mobile-debug-apk
@@ -41,3 +42,28 @@ jobs:
         with:
           name: deckra-bridge-windows-x64
           path: publish/bridge/DeckraBridge.exe
+
+  publish-release:
+    needs: [build, bridge-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK and Windows Bridge
+        uses: actions/download-artifact@v4
+        with:
+          pattern: deckra-*
+          path: release-assets
+          merge-multiple: true
+      - name: Publish latest DECKRA Mobile release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: deckra-mobile-latest
+          name: DECKRA Mobile build ${{ github.run_number }}
+          body: |
+            Atualização automática do DECKRA Mobile.
+            versionCode=${{ github.run_number }}
+            versionName=0.1.${{ github.run_number }}
+          prerelease: true
+          make_latest: false
+          files: |
+            release-assets/app-debug.apk
+            release-assets/DeckraBridge.exe
