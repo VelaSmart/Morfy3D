@@ -12,9 +12,9 @@ Console.WriteLine("DECKRA Bridge iniciado");
 Console.WriteLine("PIN de pareamento: " + pin);
 Console.WriteLine("Descoberta UDP: 37891 | WebSocket: 37892");
 Console.WriteLine("Mantenha esta janela aberta. Celular e PC devem estar na mesma rede local.");
-foreach (var network in NetworkInterface.GetAllNetworkInterfaces())
+foreach (var network in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces())
 {
-    if (network.OperationalStatus != OperationalStatus.Up || network.NetworkInterfaceType == NetworkInterfaceType.Loopback) continue;
+    if (network.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up || network.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
     foreach (var address in network.GetIPProperties().UnicastAddresses)
         if (address.Address.AddressFamily == AddressFamily.InterNetwork && !IPAddress.IsLoopback(address.Address))
             Console.WriteLine($"IP do PC ({network.Name}): {address.Address}");
