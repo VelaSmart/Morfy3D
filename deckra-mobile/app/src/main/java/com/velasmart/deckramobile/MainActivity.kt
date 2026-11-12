@@ -52,17 +52,17 @@ class MainActivity : Activity() {
 
     private fun buildShell() {
         val d=resources.displayMetrics.density
-        root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(Color.rgb(9,10,16)); setPadding((10*d).toInt(),(7*d).toInt(),(10*d).toInt(),(6*d).toInt()) }
+        root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(Color.rgb(9,10,16)); setPadding((4*d).toInt(),(4*d).toInt(),(4*d).toInt(),(4*d).toInt()) }
         val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((12*d).toInt(),0,(10*d).toInt(),0); background=rounded(Color.rgb(16,17,25),9,Color.rgb(53,53,67)) }
         val logo=ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType=ImageView.ScaleType.FIT_START; contentDescription="DECKRA" }
-        header.addView(logo,LinearLayout.LayoutParams((118*d).toInt(),(38*d).toInt()))
+        header.addView(logo,LinearLayout.LayoutParams((82*d).toInt(),(34*d).toInt()))
         val divider=View(this).apply { setBackgroundColor(Color.rgb(65,65,81)) }
         header.addView(divider,LinearLayout.LayoutParams((1*d).toInt(),(24*d).toInt()).apply { leftMargin=(12*d).toInt(); rightMargin=(12*d).toInt() })
-        header.addView(label("DECKRA CONTROL CENTER",10,muted),LinearLayout.LayoutParams(0,-2,1f))
+        header.addView(label("CONTROL CENTER",8,muted),LinearLayout.LayoutParams(0,-2,1f))
         status=label("●  PC NÃO CONECTADO",10,Color.rgb(255,190,80))
         header.addView(status)
         val toggle=action("CONECTAR") { connectionPanel.visibility=if(connectionPanel.visibility==View.VISIBLE) View.GONE else View.VISIBLE }
-        header.addView(toggle,LinearLayout.LayoutParams((92*d).toInt(),(34*d).toInt()).apply { leftMargin=(8*d).toInt() })
+        header.addView(toggle,LinearLayout.LayoutParams((72*d).toInt(),(32*d).toInt()).apply { leftMargin=(8*d).toInt() })
         root.addView(header,LinearLayout.LayoutParams(-1,(44*d).toInt()))
         connectionPanel=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((8*d).toInt(),(3*d).toInt(),(8*d).toInt(),(3*d).toInt()); background=rounded(Color.rgb(18,20,29),9,Color.rgb(37,38,50)); visibility=View.GONE }
         hostInput=EditText(this).apply { hint="IP do PC"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI; setSingleLine(true); textSize=12f }
@@ -73,11 +73,11 @@ class MainActivity : Activity() {
         connectionPanel.addView(action("PAREAR") { connectPc() },LinearLayout.LayoutParams((82*d).toInt(),(34*d).toInt()).apply { leftMargin=(5*d).toInt() })
         root.addView(connectionPanel,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(5*d).toInt() })
         val body=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL }
-        val sidebar=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((6*d).toInt(),(12*d).toInt(),(6*d).toInt(),(5*d).toInt()); background=rounded(Color.rgb(16,18,27),9,Color.rgb(36,38,51)) }
+        val sidebar=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((3*d).toInt(),(8*d).toInt(),(3*d).toInt(),(4*d).toInt()); background=rounded(Color.rgb(16,18,27),9,Color.rgb(36,38,51)) }
         navBar=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
         sidebar.addView(navBar,LinearLayout.LayoutParams(-1,0,1f))
         sidebar.addView(label("DECKRA MOBILE",8,muted).apply { gravity=Gravity.CENTER })
-        body.addView(sidebar,LinearLayout.LayoutParams((142*d).toInt(),-1).apply { rightMargin=(8*d).toInt() })
+        body.addView(sidebar,LinearLayout.LayoutParams((94*d).toInt(),-1).apply { rightMargin=(8*d).toInt() })
         val scroll=ScrollView(this).apply { clipToPadding=false; isFillViewport=true }
         content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((5*d).toInt(),(7*d).toInt(),(5*d).toInt(),(8*d).toInt()) }
         scroll.addView(content)
