@@ -31,14 +31,18 @@ jobs:
         id: signing
         env:
           KEYSTORE_BASE64: "${{ secrets.DECKRA_ANDROID_KEYSTORE_BASE64 }}"
+          KEYSTORE_PASSWORD: "${{ secrets.DECKRA_ANDROID_KEYSTORE_PASSWORD }}"
+          KEY_ALIAS: "${{ secrets.DECKRA_ANDROID_KEY_ALIAS }}"
+          KEY_PASSWORD: "${{ secrets.DECKRA_ANDROID_KEY_PASSWORD }}"
         shell: bash
         run: |
-          if [ -n "$KEYSTORE_BASE64" ]; then
+          if [ -n "$KEYSTORE_BASE64" ] && [ -n "$KEYSTORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ] && [ -n "$KEY_PASSWORD" ]; then
             echo "enabled=true" >> "$GITHUB_OUTPUT"
             echo "$KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/deckra-release.jks"
+            test -s "$RUNNER_TEMP/deckra-release.jks"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Keystore ausente: APK de teste apenas; publicação bloqueada."
+            echo "::warning::Segredos de assinatura incompletos. APK de teste apenas; publicação estável bloqueada."
           fi
       - name: Build signed release APK
         if: steps.signing.outputs.enabled == 'true'
