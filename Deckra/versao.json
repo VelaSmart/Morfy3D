@@ -1,7 +1,7 @@
 {
-  "versao": "1.6",
+  "versao": "1.7",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "1453f8de3b08f143c62e06cbfa309fc5f019c1b15ff6940211abbd903a71c246",
-  "tamanho": 30202782,
-  "notas": "Novo: medidor de áudio em cima do círculo de cada canal na aba Aplicativos (liga/desliga em Configurações). Corrigido: mexer na tela e no potenciômetro ao mesmo tempo não dá mais briga de volume. Corrigido: botões e imagens que sumiam depois de mexer muito no volume. Corrigido: o painel de notificações acompanha a janela ao arrastar."
+  "sha256": "addbea9d2a874167d43b6af25d7f52e648fe867f13503b904a7b63a341523307",
+  "tamanho": 30197974,
+  "notas": "Corrigido: erro \"Acesso negado\" ao baixar uma atualização."
 }
