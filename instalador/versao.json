@@ -1,7 +1,7 @@
 {
-  "versao": "1.5",
+  "versao": "1.6",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "ca9d65c05de707e944036ec7f3fbb3b17687fd1858dbf8edea0626adfe49902b",
-  "tamanho": 30190992,
-  "notas": "Novo: Modo claro e Modo escuro em Configurações > Tema (o escuro continua padrão). O medidor de áudio nos canais foi removido."
+  "sha256": "1453f8de3b08f143c62e06cbfa309fc5f019c1b15ff6940211abbd903a71c246",
+  "tamanho": 30202782,
+  "notas": "Novo: medidor de áudio em cima do círculo de cada canal na aba Aplicativos (liga/desliga em Configurações). Corrigido: mexer na tela e no potenciômetro ao mesmo tempo não dá mais briga de volume. Corrigido: botões e imagens que sumiam depois de mexer muito no volume. Corrigido: o painel de notificações acompanha a janela ao arrastar."
 }
