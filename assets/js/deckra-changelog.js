@@ -1,48 +1,104 @@
 (() => {
   const panel = document.querySelector("[data-changelog-url]");
   if (!panel) return;
-  fetch(panel.dataset.changelogUrl, { cache: "no-cache" })
-    .then((response) => {
-      if (!response.ok) throw new Error("Não foi possível carregar o histórico.");
-      return response.text();
-    })
-    .then((text) => {
-      const lines = text.split(/\r?\n/);
-      const entries = [];
-      let current = null;
-      for (const line of lines) {
-        const version = line.match(/^\s*(\d+(?:\.\d+){1,3}(?:\s+beta)?)\s*[-–]\s*(.+)$/i);
-        if (version) {
-          if (current) entries.push(current);
-          current = { title: version[0].trim(), lines: [] };
-          continue;
+  let lastText = null;
+  let loading = false;
+  const versionPattern = /^\s*(\d+(?:\.\d+){1,3}(?:\s+beta)?)\s*[-–]\s*(.+)$/i;
+
+  function render(text) {
+    const entries = [];
+    let current = null;
+    for (const line of text.split(/\r?\n/)) {
+      const match = line.match(versionPattern);
+      if (match) {
+        if (current) entries.push(current);
+        current = { version: match[1], date: match[2].trim(), lines: [] };
+      } else if (current && line.trim() && !/^[-=]{3,}$/.test(line.trim())) {
+        current.lines.push(line);
+      }
+    }
+    if (current) entries.push(current);
+    const opened = new Set([...panel.querySelectorAll("details[open]")].map(item => item.dataset.version));
+    panel.replaceChildren();
+    if (!entries.length) {
+      const message = document.createElement("p");
+      message.textContent = "Ainda não há versões publicadas.";
+      panel.append(message);
+      return;
+    }
+    entries.forEach((entry, index) => {
+      const card = document.createElement("details");
+      card.className = "deckra-changelog-entry";
+      card.dataset.version = entry.version;
+      card.open = opened.size ? opened.has(entry.version) || (index === 0 && !opened.has(entries[0].version)) : index === 0;
+      if (index === 0) card.classList.add("is-latest");
+      const summary = document.createElement("summary");
+      const version = document.createElement("strong");
+      version.textContent = "v" + entry.version;
+      const date = document.createElement("span");
+      date.className = "deckra-version-date";
+      date.textContent = entry.date;
+      summary.append(version, date);
+      if (index === 0) {
+        const latest = document.createElement("span");
+        latest.className = "deckra-latest-label";
+        latest.textContent = "MAIS RECENTE";
+        summary.append(latest);
+      }
+      const chevron = document.createElement("span");
+      chevron.className = "deckra-version-chevron";
+      chevron.setAttribute("aria-hidden", "true");
+      chevron.textContent = "⌄";
+      summary.append(chevron);
+      const body = document.createElement("div");
+      body.className = "deckra-change-body";
+      let list = null;
+      let lastItem = null;
+      entry.lines.forEach(line => {
+        const value = line.trim();
+        if (value.startsWith("-")) {
+          if (!list) { list = document.createElement("ul"); body.append(list); }
+          lastItem = document.createElement("li");
+          lastItem.textContent = value.slice(1).trim();
+          list.append(lastItem);
+        } else if (/^\s+/.test(line) && lastItem) {
+          lastItem.textContent += " " + value;
+        } else {
+          list = null;
+          lastItem = null;
+          const heading = document.createElement("h4");
+          heading.textContent = value;
+          body.append(heading);
         }
-        if (current && line.trim() && !/^[-=]{3,}$/.test(line.trim())) current.lines.push(line);
-      }
-      if (current) entries.push(current);
-      panel.replaceChildren();
-      if (!entries.length) {
-        const pre = document.createElement("pre");
-        pre.textContent = text.trim() || "Ainda não há atualizações publicadas.";
-        panel.append(pre);
-        return;
-      }
-      for (const entry of entries.slice(0, 8)) {
-        const details = document.createElement("details");
-        details.className = "deckra-changelog-entry";
-        const summary = document.createElement("summary");
-        summary.textContent = entry.title;
-        const body = document.createElement("pre");
-        body.textContent = entry.lines.join("\n").trim();
-        details.append(summary, body);
-        panel.append(details);
-      }
-    })
-    .catch(() => {
-      const p = document.createElement("p");
-      p.textContent = "Não foi possível carregar as atualizações agora. Use “Abrir changelog completo” para consultar o arquivo.";
-      panel.replaceChildren(p);
+      });
+      card.append(summary, body);
+      panel.append(card);
     });
+  }
+
+  async function refresh() {
+    if (loading) return;
+    loading = true;
+    try {
+      const url = new URL(panel.dataset.changelogUrl, document.baseURI);
+      url.searchParams.set("t", Date.now());
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) throw new Error("Changelog unavailable");
+      const text = await response.text();
+      if (text !== lastText) { render(text); lastText = text; }
+    } catch {
+      if (lastText === null) {
+        const message = document.createElement("p");
+        message.textContent = "Não foi possível carregar o histórico. Abra o changelog completo para consultar as versões.";
+        panel.replaceChildren(message);
+      }
+    } finally {
+      loading = false;
+    }
+  }
+  refresh();
+  setInterval(() => { if (!document.hidden) refresh(); }, 60000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
 })();
 
 (() => {
