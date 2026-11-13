@@ -431,3 +431,21 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 .deckra-page .purchase-panel .marketplace-button.is-unavailable .marketplace-status{border-color:#514a61;color:#bbb5c8}
 @media(max-width:760px){.deckra-page .deckra-panel .purchase-panel{padding:24px}.deckra-page .purchase-panel .marketplace-buttons{gap:10px}.deckra-page .purchase-panel .marketplace-button{padding:16px;font-size:14px}.deckra-page .purchase-panel .marketplace-button svg{width:34px;height:34px}.deckra-page .purchase-panel .marketplace-button .marketplace-status{padding:5px 7px;font-size:9px}}
 @media(max-width:560px){.deckra-page .purchase-panel .marketplace-buttons{grid-template-columns:1fr}.deckra-page .purchase-panel .marketplace-button{aspect-ratio:auto;min-height:145px;padding:20px;font-size:18px}}
+
+/* Cartões das lojas: elementos centrados e destaque pela cor de cada marca. */
+.deckra-page .purchase-panel .marketplace-button{align-items:center;justify-content:center;gap:20px;text-align:center;background:#191821;border-color:#393644;transition:transform .22s ease,background .22s ease,border-color .22s ease,box-shadow .22s ease}
+.deckra-page .purchase-panel .marketplace-button.is-available{background:#1c1b27;border-color:#534c6a;box-shadow:0 12px 28px #0002}
+.deckra-page .purchase-panel .marketplace-button svg{width:84px;height:84px;flex-shrink:0;color:#b9b2c8;transition:color .24s ease,filter .24s ease,transform .24s ease}
+.deckra-page .purchase-panel .marketplace-button.is-unavailable svg{color:#9992a9}
+.deckra-page .purchase-panel .marketplace-button>.marketplace-label{flex:0 1 auto;font-size:clamp(17px,1.7vw,24px);font-weight:700}
+.deckra-page .purchase-panel .marketplace-button .marketplace-status{margin:0 auto;padding:9px 15px;font-size:11px}
+.deckra-page .purchase-panel .marketplace-button.is-available .marketplace-status{background:#7056d8;border-color:#8469eb}
+.deckra-page .purchase-panel .marketplace-button.is-available:hover{transform:translateY(-4px);background:#29202a;border-color:#ff914d;box-shadow:0 16px 40px #f66e2826}
+.deckra-page .purchase-panel .marketplace-button[data-marketplace="shopee"]:is(:hover,:focus-visible) svg{color:#ff8b3d;filter:drop-shadow(0 0 10px #ff6a34) drop-shadow(0 0 25px #ff692a9c);transform:scale(1.07)}
+.deckra-page .purchase-panel .marketplace-button[data-marketplace="mercadoLivre"]:hover{background:#252319;border-color:#e3c83c;box-shadow:0 14px 36px #e3c83c1f}
+.deckra-page .purchase-panel .marketplace-button[data-marketplace="mercadoLivre"]:hover svg{color:#ffe35e;filter:drop-shadow(0 0 10px #f9d635) drop-shadow(0 0 24px #f9d6358c);transform:scale(1.07)}
+.deckra-page .purchase-panel .marketplace-button[data-marketplace="tiktokShop"]:hover{background:#172528;border-color:#41dded;box-shadow:0 14px 36px #40dceb20}
+.deckra-page .purchase-panel .marketplace-button[data-marketplace="tiktokShop"]:hover svg{color:#55edfa;filter:drop-shadow(0 0 10px #33dff2) drop-shadow(0 0 24px #33dff28c);transform:scale(1.07)}
+@media(max-width:760px){.deckra-page .purchase-panel .marketplace-button{gap:12px}.deckra-page .purchase-panel .marketplace-button svg{width:clamp(42px,7vw,66px);height:clamp(42px,7vw,66px)}.deckra-page .purchase-panel .marketplace-button>.marketplace-label{font-size:clamp(12px,2vw,18px)}}
+@media(max-width:560px){.deckra-page .purchase-panel .marketplace-button{gap:13px;min-height:180px}.deckra-page .purchase-panel .marketplace-button svg{width:64px;height:64px}.deckra-page .purchase-panel .marketplace-button>.marketplace-label{font-size:19px}}
+@media(prefers-reduced-motion:reduce){.deckra-page .purchase-panel .marketplace-button,.deckra-page .purchase-panel .marketplace-button svg{transition:none}}
