@@ -644,9 +644,9 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
 .morfy-android-app .catalog-section .product-image-arrow{width:30px;height:30px}
 .morfy-android-app .catalog-section .product-image-position{font-size:10px}
 .product-pagination{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:8px;margin:24px auto 0}
-.product-page-button{min-width:38px;height:38px;padding:0 10px;border:1px solid #303b4b;border-radius:6px;background:#111923;color:#b9c5d6;font:600 12px Montserrat,Arial,sans-serif}
-.product-page-button:disabled{opacity:.35;cursor:default}
-.product-page-button.is-current{border-color:#73a7ff;background:#142b48;color:#a8ceff}
+.catalog-page-button{min-width:38px;height:38px;padding:0 10px;border:1px solid #303b4b;border-radius:6px;background:#111923;color:#b9c5d6;font:600 12px Montserrat,Arial,sans-serif}
+.catalog-page-button:disabled{opacity:.35;cursor:default}
+.catalog-page-button.is-current{border-color:#73a7ff;background:#142b48;color:#a8ceff}
 @media(max-width:560px){
   .morfy-android-app .catalog-section .product-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}
   .morfy-android-app .catalog-section .product-body{padding:9px 7px}
