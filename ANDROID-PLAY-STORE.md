@@ -1,35 +1,24 @@
-# MORFY 3D Android — preparação para Google Play
+# MORFY 3D Android — estado da implementação
 
-## Implementado
-- Destino oficial https://morfy3d.com.br/.
-- WebView limitado ao domínio MORFY; links externos HTTPS abrem em apps externos.
-- Bloqueio de conteúdo misto, arquivos locais e erros SSL.
-- Navegação de retorno, recarregamento e compartilhamento nativo.
-- Canal e serviço de notificações Firebase Cloud Messaging.
-- Consentimento explícito para notificações no Android 13+.
-- Política pública em https://morfy3d.com.br/privacy.html.
-- Target SDK 36, versionName 1.1.0 e versionCode 2.
+## Aplicativo
+- WebView em tela cheia apontando para https://morfy3d.com.br/.
+- Navegação interna restrita ao domínio MORFY; links HTTPS externos abrem fora do app.
+- JavaScript e armazenamento web habilitados para o catálogo; arquivos locais, conteúdo misto e erros SSL bloqueados.
+- Sem barra nativa, sem compartilhamento nativo e sem telas paralelas: o conteúdo principal é o site.
+- Ícone Android gerado com a identidade visual oficial MORFY.
+- Firebase Cloud Messaging é a única integração nativa adicional, para avisos de novos produtos.
 
-## Ativar push
-O cliente inscreve o usuário no tópico FCM morfy-news após consentimento. Para ativar:
-1. Criar/selecionar projeto Firebase da MORFY.
-2. Registrar o app Android com applicationId br.com.morfy3d.app.
-3. Baixar google-services.json e codificar em Base64.
-4. Cadastrar o segredo Actions MORFY_GOOGLE_SERVICES_JSON_BASE64.
-5. Enviar mensagens ao tópico morfy-news pelo Firebase Console ou backend confiável.
+## Notificações de novos produtos
+- O app solicita permissão de notificações no Android 13+ e inscreve usuários autorizados no tópico `morfy-news`.
+- O workflow `.github/workflows/product-notifications.yml` compara os IDs de `assets/js/products.js` antes e depois de cada push na `main`.
+- Somente IDs novos disparam notificação. O toque abre o produto correspondente no catálogo.
+- É necessário configurar os segredos `MORFY_GOOGLE_SERVICES_JSON_BASE64` e `MORFY_FIREBASE_SERVICE_ACCOUNT_JSON`, ambos do mesmo projeto Firebase.
 
-Sem configuração Firebase, o app compila, mas push real não funciona.
+## Build e Play Store
+- O workflow Android gera APK debug para teste.
+- AAB de release depende dos quatro segredos de assinatura documentados em `app/PLAY-STORE-SETUP.md`.
+- Pacote: `br.com.morfy3d.app`; versionCode: 2; targetSdk: 36.
+- A aprovação depende também da ficha da loja, Segurança dos dados, política de privacidade, testes e avaliação do Google.
 
-## Publicação Play Store
-O workflow atual gera APK debug para teste. A Play Store exige AAB de release assinado. Configure uma chave de upload estável e segura, compile bundleRelease e faça upload pelo Play Console. Não use chave debug.
-
-## Pendências pré-publicação
-- Definir e publicar canal de contato do controlador de dados na política.
-- Preencher Segurança dos dados no Play Console conforme os SDKs ativados.
-- Confirmar controle do domínio da política de privacidade.
-- Configurar Firebase e testar notificações em dispositivos reais.
-- Testar acessibilidade, desempenho, modo offline e navegação.
-- Preparar ícone 512x512, screenshots, descrição, classificação etária e formulários do Play Console.
-- Realizar teste interno/fechado e aguardar avaliação do Google.
-
-A implementação técnica não garante aprovação. O Google avalia funcionalidade, conteúdo, experiência e declarações de privacidade.
+## Segurança
+Nunca armazene credenciais Firebase ou keystores no repositório. Use somente GitHub Actions Secrets.
