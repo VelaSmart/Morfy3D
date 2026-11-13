@@ -1,6 +1,12 @@
-/* Impede arrastar imagens para fora do site sem alterar cliques ou galerias. */
+/* Bloqueia o arraste e o menu nativo apenas nas imagens do site. */
+function isSiteImage(event) {
+  return event.target instanceof Element && Boolean(event.target.closest("img"));
+}
+
 document.addEventListener("dragstart", function (event) {
-  if (event.target instanceof Element && event.target.closest("img")) {
-    event.preventDefault();
-  }
+  if (isSiteImage(event)) event.preventDefault();
+});
+
+document.addEventListener("contextmenu", function (event) {
+  if (isSiteImage(event)) event.preventDefault();
 });
