@@ -566,7 +566,7 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
 
 /* Categorias e busca na antiga faixa de marca, sempre acessíveis durante o catálogo. */
 .catalog-nav{position:sticky;top:85px;z-index:29;border-block:1px solid #28303c;background:#0d1218eF;backdrop-filter:blur(16px)}
-.catalog-nav .catalog-toolbar{display:flex;align-items:stretch;justify-content:space-between;gap:22px;min-height:70px;margin:0}
+.catalog-nav .catalog-toolbar{display:flex;align-items:stretch;justify-content:space-between;gap:22px;min-height:70px;margin:0 auto}
 .catalog-nav .category-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));flex:1;gap:0;align-items:stretch;flex-wrap:nowrap;min-width:0}
 .catalog-nav .filter-button{position:relative;display:flex;align-items:center;justify-content:center;gap:9px;min-height:70px;padding:12px 10px;border:0;border-radius:0;background:transparent;color:#a6b0bf;font-size:10px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;white-space:nowrap;transition:color .2s ease}
 .catalog-nav .filter-button:hover{border:0;background:transparent;color:#f2f7ff}
