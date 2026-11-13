@@ -17,7 +17,7 @@ function walk(directory) {
 const files = walk(root);
 const pages = files.filter(file => file.endsWith(".html"));
 const actualPages = pages.map(file => path.relative(root, file)).sort();
-if (JSON.stringify(actualPages) !== JSON.stringify(["deckra.html", "index.html"])) {
+if (JSON.stringify(actualPages) !== JSON.stringify(["deckra.html", "index.html", "privacy.html"])) {
   fail("O projeto deve conter apenas index.html e deckra.html como páginas HTML.");
 }
 const sources = new Map(pages.map(file => [file, fs.readFileSync(file, "utf8")]));
