@@ -97,6 +97,7 @@ class MainActivity : Activity() {
     }
 
     private fun requestNotificationConsent() {
+        if (FirebaseApp.getApps(this).isEmpty()) return
         if (Build.VERSION.SDK_INT < 33) {
             subscribeToNewsIfConfigured()
             return
@@ -105,11 +106,16 @@ class MainActivity : Activity() {
             subscribeToNewsIfConfigured()
             return
         }
+        val preferences = getSharedPreferences("morfy_notifications", MODE_PRIVATE)
+        if (preferences.getBoolean("permission_prompted", false)) return
         AlertDialog.Builder(this)
             .setTitle("Novidades da MORFY")
             .setMessage("Deseja receber notificações quando novos produtos forem publicados?")
-            .setNegativeButton("Agora não", null)
+            .setNegativeButton("Agora não") { _, _ ->
+                preferences.edit().putBoolean("permission_prompted", true).apply()
+            }
             .setPositiveButton("Permitir") { _, _ ->
+                preferences.edit().putBoolean("permission_prompted", true).apply()
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), notificationRequestCode)
             }
             .show()
