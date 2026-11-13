@@ -74,15 +74,10 @@
     resizeObserver.observe(panels[activeIndex]);
     if (updateHash) history.replaceState(null, "", hashes[activeIndex]);
     if (scrollToInfo) {
-      requestAnimationFrame(() => {
-        const headerHeight = document.querySelector(".site-header")?.getBoundingClientRect().height || 0;
-        const hero = document.querySelector(".deckra-hero");
-        const navTop = hero ? hero.getBoundingClientRect().bottom + window.scrollY : nav.getBoundingClientRect().top + window.scrollY;
-        window.scrollTo({
-          top: Math.max(0, navTop - headerHeight),
-          behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"
-        });
-      });
+      const headerHeight = document.querySelector(".site-header")?.getBoundingClientRect().height || 0;
+      const hero = document.querySelector(".deckra-hero");
+      const navTop = hero ? hero.getBoundingClientRect().bottom + window.scrollY : nav.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({ top: Math.max(0, navTop - headerHeight), behavior: "instant" });
     }
   }
   buttons.forEach((button, index) => {
