@@ -8,7 +8,6 @@ if (!stage || !canvas) throw new Error("Área do visualizador MORFY não encontr
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.08;
@@ -120,6 +119,9 @@ loadOriginalModel();
 function resize() {
   const width = Math.max(1, stage.clientWidth);
   const height = Math.max(1, stage.clientHeight);
+  // Reduz o custo de renderização em celulares sem prejudicar telas maiores.
+  const pixelRatioLimit = width <= 800 ? 1.35 : 2;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, pixelRatioLimit));
   renderer.setSize(width, height, false);
   camera.aspect = width / height;
   camera.updateProjectionMatrix();
