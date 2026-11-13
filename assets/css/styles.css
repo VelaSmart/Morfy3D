@@ -287,3 +287,27 @@
 /* Cliques rápidos entre abas não deslocam a página. */
 html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 .deckra-page .deckra-panels-viewport{transition:none;overflow-anchor:none}
+
+/* Cartões de download do DECKRA. */
+.deckra-page .software-download-panel{display:flex;align-items:center;gap:clamp(24px,4vw,64px);max-width:1450px;margin-inline:auto}
+.deckra-page .software-download-panel>div:first-child{flex:1;min-width:0}
+.deckra-page .deckra-download-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;flex:0 1 590px;min-width:390px}
+.deckra-page .deckra-os-card{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:9px;min-width:0;min-height:165px;padding:20px 15px;border:1px solid #68549c;border-radius:9px;text-align:center;color:#fff;transition:transform .2s,border-color .2s,background .2s}
+.deckra-page .deckra-os-card .deckra-os-icon{width:39px;height:39px;flex:none;stroke:none}
+.deckra-page .deckra-os-card strong{font-size:15px;letter-spacing:.1em;line-height:1.2}
+.deckra-page .deckra-os-card small{font-size:10px;line-height:1.5;color:#ddd3f4}
+.deckra-page .deckra-os-windows{background:linear-gradient(145deg,#815cf3,#5f48d4);box-shadow:0 10px 26px #6043d142}
+.deckra-page .deckra-os-windows:hover{transform:translateY(-3px);background:linear-gradient(145deg,#9171ff,#7155e8);border-color:#bda9ff}
+.deckra-page .deckra-os-linux{border-color:#413750;background:#14121c;color:#c2bdd0}
+.deckra-page .deckra-os-linux small{color:#9c95aa}
+@media(max-width:960px){
+ .deckra-page .software-download-panel{flex-direction:column;align-items:stretch}
+ .deckra-page .deckra-download-options{flex:initial;width:100%;min-width:0}
+}
+@media(max-width:500px){
+ .deckra-page .deckra-download-options{gap:9px}
+ .deckra-page .deckra-os-card{min-height:140px;padding:12px 8px}
+ .deckra-page .deckra-os-card strong{font-size:12px}
+ .deckra-page .deckra-os-card small{font-size:9px}
+ .deckra-page .deckra-os-card .deckra-os-icon{width:32px;height:32px}
+}
