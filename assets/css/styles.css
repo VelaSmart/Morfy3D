@@ -500,3 +500,7 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 .deckra-page .deckra-download-block .deckra-os-macos small{color:#9c95aa}
 @media(max-width:950px){.deckra-page .deckra-download-block .deckra-download-options{grid-template-columns:repeat(2,minmax(0,1fr))}.deckra-page .deckra-download-block .deckra-os-macos{grid-column:1/-1}}
 @media(max-width:580px){.deckra-page .deckra-download-block .deckra-download-options{grid-template-columns:1fr}.deckra-page .deckra-download-block .deckra-os-macos{grid-column:auto}.deckra-page .deckra-download-block .deckra-os-card{min-height:112px;padding:16px 20px}.deckra-page .deckra-download-block .deckra-os-card strong{font-size:16px}}
+
+
+/* No modal MORFY, as logos substituem os ícones sem aumentar os botões. */
+.product-dialog #modal-marketplaces .marketplace-logo{display:block;width:20px;height:20px;flex:0 0 20px;object-fit:contain}
