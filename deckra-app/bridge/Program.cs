@@ -5,6 +5,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using NAudio.CoreAudioApi;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 var pin = RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
 Console.WriteLine("DECKRA_PIN=" + pin);
