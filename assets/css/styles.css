@@ -483,3 +483,8 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 .deckra-page .deckra-models-section .section-heading h2,
 .deckra-page .deckra-models-section .section-heading .text-accent{color:#f5f5f7}
 .deckra-page .deckra-model-copy h3 .deckra-model-variant{color:#a38cff}
+
+/* O cartão inteiro abre os detalhes do produto. */
+.product-card{cursor:pointer}
+.product-card:focus-visible{outline:3px solid var(--accent);outline-offset:5px}
+.product-card .product-image-arrow{cursor:pointer}
