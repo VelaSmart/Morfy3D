@@ -16,7 +16,6 @@ renderer.toneMappingExposure = 1.08;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 100);
 camera.position.set(0, 1.15, 3.6);
-
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.055;
@@ -27,7 +26,7 @@ controls.autoRotate = !reducedMotion;
 controls.autoRotateSpeed = 0.35;
 
 scene.add(new THREE.HemisphereLight(0xc9eaff, 0x071326, 1.8));
-const key = new THREE.DirectionalLight(0xffffff, 3.0);
+const key = new THREE.DirectionalLight(0xffffff, 3);
 key.position.set(-3, 5, 4);
 scene.add(key);
 const cyan = new THREE.PointLight(0x16c8ff, 18, 8);
@@ -40,63 +39,54 @@ scene.add(blue);
 const modelRoot = new THREE.Group();
 scene.add(modelRoot);
 
-const loader = new GLTFLoader();
-const MODEL_URL = "./assets/models/morfy-logo.glb";
-const status = stage.querySelector("[data-viewer-status]");
-
-function setStatus(message) {
-  if (status) status.textContent = message;
-}
+// O visualizador carrega a malha original. Não há mais uma silhueta Y
+// aproximada construída por código: a geometria e os materiais vêm do GLB.
+const status = document.createElement("p");
+status.className = "viewer-model-status";
+status.setAttribute("role", "status");
+status.style.cssText = "position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);max-width:min(82%,420px);padding:12px 16px;border:1px solid rgba(91,190,255,.35);border-radius:12px;background:rgba(3,12,29,.82);color:#c9eaff;font:500 13px/1.5 system-ui,sans-serif;text-align:center;pointer-events:none";
+stage.append(status);
 
 function frameModel(object) {
   const bounds = new THREE.Box3().setFromObject(object);
   const size = bounds.getSize(new THREE.Vector3());
-  const center = bounds.getCenter(new THREE.Vector3());
-  object.position.sub(center);
-
+  object.position.sub(bounds.getCenter(new THREE.Vector3()));
   const maxDimension = Math.max(size.x, size.y, size.z) || 1;
-  const scale = 2.15 / maxDimension;
-  object.scale.setScalar(scale);
-
-  const fitted = new THREE.Box3().setFromObject(object);
-  const fittedSize = fitted.getSize(new THREE.Vector3());
-  const distance = Math.max(fittedSize.x, fittedSize.y, fittedSize.z) * 2.25;
+  object.scale.setScalar(2.15 / maxDimension);
+  const distance = 2.15 * 2.25;
   camera.position.set(distance * 0.12, distance * 0.18, distance);
-  camera.near = Math.max(0.001, distance / 100);
-  camera.far = distance * 20;
+  camera.near = 0.01;
+  camera.far = 100;
   camera.updateProjectionMatrix();
   controls.target.set(0, 0, 0);
-  controls.minDistance = distance * 0.65;
-  controls.maxDistance = distance * 4.5;
+  controls.minDistance = 1.1;
+  controls.maxDistance = 8;
   controls.update();
 }
 
-loader.load(
-  MODEL_URL,
+new GLTFLoader().load(
+  "./assets/models/morfy-logo.glb",
   (gltf) => {
     const model = gltf.scene;
     model.traverse((node) => {
       if (!node.isMesh) return;
       node.castShadow = true;
       node.receiveShadow = true;
-      if (node.material) {
-        const materials = Array.isArray(node.material) ? node.material : [node.material];
-        for (const material of materials) {
-          if ("roughness" in material && material.roughness > 0.42) material.roughness = 0.42;
-          if ("metalness" in material && material.metalness < 0.12) material.metalness = 0.12;
-          material.needsUpdate = true;
-        }
+      const materials = Array.isArray(node.material) ? node.material : [node.material];
+      for (const material of materials) {
+        if ("roughness" in material) material.roughness = Math.min(material.roughness, 0.42);
+        material.needsUpdate = true;
       }
     });
     modelRoot.add(model);
     frameModel(modelRoot);
+    status.remove();
     stage.classList.add("is-ready");
-    setStatus("");
   },
   undefined,
   (error) => {
-    console.error("Falha ao carregar o modelo 3D original da MORFY:", error);
-    setStatus("Modelo 3D original não encontrado em assets/models/morfy-logo.glb.");
+    console.error("Não foi possível carregar o GLB original da MORFY:", error);
+    status.textContent = "A malha original ainda precisa ser adicionada em assets/models/morfy-logo.glb. O visualizador não usará uma imitação simplificada.";
     stage.classList.add("is-error");
   }
 );
