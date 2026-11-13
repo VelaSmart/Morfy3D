@@ -545,3 +545,21 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   #product-dialog #modal-marketplaces .marketplace-button .marketplace-logo{transition:none}
 }
 
+/* MORFY 3D hero viewer */
+.hero.hero-slicer{background:#090e15}
+.hero-slicer-background.hero-3d-backdrop{z-index:0;pointer-events:none;background:radial-gradient(ellipse at 76% 48%,#0c2c50 0%,#0a1726 34%,transparent 68%),linear-gradient(120deg,#090e15,#0b111a 58%,#080d14)}
+.hero.hero-slicer::before{z-index:1;background:linear-gradient(90deg,#090e15 0%,#090e15f5 25%,#090e15a8 43%,transparent 67%),linear-gradient(0deg,#090e15,transparent 13%,transparent 88%,#090e1570);pointer-events:none}
+.hero-3d-stage{position:absolute;z-index:2;right:0;top:0;width:58%;height:100%;min-height:600px;overflow:hidden;touch-action:none;cursor:grab}
+.hero-3d-stage:active{cursor:grabbing}
+.hero-3d-stage canvas{display:block;width:100%;height:100%;outline:none}
+.viewer-toolbar{position:absolute;top:14%;right:8%;display:flex;flex-direction:column;gap:7px;padding:6px;border:1px solid #20364e;background:#091522b8;border-radius:7px;backdrop-filter:blur(12px)}
+.viewer-toolbar button{width:38px;height:38px;border:1px solid #203a55;border-radius:5px;background:#0b1b2c;color:#8eb9e9;font-size:22px;line-height:1;cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.viewer-toolbar button:hover,.viewer-toolbar button[aria-pressed="true"]{background:#12365a;border-color:#2589e8;color:#35caff}
+.viewer-coordinate{position:absolute;top:7%;left:11%;right:18%;display:flex;justify-content:space-between;color:#6886a5;font-size:8px;letter-spacing:.16em;pointer-events:none}
+.viewer-hint{position:absolute;right:8%;bottom:7%;color:#7089a5;font-size:8px;letter-spacing:.12em;pointer-events:none}
+.viewer-hint span{color:#21baff;margin-inline:5px}
+@media(max-width:1100px){.hero-3d-stage{width:57%}.viewer-toolbar{right:5%}}
+@media(max-width:800px){.hero-3d-stage{width:58%;min-height:540px}.viewer-coordinate{left:5%;font-size:7px}.viewer-hint{right:4%;font-size:7px}.viewer-toolbar button{width:34px;height:34px}}
+@media(max-width:560px){.hero.hero-slicer{overflow:hidden}.hero-slicer-inner{position:relative;z-index:3;padding-bottom:390px}.hero-3d-stage{top:auto;bottom:0;width:100%;height:390px;min-height:390px}.hero.hero-slicer::before{background:linear-gradient(180deg,#090e15 0%,#090e15 36%,#090e1540 64%,#090e15 100%)}.viewer-coordinate{top:4%;left:8%;right:24%}.viewer-toolbar{top:12%;right:5%}.viewer-toolbar button{width:32px;height:32px}.viewer-hint{bottom:4%;right:8%;left:8%;text-align:center;font-size:6px}}
+@media(prefers-reduced-motion:reduce){.viewer-toolbar button{transition:none}}
+
