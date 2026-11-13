@@ -13,18 +13,18 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.12;
 
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-camera.position.set(0, 3.5, 5.8);
+const camera = new THREE.PerspectiveCamera(37, 1, 0.1, 100);
+camera.position.set(0, 3.7, 6.3);
 
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.055;
 controls.enablePan = true;
 controls.screenSpacePanning = true;
-controls.minDistance = 2.8;
-controls.maxDistance = 10;
+controls.minDistance = 3.4;
+controls.maxDistance = 11;
 controls.autoRotate = !reducedMotion;
-controls.autoRotateSpeed = 1.0;
+controls.autoRotateSpeed = 0.42;
 controls.target.set(0, 0, 0);
 
 scene.add(new THREE.AmbientLight(0x9ccfff, 1.45));
@@ -41,65 +41,99 @@ scene.add(blueLight);
 const modelRoot = new THREE.Group();
 scene.add(modelRoot);
 
-// Silhueta superior do símbolo oficial: um único perfil em Y,
-// extrudado para baixo para formar a peça prismática em perspectiva.
+// Perfil do símbolo oficial: braços simétricos, haste central e cantos
+// levemente chanfrados para preservar a leitura da peça em qualquer ângulo.
 function makeSymbol() {
   const shape = new THREE.Shape();
-  shape.moveTo(-1.55, 0.88);
-  shape.lineTo(-1.17, 1.22);
-  shape.lineTo(0, 0.48);
-  shape.lineTo(1.17, 1.22);
-  shape.lineTo(1.55, 0.88);
-  shape.lineTo(0.34, 0.08);
-  shape.lineTo(0.34, -1.36);
-  shape.lineTo(0, -1.58);
-  shape.lineTo(-0.34, -1.36);
-  shape.lineTo(-0.34, 0.08);
+  shape.moveTo(-1.55, 1.18);
+  shape.lineTo(-1.55, 0.91);
+  shape.lineTo(0, 0.08);
+  shape.lineTo(1.55, 0.91);
+  shape.lineTo(1.55, 1.18);
+  shape.lineTo(0.34, 0.51);
+  shape.lineTo(0.34, -1.19);
+  shape.lineTo(0, -1.42);
+  shape.lineTo(-0.34, -1.19);
+  shape.lineTo(-0.34, 0.51);
   shape.closePath();
 
-  const depth = 0.62;
-  const geometry = new THREE.ExtrudeGeometry(shape, {
+  const depth = 0.58;
+  let geometry = new THREE.ExtrudeGeometry(shape, {
     depth,
     bevelEnabled: true,
-    bevelSegments: 4,
+    bevelSegments: 2,
     steps: 1,
-    bevelSize: 0.045,
-    bevelThickness: 0.045,
+    bevelSize: 0.035,
+    bevelThickness: 0.035,
     curveSegments: 2
   });
-  // A face em Y fica na horizontal; a extrusão desce, formando
-  // as paredes laterais visíveis no símbolo original.
+
+  // A face do Y fica no plano horizontal; a extrusão desce para criar as
+  // laterais. Separar as faces por orientação mantém o topo ciano visível
+  // e aplica as duas cores oficiais aos lados esquerdo e direito.
   geometry.rotateX(Math.PI / 2);
   geometry.translate(0, -depth / 2, 0);
+  if (geometry.index) geometry = geometry.toNonIndexed();
   geometry.computeVertexNormals();
 
-  const sideMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0750a8,
-    metalness: 0.58,
-    roughness: 0.25
+  const positions = geometry.getAttribute("position");
+  geometry.clearGroups();
+  let groupMaterial = -1;
+  let groupStart = 0;
+
+  for (let vertex = 0; vertex < positions.count; vertex += 3) {
+    const ax = positions.getX(vertex);
+    const ay = positions.getY(vertex);
+    const az = positions.getZ(vertex);
+    const bx = positions.getX(vertex + 1);
+    const by = positions.getY(vertex + 1);
+    const bz = positions.getZ(vertex + 1);
+    const cx = positions.getX(vertex + 2);
+    const cy = positions.getY(vertex + 2);
+    const cz = positions.getZ(vertex + 2);
+
+    const abx = bx - ax;
+    const aby = by - ay;
+    const abz = bz - az;
+    const acx = cx - ax;
+    const acy = cy - ay;
+    const acz = cz - az;
+    const normalY = abz * acx - abx * acz;
+    const normalX = aby * acz - abz * acy;
+    const normalZ = abx * acy - aby * acx;
+    const normalLength = Math.hypot(normalX, normalY, normalZ);
+    const isTopFace = normalLength > 0 && Math.abs(normalY) / normalLength > 0.85;
+    const materialIndex = isTopFace
+      ? 2
+      : (ax + bx + cx) / 3 < 0 ? 0 : 1;
+
+    if (materialIndex !== groupMaterial) {
+      if (groupMaterial !== -1) geometry.addGroup(groupStart, vertex - groupStart, groupMaterial);
+      groupMaterial = materialIndex;
+      groupStart = vertex;
+    }
+  }
+  if (groupMaterial !== -1) {
+    geometry.addGroup(groupStart, positions.count - groupStart, groupMaterial);
+  }
+
+  const leftMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0b91bb,
+    metalness: 0.32,
+    roughness: 0.3
+  });
+  const rightMaterial = new THREE.MeshStandardMaterial({
+    color: 0x0b45bd,
+    metalness: 0.32,
+    roughness: 0.3
   });
   const topMaterial = new THREE.MeshStandardMaterial({
-    color: 0x35c8f3,
-    metalness: 0.34,
-    roughness: 0.23
+    color: 0x52d6f4,
+    metalness: 0.18,
+    roughness: 0.26
   });
-  const solid = new THREE.Mesh(geometry, [sideMaterial, topMaterial]);
+  const solid = new THREE.Mesh(geometry, [leftMaterial, rightMaterial, topMaterial]);
   modelRoot.add(solid);
-
-  // Reforço azul nas paredes da frente para preservar a leitura
-  // de volume e a divisão cromática da marca oficial.
-  const frontMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0750a8,
-    metalness: 0.52,
-    roughness: 0.27
-  });
-  const frontFace = new THREE.Mesh(
-    new THREE.BoxGeometry(0.68, 0.025, 1.46),
-    frontMaterial
-  );
-  frontFace.position.set(0, -0.76, 0);
-  frontFace.visible = false;
-  modelRoot.add(frontFace);
 
   modelRoot.rotation.set(0, -0.16, 0);
   const bounds = new THREE.Box3().setFromObject(modelRoot);
@@ -133,7 +167,7 @@ stage.querySelectorAll("[data-viewer-action]").forEach(button => {
       camera.position.multiplyScalar(1.22);
       controls.update();
     } else if (action === "reset") {
-      camera.position.set(0, 3.5, 5.8);
+      camera.position.set(0, 3.7, 6.3);
       controls.target.set(0, 0, 0);
       modelRoot.rotation.set(0, -0.16, 0);
       controls.autoRotate = !reducedMotion;
