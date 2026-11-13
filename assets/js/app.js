@@ -321,13 +321,19 @@
       body.appendChild(createElement("span", "product-category", categories[product.category] || product.category));
       body.appendChild(createElement("h3", "", product.name));
       body.appendChild(createElement("p", "", product.description));
-      var button = createElement("button", "detail-button", "Ver detalhes");
-      button.type = "button";
-      button.dataset.product = product.id;
-      button.setAttribute("aria-label", "Ver detalhes de " + product.name);
-      button.setAttribute("aria-haspopup", "dialog");
-      button.addEventListener("click", function () { openProduct(product, button); });
-      body.appendChild(button);
+      article.tabIndex = 0;
+      article.setAttribute("role", "group");
+      article.setAttribute("aria-label", product.name + ". Clique ou pressione Enter para ver os detalhes.");
+      article.addEventListener("click", function (event) {
+        // Os controles da galeria continuam independentes do clique no cartão.
+        if (event.target.closest("button, a, input, select, textarea")) return;
+        openProduct(product, article);
+      });
+      article.addEventListener("keydown", function (event) {
+        if (event.target !== article || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        openProduct(product, article);
+      });
       article.appendChild(visual);
       article.appendChild(body);
       return article;
