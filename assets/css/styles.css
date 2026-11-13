@@ -474,3 +474,7 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 .deckra-page .deckra-model-availability span{font-size:12px;line-height:1.6;color:#c9c5d1}
 @media(max-width:800px){.deckra-page .deckra-future-models{gap:20px;margin-top:20px}.deckra-page .deckra-model-upcoming .deckra-model-image{min-height:0;aspect-ratio:16/9}.deckra-page .deckra-model-concept .deckra-concept-wordmark{font-size:clamp(26px,7vw,48px)}}
 @media(max-width:560px){.deckra-page .deckra-model-availability{margin-top:5px}.deckra-page .deckra-model-concept>span:last-child{font-size:7px;letter-spacing:.1em}}
+
+/* Incógnita visual para os modelos cujo design ainda não foi apresentado. */
+.deckra-page .deckra-model-concept .deckra-concept-question{font-size:clamp(120px,14vw,210px);line-height:1;font-weight:600;letter-spacing:0;color:#a98cff;text-shadow:0 0 20px #ae87ffb3,0 0 65px #8657f393}
+@media(max-width:800px){.deckra-page .deckra-model-concept .deckra-concept-question{font-size:clamp(100px,22vw,170px)}}
