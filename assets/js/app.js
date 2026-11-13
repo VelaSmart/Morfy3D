@@ -100,7 +100,23 @@
         if (!url && !unavailable && !config.demoMode) return;
         var button = createElement(url ? "a" : "button", "marketplace-button");
         button.dataset.marketplace = marketplace.id;
-        button.appendChild(marketplaceIcon(marketplace.id));
+        if (container.dataset.marketplaces === "deckra") {
+          var logoPaths = {
+            shopee: "./assets/images/marketplace-shopee.png",
+            tiktokShop: "./assets/images/marketplace-tiktok-shop.png",
+            mercadoLivre: "./assets/images/marketplace-mercado-livre.png"
+          };
+          var logo = createElement("img", "marketplace-logo");
+          logo.src = logoPaths[marketplace.id];
+          logo.alt = "";
+          logo.width = 120;
+          logo.height = 120;
+          logo.decoding = "async";
+          logo.setAttribute("aria-hidden", "true");
+          button.appendChild(logo);
+        } else {
+          button.appendChild(marketplaceIcon(marketplace.id));
+        }
         button.appendChild(createElement("span", "marketplace-label", marketplace.label));
 
         if (url) {

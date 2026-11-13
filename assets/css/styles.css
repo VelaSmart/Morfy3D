@@ -448,3 +448,12 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 @media(prefers-reduced-motion:reduce){.deckra-page .purchase-panel .marketplace-button,.deckra-page .purchase-panel .marketplace-button svg{transition:none}}
 
 .deckra-page .purchase-panel .marketplace-button.is-available:hover{transform:none;background:#1c1b27;border-color:#534c6a;box-shadow:0 12px 28px #0002}
+
+/* Logos enviadas para os cartões DECKRA; apenas a imagem recebe o brilho. */
+.deckra-page .purchase-panel .marketplace-button .marketplace-logo{display:block;width:120px;height:120px;flex-shrink:0;object-fit:contain;filter:none;transition:filter .24s ease,transform .24s ease}
+.deckra-page .purchase-panel .marketplace-button[data-marketplace="shopee"]:is(:hover,:focus-visible) .marketplace-logo{filter:brightness(0) saturate(100%) invert(65%) sepia(85%) saturate(2957%) hue-rotate(333deg) brightness(102%) contrast(103%) drop-shadow(0 0 10px #ff6a34) drop-shadow(0 0 23px #ff692a99);transform:scale(1.06)}
+.deckra-page .purchase-panel .marketplace-button[data-marketplace="mercadoLivre"]:hover .marketplace-logo{filter:brightness(0) saturate(100%) invert(86%) sepia(68%) saturate(1119%) hue-rotate(348deg) brightness(106%) contrast(102%) drop-shadow(0 0 10px #f9d635) drop-shadow(0 0 23px #f9d63590);transform:scale(1.06)}
+.deckra-page .purchase-panel .marketplace-button[data-marketplace="tiktokShop"]:hover .marketplace-logo{filter:brightness(0) saturate(100%) invert(81%) sepia(74%) saturate(765%) hue-rotate(142deg) brightness(103%) contrast(104%) drop-shadow(0 0 10px #33dff2) drop-shadow(0 0 23px #33dff290);transform:scale(1.06)}
+@media(max-width:760px){.deckra-page .purchase-panel .marketplace-button .marketplace-logo{width:clamp(56px,10vw,90px);height:clamp(56px,10vw,90px)}}
+@media(max-width:560px){.deckra-page .purchase-panel .marketplace-button .marketplace-logo{width:84px;height:84px}}
+@media(prefers-reduced-motion:reduce){.deckra-page .purchase-panel .marketplace-button .marketplace-logo{transition:none}}
