@@ -1,6 +1,23 @@
-DECKRA - Histórico de versões (changelog)
+DECKRA APP - Histórico de versões (changelog)
 Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
+
+
+1.12 beta - 13/11/2026
+--------------------------------------------------------------------------
+Novidades
+- O programa passa a se chamar DECKRA APP (janela, ícone perto do relógio,
+  instalador, atalhos e lista de programas do Windows).
+- O controle físico passa a ser identificado como DECKRA ONE (status da
+  barra lateral e Início > Dispositivos).
+- "Ouvir meu microfone" na aba Microfone: liga a opção "Escutar este
+  dispositivo" do Windows para você ouvir a própria voz no fone.
+- Firmware v1.2 do DECKRA ONE: o aparelho aparece no Windows como
+  "DECKRA ONE" (o app continua aceitando o firmware anterior).
+
+Melhorias
+- A janela se ajusta sozinha para caber inteira em telas pequenas.
+- Mensagens dos cartões dos canais mais curtas, sem encostar nos botões.
 
 
 1.11.1 beta - 12/11/2026

@@ -1,7 +1,7 @@
 {
-  "versao": "1.11.1",
+  "versao": "1.12",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "c258413c662eb4aa36acf5ef674b5df0b97a4da11ff7c46e20b7262c0801d7d8",
-  "tamanho": 31157216,
-  "notas": "Medidor de áudio com muito mais movimento: acompanha as batidas da música. Seletor de posição do mostrador com visual novo."
+  "sha256": "43c69953b078f56efe279bb95d9f3c898830498aa97c32017a4bd1df318aeadf",
+  "tamanho": 31162967,
+  "notas": "O programa agora se chama DECKRA APP, e o controle físico, DECKRA ONE. Novo: \"Ouvir meu microfone\" na aba Microfone. A janela se ajusta sozinha para caber em telas pequenas. Mensagens dos cartões dos canais mais curtas."
 }
