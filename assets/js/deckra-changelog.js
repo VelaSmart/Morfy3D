@@ -44,3 +44,54 @@
       panel.replaceChildren(p);
     });
 })();
+
+(() => {
+  const nav = document.querySelector(".deckra-category-nav");
+  const viewport = document.querySelector(".deckra-panels-viewport");
+  const track = document.querySelector(".deckra-panels-track");
+  if (!nav || !viewport || !track) return;
+  const buttons = [...nav.querySelectorAll('[role="tab"]')];
+  const panels = buttons.map((button) => document.getElementById(button.getAttribute("aria-controls")));
+  const hashes = ["#modelos", "#software", "#onde-comprar", "#atualizacoes"];
+  let activeIndex = 0;
+  const resizeObserver = new ResizeObserver(() => {
+    const active = panels[activeIndex];
+    if (active) viewport.style.height = active.scrollHeight + "px";
+  });
+  function activate(index, updateHash = true) {
+    activeIndex = (index + buttons.length) % buttons.length;
+    buttons.forEach((button, i) => {
+      const selected = i === activeIndex;
+      button.classList.toggle("is-active", selected);
+      button.setAttribute("aria-selected", String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      panels[i].setAttribute("aria-hidden", String(!selected));
+      panels[i].inert = !selected;
+    });
+    track.style.transform = `translateX(-${activeIndex * 100}%)`;
+    viewport.style.height = panels[activeIndex].scrollHeight + "px";
+    resizeObserver.disconnect();
+    resizeObserver.observe(panels[activeIndex]);
+    if (updateHash) history.replaceState(null, "", hashes[activeIndex]);
+  }
+  buttons.forEach((button, index) => {
+    button.addEventListener("click", () => activate(index));
+    button.addEventListener("keydown", (event) => {
+      let next = index;
+      if (event.key === "ArrowRight") next = (index + 1) % buttons.length;
+      else if (event.key === "ArrowLeft") next = (index - 1 + buttons.length) % buttons.length;
+      else if (event.key === "Home") next = 0;
+      else if (event.key === "End") next = buttons.length - 1;
+      else return;
+      event.preventDefault();
+      buttons[next].focus();
+      activate(next);
+    });
+  });
+  const initialIndex = hashes.indexOf(window.location.hash);
+  activate(initialIndex >= 0 ? initialIndex : 0, false);
+  window.addEventListener("hashchange", () => {
+    const index = hashes.indexOf(window.location.hash);
+    if (index >= 0 && index !== activeIndex) activate(index, false);
+  });
+})();
