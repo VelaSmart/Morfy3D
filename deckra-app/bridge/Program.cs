@@ -33,36 +33,33 @@ _ = Task.Run(async () =>
     }
 });
 
-using var listener = new HttpListener();
-listener.Prefixes.Add("http://+:37892/");
-try { listener.Start(); }
-catch (HttpListenerException ex)
+var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.WebHost.UseUrls("http://0.0.0.0:37892");
+var app = builder.Build();
+app.UseWebSockets();
+app.Map("/", async context =>
+{
+    if (!context.WebSockets.IsWebSocketRequest)
+    {
+        context.Response.StatusCode = 400;
+        return;
+    }
+    using var socket = await context.WebSockets.AcceptWebSocketAsync();
+    await Handle(socket, pin);
+});
+try { await app.RunAsync(); }
+catch (Exception ex)
 {
     Console.WriteLine("DECKRA_ERROR=" + ex.Message);
     Console.Out.Flush();
-    return;
-}
-while (listener.IsListening)
-{
-    HttpListenerContext context;
-    try { context = await listener.GetContextAsync(); }
-    catch (HttpListenerException) { break; }
-    if (!context.Request.IsWebSocketRequest)
-    {
-        context.Response.StatusCode = 400;
-        context.Response.Close();
-        continue;
-    }
-    _ = Handle(context, pin);
 }
 
-static async Task Handle(HttpListenerContext context, string expectedPin)
+static async Task Handle(WebSocket ws, string expectedPin)
 {
-    WebSocket? ws = null;
     var paired = false;
     try
     {
-        ws = (await context.AcceptWebSocketAsync(null)).WebSocket;
         var buffer = new byte[8192];
         while (ws.State == WebSocketState.Open)
         {
@@ -97,7 +94,7 @@ static async Task Handle(HttpListenerContext context, string expectedPin)
         }
     }
     catch { }
-    finally { ws?.Dispose(); }
+    finally { }
 }
 
 static object Execute(string command, JsonElement root)

@@ -205,4 +205,4 @@ A integração da Bridge é empacotada como um serviço auxiliar sem janela, ini
 
 O build Windows publica o serviço .NET 8 como executável autocontido e o inclui nos recursos do instalador. Para compilar é necessário ter o SDK .NET 8 instalado no ambiente de desenvolvimento. O primeiro pareamento continua exigindo que o PIN temporário mostrado no PC seja digitado no Mobile, pois o aplicativo Android da branch `main` permanece somente como origem de leitura nesta alteração.
 
-A Bridge usa `HttpListener` em `http://+:37892/`; o instalador/ambiente Windows ainda precisa garantir a permissão de reserva de URL e liberar TCP 37892/UDP 37891 no Firewall para rede privada. A comunicação atual continua sendo WebSocket sem TLS e deve ser usada somente em rede local confiável.
+A Bridge usa Kestrel em `0.0.0.0:37892`, sem necessidade de reserva HTTP.sys/URL ACL. O Firewall do Windows ainda precisa permitir TCP 37892 e UDP 37891 em rede privada. A comunicação atual continua sendo WebSocket sem TLS e deve ser usada somente em rede local confiável.
