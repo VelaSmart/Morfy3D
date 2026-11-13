@@ -124,3 +124,39 @@ document.addEventListener("click", (event) => {
 
   }
 });
+
+(() => {
+  const gallery = document.querySelector("[data-deckra-gallery]");
+  if (!gallery) return;
+  const track = gallery.querySelector(".deckra-gallery-track");
+  const slides = [...track.querySelectorAll("img")];
+  const dots = [...gallery.querySelectorAll(".deckra-gallery-dot")];
+  const counter = document.querySelector("[data-deckra-gallery-count]");
+  if (slides.length < 2) return;
+  let index = 0;
+  let timer;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  function show(next) {
+    index = (next + slides.length) % slides.length;
+    track.style.transform = `translateX(-${index * 100}%)`;
+    slides.forEach((slide, i) => slide.setAttribute("aria-hidden", String(i !== index)));
+    dots.forEach((dot, i) => {
+      dot.classList.toggle("is-active", i === index);
+      dot.setAttribute("aria-pressed", String(i === index));
+    });
+    if (counter) counter.textContent = `${index + 1} / ${slides.length}`;
+  }
+  function restart() {
+    clearInterval(timer);
+    if (reduceMotion.matches) return;
+    timer = setInterval(() => {
+      if (document.hidden || gallery.closest(".deckra-panel")?.inert || gallery.matches(":hover") || gallery.matches(":focus-within")) return;
+      show(index + 1);
+    }, 5000);
+  }
+  gallery.querySelector(".deckra-gallery-prev")?.addEventListener("click", () => { show(index - 1); restart(); });
+  gallery.querySelector(".deckra-gallery-next")?.addEventListener("click", () => { show(index + 1); restart(); });
+  dots.forEach((dot, i) => dot.addEventListener("click", () => { show(i); restart(); }));
+  reduceMotion.addEventListener("change", restart);
+  restart();
+})();
