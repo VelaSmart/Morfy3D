@@ -19,11 +19,16 @@ camera.position.set(0, 1.15, 3.6);
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.055;
+controls.addEventListener("start", () => { isInteracting = true; });
+controls.addEventListener("end", () => { isInteracting = false; });
 controls.enablePan = false;
 controls.minDistance = 1.1;
 controls.maxDistance = 8;
-controls.autoRotate = !reducedMotion;
-controls.autoRotateSpeed = 0.35;
+controls.autoRotate = false;
+let autoSweepEnabled = !reducedMotion;
+let sweepDirection = -1;
+let isInteracting = false;
+const sweepSpeed = THREE.MathUtils.degToRad(7);
 // Limita o giro horizontal a um arco total de 160 graus (80° para cada lado).
 // Mantém o lado esquerdo com o alcance atual e encurta o giro para a direita.
 controls.minAzimuthAngle = THREE.MathUtils.degToRad(-80);
@@ -61,7 +66,7 @@ function frameModel(object) {
   object.updateWorldMatrix(true, true);
   const maxDimension = Math.max(size.x, size.y, size.z) || 1;
   object.scale.setScalar(2.15 / maxDimension);
-  const distance = 2.15 * 2.25;
+  const distance = 2.15 * 2.45;
   camera.position.set(distance * 0.12, distance * 0.18, distance);
   camera.near = 0.01;
   camera.far = 100;
@@ -126,8 +131,8 @@ stage.querySelectorAll("[data-viewer-action]").forEach((button) => {
   button.addEventListener("click", () => {
     const action = button.dataset.viewerAction;
     if (action === "rotate") {
-      controls.autoRotate = !controls.autoRotate;
-      button.setAttribute("aria-pressed", String(controls.autoRotate));
+      autoSweepEnabled = !autoSweepEnabled;
+      button.setAttribute("aria-pressed", String(autoSweepEnabled));
     } else if (action === "zoom-in") {
       camera.position.multiplyScalar(0.82);
       controls.update();
@@ -136,15 +141,40 @@ stage.querySelectorAll("[data-viewer-action]").forEach((button) => {
       controls.update();
     } else if (action === "reset" && modelRoot.children.length) {
       frameModel(modelRoot);
-      controls.autoRotate = !reducedMotion;
-      stage.querySelector('[data-viewer-action="rotate"]')?.setAttribute("aria-pressed", String(controls.autoRotate));
+      autoSweepEnabled = !reducedMotion;
+      sweepDirection = -1;
+      stage.querySelector('[data-viewer-action="rotate"]')?.setAttribute("aria-pressed", String(autoSweepEnabled));
     }
   });
 });
 
 let animationFrame = 0;
+const animationClock = new THREE.Clock();
 function animate() {
   animationFrame = requestAnimationFrame(animate);
+  const delta = Math.min(animationClock.getDelta(), 0.05);
+
+  if (autoSweepEnabled && !isInteracting && modelRoot.children.length) {
+    const angle = controls.getAzimuthalAngle();
+    const minAngle = controls.minAzimuthAngle;
+    const maxAngle = controls.maxAzimuthAngle;
+    const nextAngle = angle + sweepDirection * sweepSpeed * delta;
+
+    if (nextAngle <= minAngle) sweepDirection = 1;
+    else if (nextAngle >= maxAngle) sweepDirection = -1;
+
+    const boundedAngle = THREE.MathUtils.clamp(
+      angle + sweepDirection * sweepSpeed * delta,
+      minAngle,
+      maxAngle
+    );
+    const offset = camera.position.clone().sub(controls.target);
+    const spherical = new THREE.Spherical().setFromVector3(offset);
+    spherical.theta = boundedAngle;
+    camera.position.copy(controls.target).add(new THREE.Vector3().setFromSpherical(spherical));
+    camera.lookAt(controls.target);
+  }
+
   controls.update();
   renderer.render(scene, camera);
 }
