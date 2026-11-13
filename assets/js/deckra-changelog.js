@@ -107,3 +107,14 @@ document.addEventListener("click", (event) => {
     document.querySelector(".deckra-category-nav")?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 });
+
+document.addEventListener("click", (event) => {
+  const control = event.target.closest("[data-open-deckra-tab]");
+  if (!control) return;
+  const target = control.dataset.openDeckraTab;
+  const tab = document.getElementById("tab-" + target);
+  if (tab) {
+    tab.click();
+    document.querySelector(".deckra-category-nav")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+});
