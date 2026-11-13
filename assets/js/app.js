@@ -161,6 +161,11 @@
     }
 
     var grid = document.getElementById("product-grid");
+    var isAndroidApp = /MorfyAndroidApp/i.test(navigator.userAgent);
+    if (isAndroidApp) document.documentElement.classList.add("morfy-android-app");
+    var pagination = document.getElementById("product-pagination");
+    var currentPage = 1;
+    var pageSize = 6;
     var search = document.getElementById("product-search");
     var count = document.getElementById("product-count");
     var emptyState = document.getElementById("empty-state");
@@ -376,8 +381,33 @@
       }
     }
 
-    function renderProducts() {
+    function renderPagination(totalPages) {
+      if (!pagination) return;
+      pagination.replaceChildren();
+      pagination.hidden = !isAndroidApp || totalPages <= 1;
+      if (!isAndroidApp || totalPages <= 1) return;
+      function addPage(label, page, disabled, current) {
+        var button = createElement("button", "catalog-page-button" + (current ? " is-current" : ""), label);
+        button.type = "button";
+        button.disabled = !!disabled;
+        if (current) button.setAttribute("aria-current", "page");
+        button.addEventListener("click", function () {
+          currentPage = page;
+          renderProducts(false);
+          showCatalogResults();
+        });
+        pagination.appendChild(button);
+      }
+      addPage("‹", currentPage - 1, currentPage === 1, false);
+      for (var page = 1; page <= totalPages; page += 1) {
+        addPage(String(page), page, false, page === currentPage);
+      }
+      addPage("›", currentPage + 1, currentPage === totalPages, false);
+    }
+
+    function renderProducts(resetPage) {
       if (!grid) return;
+      if (resetPage !== false) currentPage = 1;
       var query = normalize(search ? search.value : "");
       var visible = products.filter(function (product) {
         var categoryMatch = activeCategory === "todos" || activeCategory === "all" || product.category === activeCategory;
@@ -387,8 +417,17 @@
       grid.replaceChildren();
       grid.style.maxHeight = "none";
       grid.style.overflowY = "visible";
-      visible.forEach(function (product) { grid.appendChild(productCard(product)); });
-      updateCatalogScroll();
+      if (isAndroidApp) {
+        var totalPages = Math.max(1, Math.ceil(visible.length / pageSize));
+        currentPage = Math.min(currentPage, totalPages);
+        visible.slice((currentPage - 1) * pageSize, currentPage * pageSize).forEach(function (product) {
+          grid.appendChild(productCard(product));
+        });
+        renderPagination(totalPages);
+      } else {
+        visible.forEach(function (product) { grid.appendChild(productCard(product)); });
+        updateCatalogScroll();
+      }
       if (count) count.textContent = visible.length + (visible.length === 1 ? " produto" : " produtos");
       if (emptyState) emptyState.hidden = visible.length !== 0;
       filterButtons.forEach(function (button) {
