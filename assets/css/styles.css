@@ -210,41 +210,26 @@
 /* Logo MORFY em roxo na página DECKRA. */
 .deckra-page .deckra-morfy-brand .morfy-logo img{filter:hue-rotate(58deg) saturate(1.25)}
 
-/* Categorias e modelos DECKRA ONE. */
-.deckra-page .deckra-category-nav{position:sticky;top:85px;z-index:20;display:flex;justify-content:center;gap:clamp(16px,4vw,56px);padding:17px 24px;border-bottom:1px solid #ffffff12;background:#101018ed;backdrop-filter:blur(16px)}
-.deckra-page .deckra-category-nav a{font-size:10px;font-weight:600;letter-spacing:.15em;color:#a9a5b5;transition:color .2s}
-.deckra-page .deckra-category-nav a:hover,.deckra-page .deckra-category-nav a:focus-visible{color:#a795ff}
-.deckra-page .deckra-models-section,.deckra-page .software-section,.deckra-page .purchase-section,.deckra-page .deckra-updates-section{scroll-margin-top:145px}
-.deckra-model-card{display:grid;grid-template-columns:100px 1fr auto;align-items:center;gap:28px;padding:27px;border:1px solid #3b3154;border-radius:10px;background:linear-gradient(110deg,#181420,#10151c)}
-.deckra-model-mark{display:grid;place-items:center;width:80px;height:80px;border:1px solid #7661bf;border-radius:16px;background:#8c78ff16;color:#c2b6ff;font-size:34px;font-weight:700;letter-spacing:-.1em}
-.deckra-model-mark span{font-size:18px;color:#8c78ff}
-.deckra-model-card .tiny-label{color:#a99aff}
-.deckra-model-card h3{margin:6px 0 8px;font-size:24px;letter-spacing:.02em}
-.deckra-model-card p{font-size:12px;line-height:1.8}
-.deckra-download-options{display:flex;align-items:stretch;gap:12px;flex-shrink:0}
-.deckra-download-options .software-download-button{min-width:245px}
-.deckra-platform-future{display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:165px;padding:13px 18px;border:1px solid #34303f;border-radius:6px;background:#111018;color:#b3adbf;font-size:12px;font-weight:600}
-.deckra-platform-future>span:first-child{color:#8c78ff;font-size:20px}
-.deckra-platform-future small{font-size:10px;font-weight:400;color:#827c8e}
-.deckra-page .deckra-changelog{display:grid;gap:10px;max-width:900px;margin-inline:auto}
-.deckra-changelog-entry{border:1px solid #342d45;border-radius:7px;background:#111018}
-.deckra-changelog-entry summary{padding:15px 18px;color:#e9e4ff;font-size:13px;font-weight:600;cursor:pointer;list-style:none}
-.deckra-changelog-entry summary::-webkit-details-marker{display:none}
-.deckra-changelog-entry summary::after{content:'+';float:right;color:#a795ff;font-size:18px;line-height:1}
-.deckra-changelog-entry[open] summary::after{content:'−'}
-.deckra-changelog-entry pre,.deckra-changelog>pre{margin:0;padding:0 18px 18px;white-space:pre-wrap;overflow-wrap:anywhere;color:#b4afc1;font:11px/1.8 Montserrat,Arial,sans-serif}
-.deckra-changelog>p{padding:18px;border:1px solid #342d45;border-radius:7px;background:#111018;font-size:12px}
-.deckra-page #atualizacoes .section-heading{max-width:900px;margin-inline:auto;margin-bottom:26px}
+
+/* Categorias DECKRA como abas laterais com transição horizontal. */
+.deckra-page .deckra-category-nav{position:relative;top:auto;z-index:4;display:flex;justify-content:center;gap:0;padding:0 max(24px,calc((100vw - 1760px)/2));border-block:1px solid #282430;background:#111018}
+.deckra-page .deckra-category-tab{position:relative;flex:1;max-width:260px;min-height:62px;padding:16px 18px;border:0;background:transparent;color:#a9a5b5;font:600 10px/1.4 Montserrat,Arial,sans-serif;letter-spacing:.15em;white-space:nowrap;cursor:pointer;transition:color .2s,background .2s}
+.deckra-page .deckra-category-tab::after{content:"";position:absolute;left:20%;right:20%;bottom:0;height:2px;background:#8c78ff;transform:scaleX(0);transition:transform .24s ease}
+.deckra-page .deckra-category-tab:hover{color:#e9e4ff;background:#ffffff04}
+.deckra-page .deckra-category-tab.is-active{color:#c2b6ff}
+.deckra-page .deckra-category-tab.is-active::after{transform:scaleX(1)}
+.deckra-page .deckra-category-tab:focus-visible{outline:2px solid #8c78ff;outline-offset:-4px}
+.deckra-page .deckra-panels-viewport{width:100%;overflow:hidden}
+.deckra-page .deckra-panels-track{display:flex;align-items:flex-start;width:100%;transform:translateX(0);transition:transform .55s cubic-bezier(.22,.75,.25,1);will-change:transform}
+.deckra-page .deckra-panel{flex:0 0 100%;min-width:0;overflow:hidden}
+.deckra-page .deckra-panel[aria-hidden="true"]{user-select:none}
+.deckra-page .deckra-panel .section{scroll-margin-top:20px}
+.deckra-page .deckra-models-section,.deckra-page .software-section,.deckra-page .purchase-section,.deckra-page .deckra-updates-section{scroll-margin-top:20px}
+.deckra-page .deckra-panel .deckra-model-card,.deckra-page .deckra-panel .purchase-panel,.deckra-page .deckra-panel .deckra-changelog{max-width:950px;margin-inline:auto}
 @media(max-width:700px){
- .deckra-page .deckra-category-nav{top:72px;justify-content:flex-start;gap:22px;overflow-x:auto;padding:14px 20px;scrollbar-width:none}
+ .deckra-page .deckra-category-nav{justify-content:flex-start;overflow-x:auto;padding-inline:10px;scrollbar-width:none}
  .deckra-page .deckra-category-nav::-webkit-scrollbar{display:none}
- .deckra-page .deckra-category-nav a{font-size:8px;white-space:nowrap}
- .deckra-model-card{grid-template-columns:60px 1fr;gap:14px;padding:18px}
- .deckra-model-mark{width:56px;height:56px;border-radius:11px;font-size:26px}
- .deckra-model-card h3{font-size:19px}
- .deckra-model-card p{font-size:10px}
- .deckra-model-card>.button{grid-column:1/-1}
- .deckra-download-options{width:100%;flex-direction:column}
- .deckra-download-options .software-download-button,.deckra-platform-future{width:100%;min-width:0}
- .deckra-page .deckra-models-section,.deckra-page .software-section,.deckra-page .purchase-section,.deckra-page .deckra-updates-section{scroll-margin-top:125px}
+ .deckra-page .deckra-category-tab{flex:1 0 auto;min-height:56px;padding:14px 15px;font-size:8px;letter-spacing:.1em}
+ .deckra-page .deckra-panel .section{padding-block:55px}
 }
+@media(prefers-reduced-motion:reduce){.deckra-page .deckra-panels-track,.deckra-page .deckra-category-tab,.deckra-page .deckra-category-tab::after{transition:none}}
