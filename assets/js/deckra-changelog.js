@@ -71,6 +71,13 @@
           body.append(heading);
         }
       });
+      if (index === 0) {
+        const download = document.createElement("a");
+        download.className = "button button-purple deckra-version-download";
+        download.href = "#software";
+        download.textContent = "Baixar versão mais recente";
+        body.append(download);
+      }
       card.append(summary, body);
       panel.append(card);
     });
@@ -108,7 +115,7 @@
   if (!nav || !viewport || !track) return;
   const buttons = [...nav.querySelectorAll('[role="tab"]')];
   const panels = buttons.map((button) => document.getElementById(button.getAttribute("aria-controls")));
-  const hashes = ["#modelos", "#software", "#onde-comprar", "#atualizacoes"];
+  const hashes = ["#modelos", "#onde-comprar", "#software", "#atualizacoes"];
   let activeIndex = 0;
   const resizeObserver = new ResizeObserver(() => {
     const active = panels[activeIndex];
@@ -161,7 +168,7 @@
 document.addEventListener("click", (event) => {
   const link = event.target.closest('a[href="#software"], a[href="#onde-comprar"], a[href="#atualizacoes"], a[href="#modelos"]');
   if (!link) return;
-  const index = ["#modelos", "#software", "#onde-comprar", "#atualizacoes"].indexOf(link.getAttribute("href"));
+  const index = ["#modelos", "#onde-comprar", "#software", "#atualizacoes"].indexOf(link.getAttribute("href"));
   const tab = document.querySelectorAll(".deckra-category-tab")[index];
   if (tab) {
     event.preventDefault();
