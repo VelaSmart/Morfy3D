@@ -109,8 +109,13 @@
           var logo = createElement("img", "marketplace-logo");
           logo.src = logoPaths[marketplace.id];
           logo.alt = "";
-          logo.width = 120;
-          logo.height = 120;
+          var logoSize = container.id === "modal-marketplaces" ? 20 : 120;
+          logo.width = logoSize;
+          logo.height = logoSize;
+          logo.style.width = logoSize + "px";
+          logo.style.height = logoSize + "px";
+          logo.style.flex = "0 0 " + logoSize + "px";
+          logo.style.objectFit = "contain";
           logo.decoding = "async";
           logo.setAttribute("aria-hidden", "true");
           button.appendChild(logo);
