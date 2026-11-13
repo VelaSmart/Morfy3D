@@ -478,3 +478,8 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 /* Incógnita visual para os modelos cujo design ainda não foi apresentado. */
 .deckra-page .deckra-model-concept .deckra-concept-question{font-size:clamp(120px,14vw,210px);line-height:1;font-weight:600;letter-spacing:0;color:#a98cff;text-shadow:0 0 20px #ae87ffb3,0 0 65px #8657f393}
 @media(max-width:800px){.deckra-page .deckra-model-concept .deckra-concept-question{font-size:clamp(100px,22vw,170px)}}
+
+/* Título da linha em branco, variantes em roxo; etiqueta da seção preservada. */
+.deckra-page .deckra-models-section .section-heading h2,
+.deckra-page .deckra-models-section .section-heading .text-accent{color:#f5f5f7}
+.deckra-page .deckra-model-copy h3 .deckra-model-variant{color:#a38cff}
