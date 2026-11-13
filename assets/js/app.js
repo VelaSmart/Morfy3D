@@ -100,7 +100,7 @@
         if (!url && !unavailable && !config.demoMode) return;
         var button = createElement(url ? "a" : "button", "marketplace-button");
         button.dataset.marketplace = marketplace.id;
-        if (container.dataset.marketplaces === "deckra") {
+        if (container.dataset.marketplaces === "deckra" || container.id === "modal-marketplaces") {
           var logoPaths = {
             shopee: "./assets/images/marketplace-shopee.png",
             tiktokShop: "./assets/images/marketplace-tiktok-shop.png",
