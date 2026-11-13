@@ -1,0 +1,34 @@
+name: Notify MORFY new products
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "assets/js/products.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Compare product catalog and send FCM notifications
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          FCM_SERVICE_ACCOUNT: ${{ secrets.MORFY_FIREBASE_SERVICE_ACCOUNT_JSON }}
+        run: |
+          if [ -n "$BEFORE_SHA" ] && [ "$BEFORE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            git show "$BEFORE_SHA:assets/js/products.js" > "$RUNNER_TEMP/products-before.js" || true
+          else
+            : > "$RUNNER_TEMP/products-before.js"
+          fi
+          cp assets/js/products.js "$RUNNER_TEMP/products-after.js"
+          python3 -m pip install --disable-pip-version-check google-auth requests
+          python3 .github/scripts/notify-new-products.py "$RUNNER_TEMP/products-before.js" "$RUNNER_TEMP/products-after.js"
