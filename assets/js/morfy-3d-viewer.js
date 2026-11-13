@@ -68,7 +68,7 @@ function frameModel(object) {
   camera.updateProjectionMatrix();
   controls.target.set(0, 0, 0);
   controls.minAzimuthAngle = THREE.MathUtils.degToRad(-80);
-  controls.maxAzimuthAngle = THREE.MathUtils.degToRad(35);
+  controls.maxAzimuthAngle = THREE.MathUtils.degToRad(5);
   controls.minDistance = 1.1;
   controls.maxDistance = 8;
   controls.update();
