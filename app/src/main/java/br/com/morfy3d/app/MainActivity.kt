@@ -72,10 +72,22 @@ class MainActivity : Activity() {
 
     private fun resolveStartUrl(source: Intent?): String {
         val candidate = source?.data
-        if (candidate != null && candidate.scheme == "https" && candidate.host?.lowercase() in internalHosts) {
-            return candidate.toString()
+        val target = if (
+            candidate != null &&
+            candidate.scheme == "https" &&
+            candidate.host?.lowercase() in internalHosts
+        ) {
+            candidate
+        } else {
+            Uri.parse(homeUrl)
         }
-        return homeUrl
+
+        // Atualiza o documento principal a cada abertura do app sem apagar
+        // todo o cache do WebView nem forçar o download de todos os recursos.
+        val refreshed = target.buildUpon()
+            .appendQueryParameter("_morfy_app_refresh", System.currentTimeMillis().toString())
+            .build()
+        return refreshed.toString()
     }
 
     private fun configureWebView() {
