@@ -24,6 +24,9 @@ controls.minDistance = 1.1;
 controls.maxDistance = 8;
 controls.autoRotate = !reducedMotion;
 controls.autoRotateSpeed = 0.35;
+// Limita o giro horizontal a um arco total de 160 graus (80° para cada lado).
+controls.minAzimuthAngle = THREE.MathUtils.degToRad(-80);
+controls.maxAzimuthAngle = THREE.MathUtils.degToRad(80);
 
 scene.add(new THREE.HemisphereLight(0xc9eaff, 0x071326, 1.8));
 const key = new THREE.DirectionalLight(0xffffff, 3);
@@ -48,9 +51,13 @@ status.style.cssText = "position:absolute;z-index:3;left:50%;top:50%;transform:t
 stage.append(status);
 
 function frameModel(object) {
+  object.updateWorldMatrix(true, true);
   const bounds = new THREE.Box3().setFromObject(object);
   const size = bounds.getSize(new THREE.Vector3());
-  object.position.sub(bounds.getCenter(new THREE.Vector3()));
+  const center = bounds.getCenter(new THREE.Vector3());
+  // Centraliza a malha pelo centro geométrico real, não pela origem do arquivo GLB.
+  object.position.sub(center);
+  object.updateWorldMatrix(true, true);
   const maxDimension = Math.max(size.x, size.y, size.z) || 1;
   object.scale.setScalar(2.15 / maxDimension);
   const distance = 2.15 * 2.25;
@@ -59,6 +66,8 @@ function frameModel(object) {
   camera.far = 100;
   camera.updateProjectionMatrix();
   controls.target.set(0, 0, 0);
+  controls.minAzimuthAngle = THREE.MathUtils.degToRad(-80);
+  controls.maxAzimuthAngle = THREE.MathUtils.degToRad(80);
   controls.minDistance = 1.1;
   controls.maxDistance = 8;
   controls.update();
