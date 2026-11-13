@@ -32,6 +32,9 @@
     ],
     "category": "Utility",
     "shortDescription": "Configure seu controlador DECKRA",
-    "longDescription": "Aplicativo de configuração do controlador físico DECKRA."
+    "longDescription": "Aplicativo de configuração do controlador físico DECKRA.",
+    "resources": {
+      "bridge-publish/DeckraBridge.Service.exe": "bridge/DeckraBridge.Service.exe"
+    }
   }
 }

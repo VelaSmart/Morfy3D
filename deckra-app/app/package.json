@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && npm run build:bridge",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "build:bridge": "dotnet publish ../bridge/DeckraBridge.Service.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o src-tauri/bridge-publish"
   },
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",

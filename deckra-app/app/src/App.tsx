@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { invoke } from "@tauri-apps/api/core";
 
 type Page = "config" | "apps" | "keys";
 
@@ -9,6 +10,18 @@ export default function App() {
   const [keyFunction, setKeyFunction] = useState("shortcut");
   const [volume, setVolume] = useState(65);
   const [demo, setDemo] = useState(true);
+  const [bridge, setBridge] = useState<{running:boolean; pin:string|null; message:string}>({running:false,pin:null,message:"Verificando serviço integrado..."});
+
+  useEffect(() => {
+    let active = true;
+    const refresh = async () => {
+      try { const status = await invoke<{running:boolean;pin:string|null;message:string}>("bridge_status"); if (active) setBridge(status); }
+      catch { if (active) setBridge({running:false,pin:null,message:"Disponível somente no aplicativo desktop Windows."}); }
+    };
+    void refresh();
+    const timer = window.setInterval(refresh, 1500);
+    return () => { active = false; window.clearInterval(timer); };
+  }, []);
 
   const pageTitle = page === "config" ? "Configure seu controle" : page === "apps" ? "Aplicativos" : "Atalhos das teclas";
   const nav = [
@@ -30,6 +43,11 @@ export default function App() {
       </aside>
       <section className="main-content">
         <h1>{pageTitle}</h1>
+        <section className="bridge-status-panel" aria-live="polite">
+          <div><span className={"bridge-status-dot " + (bridge.running ? "active" : "")} />
+            <strong>Conexão móvel integrada</strong><small>{bridge.message}</small></div>
+          {bridge.pin && <div className="bridge-pin"><small>PIN temporário para parear o celular</small><b>{bridge.pin}</b></div>}
+        </section>
         {page === "config" && <div className="config-grid">
           <article className="panel volume-panel">
             <div className="panel-title"><span className="purple-icon">◖))</span><h2>Volume por aplicativo</h2></div>
