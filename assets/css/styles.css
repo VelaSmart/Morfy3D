@@ -517,3 +517,6 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 #product-dialog #modal-marketplaces .marketplace-button[data-marketplace="mercadoLivre"]:is(:hover,:focus-visible) .marketplace-logo{filter:brightness(0) saturate(100%) invert(86%) sepia(68%) saturate(1119%) hue-rotate(348deg) brightness(106%) contrast(102%) drop-shadow(0 0 10px #f9d635) drop-shadow(0 0 23px #f9d63590);transform:scale(1.06)}
 #product-dialog #modal-marketplaces .marketplace-button[data-marketplace="tiktokShop"]:is(:hover,:focus-visible) .marketplace-logo{filter:brightness(0) saturate(100%) invert(81%) sepia(74%) saturate(765%) hue-rotate(142deg) brightness(103%) contrast(104%) drop-shadow(0 0 10px #33dff2) drop-shadow(0 0 23px #33dff290);transform:scale(1.06)}
 @media(prefers-reduced-motion:reduce){#product-dialog #modal-marketplaces .marketplace-button .marketplace-logo{transition:none}}
+
+/* Mantém imagens e galerias no lugar durante o arraste com o mouse. */
+img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
