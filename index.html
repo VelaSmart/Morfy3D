@@ -12,6 +12,7 @@
   <script src="./assets/js/products.js?v=20261111-galerias-completas" defer></script>
   <script src="./assets/js/app.js?v=20261113-marketplace-hover-enabled" defer></script>
   <script src="./assets/js/prevent-image-drag.js" defer></script>
+  <script type="module" src="./assets/js/morfy-3d-viewer.js?v=20261113-morfy-symbol-3d"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Pular para o conteúdo</a>
@@ -29,7 +30,18 @@
   </header>
   <main id="main">
     <section class="hero hero-slicer" aria-labelledby="hero-title">
-      <img class="hero-slicer-background" src="./assets/images/morfy-slicing-hero.png" alt="" aria-hidden="true" width="1672" height="941" fetchpriority="high" decoding="async">
+      <div class="hero-slicer-background hero-3d-backdrop" aria-hidden="true"></div>
+      <div class="hero-3d-stage" id="morfy-3d-viewer" aria-label="Visualizador 3D interativo do símbolo MORFY">
+        <canvas id="morfy-3d-canvas" aria-label="Símbolo tridimensional da MORFY. Arraste para girar, use a roda do mouse para aproximar e afastar."></canvas>
+        <div class="viewer-toolbar" role="group" aria-label="Controles do visualizador 3D">
+          <button type="button" data-viewer-action="rotate" aria-pressed="true" title="Alternar rotação automática">↻</button>
+          <button type="button" data-viewer-action="zoom-in" title="Aproximar">+</button>
+          <button type="button" data-viewer-action="zoom-out" title="Afastar">−</button>
+          <button type="button" data-viewer-action="reset" title="Restaurar visualização">⌂</button>
+        </div>
+        <div class="viewer-coordinate"><span>OBJETO 3D · MORFY</span><span>INTERAÇÃO ATIVA</span></div>
+        <div class="viewer-hint">ARRASTE PARA GIRAR <span>·</span> SCROLL PARA ZOOM <span>·</span> BOTÃO DIREITO PARA MOVER</div>
+      </div>
       <div class="container hero-slicer-inner">
         <div class="hero-copy">
           <p class="eyebrow"><span class="accent-line"></span> MORFY · DESIGN E IMPRESSÃO 3D</p>
