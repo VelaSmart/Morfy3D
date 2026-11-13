@@ -233,3 +233,32 @@
  .deckra-page .deckra-panel .section{padding-block:55px}
 }
 @media(prefers-reduced-motion:reduce){.deckra-page .deckra-panels-track,.deckra-page .deckra-category-tab,.deckra-page .deckra-category-tab::after{transition:none}}
+
+/* Cartão de produto DECKRA ONE. */
+.deckra-page .deckra-panel .deckra-models-section{width:min(1760px,calc(100% - 96px));max-width:1760px;padding-block:72px 82px}
+.deckra-page .deckra-models-section .section-heading{max-width:1450px;margin:0 auto 28px}
+.deckra-page .deckra-model-card{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);align-items:stretch;gap:0;width:min(1450px,100%);max-width:1450px;min-height:410px;margin:0 auto;padding:0;overflow:hidden;border:1px solid #3b3154;border-radius:12px;background:linear-gradient(115deg,#171420,#10131a);box-shadow:0 18px 55px #0003}
+.deckra-page .deckra-model-image{position:relative;min-height:410px;overflow:hidden;background:#0c0c12}
+.deckra-page .deckra-model-image::after{position:absolute;inset:45% 0 0;content:"";background:linear-gradient(transparent,#08080db3);pointer-events:none}
+.deckra-page .deckra-model-image img{display:block;width:100%;height:100%;min-height:410px;position:absolute;inset:0;object-fit:cover;object-position:center;transition:transform .6s ease}
+.deckra-page .deckra-model-card:hover .deckra-model-image img{transform:scale(1.025)}
+.deckra-page .deckra-model-image>span{position:absolute;z-index:1;left:22px;bottom:18px;color:#ddd4ff;font-size:8px;font-weight:600;letter-spacing:.16em}
+.deckra-page .deckra-model-copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:clamp(28px,5vw,68px)}
+.deckra-page .deckra-model-copy .tiny-label{color:#a99aff;font-size:9px;letter-spacing:.17em}
+.deckra-page .deckra-model-copy h3{margin:13px 0 14px;font-size:clamp(28px,3vw,42px);letter-spacing:-.04em}
+.deckra-page .deckra-model-copy p{max-width:410px;font-size:13px;line-height:1.9}
+.deckra-page .deckra-model-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:27px}
+.deckra-page .deckra-model-actions .button{min-height:46px;padding:12px 16px;gap:12px;font-size:10px}
+@media(max-width:800px){
+ .deckra-page .deckra-panel .deckra-models-section{width:calc(100% - 40px);padding-block:48px 60px}
+ .deckra-page .deckra-model-card{grid-template-columns:1fr}
+ .deckra-page .deckra-model-image,.deckra-page .deckra-model-image img{min-height:0;height:auto;aspect-ratio:16/10}
+ .deckra-page .deckra-model-copy{padding:27px}
+ .deckra-page .deckra-model-copy h3{font-size:30px}
+ .deckra-page .deckra-model-copy p{font-size:12px}
+ .deckra-page .deckra-model-actions{width:100%}
+}
+@media(max-width:460px){
+ .deckra-page .deckra-model-actions{display:grid;grid-template-columns:1fr}
+ .deckra-page .deckra-model-actions .button{width:100%;justify-content:space-between}
+}
