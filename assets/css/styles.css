@@ -405,3 +405,6 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
  .deckra-page .deckra-version-chevron{margin-left:auto}
  .deckra-page .deckra-change-body{padding:0 16px 17px}
 }
+
+/* Acesso ao download da versão mais recente. */
+.deckra-page .deckra-version-download{margin-top:19px;padding:12px 18px;min-height:44px;font-size:11px}
