@@ -35,7 +35,13 @@ _ = Task.Run(async () =>
 
 using var listener = new HttpListener();
 listener.Prefixes.Add("http://+:37892/");
-listener.Start();
+try { listener.Start(); }
+catch (HttpListenerException ex)
+{
+    Console.WriteLine("DECKRA_ERROR=" + ex.Message);
+    Console.Out.Flush();
+    return;
+}
 while (listener.IsListening)
 {
     HttpListenerContext context;

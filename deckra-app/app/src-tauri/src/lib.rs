@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::{
     io::{BufRead, BufReader},
     process::{Child, Command, Stdio},
@@ -40,9 +40,6 @@ fn bridge_status(state: tauri::State<'_, BridgeState>) -> BridgeStatus {
             else { error.unwrap_or_else(|| "Serviço de conexão não iniciado".into()) },
     }
 }
-
-#[derive(Deserialize)]
-struct PortRequest { port_name: String, baud_rate: u32 }
 
 #[tauri::command]
 fn list_serial_ports() -> Result<Vec<PortInfo>, String> {
@@ -104,6 +101,9 @@ fn start_bridge(app: &tauri::App) {
                 if let Some(stdout) = child.stdout.take() {
                     thread::spawn(move || {
                         for line in BufReader::new(stdout).lines().flatten() {
+                            if let Some(message) = line.strip_prefix("DECKRA_ERROR=") {
+                                *error_slot.lock().expect("error mutex poisoned") = Some(message.to_string());
+                            }
                             if let Some(value) = line.strip_prefix("DECKRA_PIN=") {
                                 if value.len() == 6 && value.chars().all(|c| c.is_ascii_digit()) {
                                     *pin_slot.lock().expect("pin mutex poisoned") = Some(value.to_string());
