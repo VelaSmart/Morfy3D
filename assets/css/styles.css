@@ -206,3 +206,6 @@
     display: none;
   }
 }
+
+/* Logo MORFY em roxo na página DECKRA. */
+.deckra-page .deckra-morfy-brand .morfy-logo img{filter:hue-rotate(58deg) saturate(1.25)}
