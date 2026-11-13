@@ -457,3 +457,20 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 @media(max-width:760px){.deckra-page .purchase-panel .marketplace-button .marketplace-logo{width:clamp(56px,10vw,90px);height:clamp(56px,10vw,90px)}}
 @media(max-width:560px){.deckra-page .purchase-panel .marketplace-button .marketplace-logo{width:84px;height:84px}}
 @media(prefers-reduced-motion:reduce){.deckra-page .purchase-panel .marketplace-button .marketplace-logo{transition:none}}
+
+/* Modelos futuros da linha DECKRA, sem fotos ou ofertas de produtos inexistentes. */
+.deckra-page .deckra-future-models{display:grid;gap:28px;max-width:1450px;margin:28px auto 0}
+.deckra-page .deckra-panel .deckra-model-upcoming{min-height:350px}
+.deckra-page .deckra-model-upcoming .deckra-model-image{min-height:350px}
+.deckra-page .deckra-model-concept{display:flex;align-items:center;justify-content:center;isolation:isolate;background:radial-gradient(ellipse at 48% 55%,#39276c 0%,#171328 50%,#0b0a13 100%)}
+.deckra-page .deckra-model-concept-pro{background:radial-gradient(ellipse at 55% 48%,#27234f 0%,#151425 51%,#0b0a13 100%)}
+.deckra-page .deckra-model-concept::before{position:absolute;inset:12%;content:"";border:1px solid #8c78ff27;border-radius:50%;box-shadow:0 0 90px #7764ff20;transform:rotate(-18deg) scaleY(.54)}
+.deckra-page .deckra-model-concept::after{background:linear-gradient(transparent,#08080d80)}
+.deckra-page .deckra-model-concept .deckra-concept-wordmark{position:relative;z-index:1;left:auto;bottom:auto;font-size:clamp(27px,4vw,58px);font-weight:600;letter-spacing:.08em;color:#ece8ff;text-align:center;text-shadow:0 0 30px #8c78ff66}
+.deckra-page .deckra-model-concept .deckra-concept-wordmark strong{color:#9d88ff}
+.deckra-page .deckra-model-upcoming .deckra-model-copy{justify-content:space-between}
+.deckra-page .deckra-model-availability{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:30px;padding:16px 18px;border:1px solid #68558d;border-left:3px solid #9d88ff;border-radius:6px;background:#8c78ff12}
+.deckra-page .deckra-model-availability strong{font-size:13px;color:#c2b2ff}
+.deckra-page .deckra-model-availability span{font-size:12px;line-height:1.6;color:#c9c5d1}
+@media(max-width:800px){.deckra-page .deckra-future-models{gap:20px;margin-top:20px}.deckra-page .deckra-model-upcoming .deckra-model-image{min-height:0;aspect-ratio:16/9}.deckra-page .deckra-model-concept .deckra-concept-wordmark{font-size:clamp(26px,7vw,48px)}}
+@media(max-width:560px){.deckra-page .deckra-model-availability{margin-top:5px}.deckra-page .deckra-model-concept>span:last-child{font-size:7px;letter-spacing:.1em}}
