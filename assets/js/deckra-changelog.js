@@ -95,3 +95,15 @@
     if (index >= 0 && index !== activeIndex) activate(index, false);
   });
 })();
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest('a[href="#software"], a[href="#onde-comprar"], a[href="#atualizacoes"], a[href="#modelos"]');
+  if (!link) return;
+  const index = ["#modelos", "#software", "#onde-comprar", "#atualizacoes"].indexOf(link.getAttribute("href"));
+  const tab = document.querySelectorAll(".deckra-category-tab")[index];
+  if (tab) {
+    event.preventDefault();
+    tab.click();
+    document.querySelector(".deckra-category-nav")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+});
