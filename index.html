@@ -8,12 +8,12 @@
   <title>MORFY — Ideias que ganham forma</title>
   <link rel="icon" href="./assets/images/morfy-official-symbol-transparent.png" type="image/png">
   <link rel="preload" href="./assets/fonts/montserrat.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="./assets/css/styles.css?v=20261113-morfy-3d-viewer">
+  <link rel="stylesheet" href="./assets/css/styles.css?v=20261113-catalog-nav">
   <script src="./assets/js/products.js?v=20261111-galerias-completas" defer></script>
   <script src="./assets/js/app.js?v=20261113-marketplace-hover-enabled" defer></script>
   <script src="./assets/js/prevent-image-drag.js?v=contextmenu-1" defer></script>
   <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
-  <script type="module" src="./assets/js/morfy-3d-viewer.js?v=20261113-original-glb-gzip"></script>
+  <script type="module" src="./assets/js/morfy-3d-viewer.js?v=20261113-morfy-symbol-3d-corrected"></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Pular para o conteúdo</a>
@@ -55,15 +55,8 @@
         </div>
       </div>
     </section>
-    <div class="brand-strip">
-      <div class="container strip-inner"><span>TECNOLOGIA COM PROPÓSITO</span><span class="strip-star" aria-hidden="true">✳</span><span>CRIATIVIDADE SEM LIMITES</span><span class="strip-star" aria-hidden="true">✳</span><span>IDEIAS QUE GANHAM FORMA</span><span class="strip-star" aria-hidden="true">✳</span></div>
-    </div>
-    <section id="catalogo" class="section container catalog-section" aria-labelledby="catalog-title">
-      <div class="section-heading">
-        <div><p class="eyebrow">EXPLORE A MORFY</p><h2 id="catalog-title">Uma forma para cada ideia<span class="text-accent">.</span></h2></div>
-        <p class="section-description">Do útil ao inesperado.<br>Encontre algo que combina com você.</p>
-      </div>
-      <div class="catalog-toolbar">
+    <nav class="catalog-nav" aria-label="Categorias e busca do catálogo">
+      <div class="catalog-toolbar container">
         <div class="category-filters" role="group" aria-label="Filtrar por categoria">
           <button type="button" class="filter-button" data-category="todos" aria-pressed="true">Todos</button>
           <button type="button" class="filter-button" data-category="utilitarios" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7Zm0 10 9-5M12 12 3 7M12 12v10"/></svg>Utilitários</button>
@@ -71,6 +64,12 @@
           <button type="button" class="filter-button" data-category="geek" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h8c3 0 4 2 5 9 0 3-2 4-4 1l-2-2H9l-2 2c-2 3-4 2-4-1 1-7 2-9 5-9Z M7 9v5M4.5 11.5h5M16 10h.01M18 13h.01"/></svg>Geek</button>
         </div>
         <div class="search-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><label class="sr-only" for="product-search">Buscar produtos</label><input id="product-search" type="search" placeholder="Buscar uma ideia..." autocomplete="off"></div>
+      </div>
+    </nav>
+    <section id="catalogo" class="section container catalog-section" aria-labelledby="catalog-title">
+      <div class="section-heading">
+        <div><p class="eyebrow">EXPLORE A MORFY</p><h2 id="catalog-title">Uma forma para cada ideia<span class="text-accent">.</span></h2></div>
+        <p class="section-description">Do útil ao inesperado.<br>Encontre algo que combina com você.</p>
       </div>
       <div class="catalog-meta"><span id="product-count" aria-live="polite">4 produtos</span><span class="demo-label"><span class="status-dot"></span> Coleção MORFY</span></div>
       <div id="product-grid" class="product-grid"></div>
