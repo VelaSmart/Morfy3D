@@ -408,3 +408,10 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 
 /* Acesso ao download da versão mais recente. */
 .deckra-page .deckra-version-download{margin-top:19px;padding:12px 18px;min-height:44px;font-size:11px}
+
+/* Apresentação da demonstração do aplicativo DECKRA. */
+.deckra-page .deckra-preview-heading{max-width:1200px;margin:42px auto 18px}
+.deckra-page .deckra-preview-heading .eyebrow{margin-bottom:9px}
+.deckra-page .deckra-preview-heading h3{font-size:clamp(22px,2.2vw,30px);line-height:1.2;margin:0 0 9px;color:#f4f2f7}
+.deckra-page .deckra-preview-heading p:not(.eyebrow){max-width:700px;color:#b8b3c4;font-size:14px;line-height:1.65}
+@media(max-width:600px){.deckra-page .deckra-preview-heading{margin-top:30px}}
