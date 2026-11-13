@@ -25,8 +25,9 @@ controls.maxDistance = 8;
 controls.autoRotate = !reducedMotion;
 controls.autoRotateSpeed = 0.35;
 // Limita o giro horizontal a um arco total de 160 graus (80° para cada lado).
+// Mantém o lado esquerdo com o alcance atual e encurta o giro para a direita.
 controls.minAzimuthAngle = THREE.MathUtils.degToRad(-80);
-controls.maxAzimuthAngle = THREE.MathUtils.degToRad(80);
+controls.maxAzimuthAngle = THREE.MathUtils.degToRad(35);
 
 scene.add(new THREE.HemisphereLight(0xc9eaff, 0x071326, 1.8));
 const key = new THREE.DirectionalLight(0xffffff, 3);
@@ -67,7 +68,7 @@ function frameModel(object) {
   camera.updateProjectionMatrix();
   controls.target.set(0, 0, 0);
   controls.minAzimuthAngle = THREE.MathUtils.degToRad(-80);
-  controls.maxAzimuthAngle = THREE.MathUtils.degToRad(80);
+  controls.maxAzimuthAngle = THREE.MathUtils.degToRad(35);
   controls.minDistance = 1.1;
   controls.maxDistance = 8;
   controls.update();
