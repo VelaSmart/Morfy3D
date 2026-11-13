@@ -578,3 +578,13 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
 #catalogo{scroll-margin-top:170px}
 @media(max-width:800px){.catalog-nav{top:74px}.catalog-nav .catalog-toolbar{flex-direction:column;align-items:stretch;gap:0;padding-block:0 10px}.catalog-nav .category-filters{display:flex;min-height:54px;flex:none;justify-content:space-around;overflow-x:auto;scrollbar-width:none}.catalog-nav .category-filters::-webkit-scrollbar{display:none}.catalog-nav .filter-button{flex:1 0 auto;min-height:54px;padding:10px 14px;font-size:9px}.catalog-nav .search-box{width:100%}#catalogo{scroll-margin-top:190px}}
 @media(max-width:560px){.catalog-nav{top:68px}.catalog-nav .catalog-toolbar{width:calc(100% - 36px)}.catalog-nav .category-filters{justify-content:flex-start}.catalog-nav .filter-button{flex:0 0 auto;min-height:50px;padding:9px 13px;font-size:8px}.catalog-nav .search-box input{height:40px}#catalogo{scroll-margin-top:185px}}
+
+/* Android e telas touch: controles do visualizador com alvo de toque confortável. */
+@media(max-width:560px){
+  .viewer-toolbar button{
+    width:40px;
+    height:40px;
+    min-width:40px;
+    min-height:40px;
+  }
+}
