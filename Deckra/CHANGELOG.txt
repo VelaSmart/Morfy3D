@@ -1,0 +1,168 @@
+DECKRA - Histórico de versões (changelog)
+Morfy3D - https://morfy3d.com.br/deckra
+==========================================================================
+
+
+1.11.1 beta - 12/11/2026
+--------------------------------------------------------------------------
+Melhorias
+- Medidor de áudio dos canais com muito mais movimento: agora acompanha as
+  batidas da música (sobe em cada batida e desce entre elas), sempre
+  respeitando o volume do canal.
+- Seletor de posição do mostrador com visual novo: miniatura de monitor com
+  os 4 cantos clicáveis.
+
+
+1.11 beta - 12/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Mostrador na tela: escolha em qual dos 4 cantos da tela ele aparece
+  (Configurações > Mostrador na tela > Posição).
+- Nova opção "Mudar volume com a roda do mouse" em Configurações. Desligada,
+  a roda do mouse só rola a página.
+- Canais extras: setinhas para mudar a ordem dos canais.
+
+Melhorias
+- Notas de atualização ficam sempre dentro do quadro (o quadro cresce junto
+  com o texto).
+- Painel de notificações maior e mais fácil de ler, mostrando o texto inteiro
+  de cada aviso.
+- Medidor de áudio mais rápido e com mais movimento.
+
+Correções
+- A atualização automática agora instala na mesma pasta e no mesmo modo da
+  instalação original (por exemplo, quando o DECKRA foi instalado em outro
+  HD ou "para todos os usuários").
+- Mensagens de erro mais claras quando o antivírus ou o Windows bloqueiam o
+  instalador da atualização.
+
+
+1.10 beta - 12/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Barra de rolagem nas páginas Aplicativos e Configurações.
+- Versões passam a ser identificadas como "beta".
+
+Melhorias
+- Atualização direto para a versão mais nova, de qualquer versão antiga, sem
+  precisar reiniciar o DECKRA.
+- O DECKRA procura atualizações sozinho a cada 3 horas enquanto está aberto.
+- Botão tocar/pausar responde na hora, sem atraso.
+- Controles de mídia (voltar, tocar/pausar, avançar) com visual novo.
+- Canais extras com visual novo: barra de volume em gradiente, botões de
+  mudo e remover redondos e destaque ao passar o mouse.
+
+Correções
+- Canal extra com o microfone agora mostra quando o microfone está mudo
+  (inclusive o mudo automático em 0%).
+
+
+1.9 - 12/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Canais extras: até 4 canais a mais, só no computador (sem botão no
+  DECKRA físico), na aba Aplicativos.
+- Botões de mídia (voltar, tocar/pausar e avançar) para Spotify, YouTube no
+  navegador e outros players.
+- Os 4 canais do controle passam a se chamar DECKRA 1 a DECKRA 4.
+
+Correções
+- Volume que "travava" (ex.: Spotify ou microfone) quando era mudado fora do
+  DECKRA, pelo Windows, Discord ou pelo próprio app.
+- O círculo de volume só responde com o mouse perto dele e não pula mais de
+  100% para 0% ao arrastar rápido.
+- O instalador espera o antivírus terminar a análise antes de abrir o
+  DECKRA (erro "arquivo em uso").
+
+
+1.8 - 12/11/2026
+--------------------------------------------------------------------------
+Melhorias
+- Mostrador na tela fica claro quando o DECKRA está no Modo claro.
+- Novo som de mute, mais suave e sempre na mesma altura (não muda com o
+  volume do Windows nem com os canais).
+- Medidor de áudio acompanha o volume de cada canal.
+
+
+1.7 - 12/11/2026
+--------------------------------------------------------------------------
+Correções
+- Erro "Acesso negado" ao baixar uma atualização.
+
+
+1.6 - 12/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Medidor de áudio em cima do círculo de cada canal na aba Aplicativos
+  (liga/desliga em Configurações).
+
+Correções
+- Mexer na tela e no potenciômetro ao mesmo tempo não causa mais disputa de
+  volume.
+- Botões e imagens que sumiam depois de mexer muito no volume.
+- O painel de notificações acompanha a janela ao ser arrastada.
+
+
+1.5 - 11/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Modo claro e Modo escuro em Configurações > Tema (o escuro é o padrão).
+
+Alterações
+- Medidor de áudio no fundo dos canais removido.
+
+
+1.4 - 11/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Atalho de teclado para abrir o DECKRA de qualquer lugar (padrão
+  Ctrl + Alt + D, configurável e com opção de desligar).
+- Medidor de áudio no fundo de cada canal na aba Aplicativos.
+
+Alterações
+- Na lista de aplicativos, o grupo SISTEMA vem antes de EM SEGUNDO PLANO.
+
+
+1.3 - 11/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Lista de aplicativos com o ícone de cada app e jogo.
+- Jogos reconhecidos pelo nome certo: Minecraft (Java, Lunar, Badlion),
+  RuneLite, FiveM, Fortnite, VALORANT, PUBG, Palworld e outros jogos da
+  Unreal Engine.
+
+Correções
+- Nomes estranhos de alguns aplicativos na lista.
+
+
+1.2 - 11/11/2026
+--------------------------------------------------------------------------
+Correções
+- Canal com o microfone mostra o mudo do microfone (inclusive o mudo
+  automático em 0%).
+- Aba Microfone acompanha o potenciômetro na hora, sem travar.
+
+
+1.1 - 11/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Controle de volume pela tela funciona mesmo sem o DECKRA físico conectado.
+- Microfone muta sozinho em 0% e volta ao subir o volume.
+- Potenciômetro sem saltos: ele só assume o volume quando alcança o valor
+  atual (nos dois sentidos). Um anel no círculo mostra onde ele está.
+
+
+1.0 - 11/11/2026
+--------------------------------------------------------------------------
+Primeira versão oficial do DECKRA.
+- 4 canais de volume controlados pelo DECKRA físico (ESP32-S3) ou pela tela,
+  cada um ligado a um aplicativo, ao volume geral, ao microfone, ao app em
+  foco ou aos sons do sistema.
+- Botões de mudo físicos e na tela, com som de confirmação.
+- Páginas Início, Aplicativos, Microfone, Equalizador e Configurações.
+- Equalizador de 5 bandas com perfis (Plano, Jogo, Música, Cinema, Voz e
+  Graves+), usando o Equalizer APO.
+- Mostrador na tela (redondo ou reto, com 6 cores) quando um canal muda.
+- Escolha da saída de som e do microfone padrão do Windows.
+- Iniciar com o Windows e atualização automática pelo próprio app.
+- Novo: central de notificações (sino no canto superior esquerdo).
