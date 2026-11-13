@@ -75,7 +75,7 @@
     if (updateHash) history.replaceState(null, "", hashes[activeIndex]);
     if (scrollToInfo) {
       requestAnimationFrame(() => {
-        const heading = panels[activeIndex].querySelector(".section-heading") || panels[activeIndex];
+        const heading = panels[activeIndex].querySelector(".section-heading, .purchase-heading") || panels[activeIndex];
         const header = document.querySelector(".site-header");
         const offset = (header?.getBoundingClientRect().height || 0) + 22;
         const top = heading.getBoundingClientRect().top + window.scrollY - offset;
