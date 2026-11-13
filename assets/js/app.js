@@ -133,10 +133,14 @@
           button.appendChild(createElement("span", "marketplace-status", isStoreLink ? "Acessar loja" : "Acessar produto"));
         } else if (unavailable) {
           button.type = "button";
-          button.disabled = true;
+          // Mantém o botão focável e com hover, mas bloqueia qualquer ação de compra.
+          // O atributo disabled impedia a interação visual em alguns navegadores.
           button.classList.add("is-unavailable");
           button.setAttribute("aria-disabled", "true");
           button.setAttribute("aria-label", marketplace.label + " — indisponível");
+          button.addEventListener("click", function (event) {
+            event.preventDefault();
+          });
           button.appendChild(createElement("span", "marketplace-status", "Indisponível"));
         } else {
           button.type = "button";
