@@ -283,3 +283,7 @@
 .deckra-page .deckra-category-nav{position:sticky;top:85px;z-index:29}
 .deckra-page .deckra-panels-viewport{overflow-anchor:none}
 @media(max-width:700px){.deckra-page .deckra-category-nav{top:72px}}
+
+/* Cliques rápidos entre abas não deslocam a página. */
+html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
+.deckra-page .deckra-panels-viewport{transition:none;overflow-anchor:none}
