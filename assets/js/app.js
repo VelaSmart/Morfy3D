@@ -311,9 +311,6 @@
       button.setAttribute("aria-label", "Ver detalhes de " + product.name);
       button.setAttribute("aria-haspopup", "dialog");
       button.addEventListener("click", function () { openProduct(product, button); });
-      var arrow = createElement("span", "button-arrow", "↗");
-      arrow.setAttribute("aria-hidden", "true");
-      button.appendChild(arrow);
       body.appendChild(button);
       article.appendChild(visual);
       article.appendChild(body);
