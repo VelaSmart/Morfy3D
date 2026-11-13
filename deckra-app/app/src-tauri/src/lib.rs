@@ -78,6 +78,7 @@ fn start_bridge(app: &tauri::App) {
     let pin_slot = state.pin.clone();
     let error_slot = state.error.clone();
     let mut candidates = Vec::new();
+    candidates.push(std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("bridge-publish").join("DeckraBridge.Service.exe"));
     if let Ok(resource_dir) = app.path().resource_dir() {
         candidates.push(resource_dir.join("bridge").join("DeckraBridge.Service.exe"));
     }

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+*.tsbuildinfo
+target/
+src-tauri/target/
+src-tauri/gen/
+.vscode/
+.idea/
+.env
+.env.*
+!.env.example

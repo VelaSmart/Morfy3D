@@ -1,11 +1,9 @@
 node_modules/
-dist/
-*.tsbuildinfo
-target/
-src-tauri/target/
-src-tauri/gen/
-.vscode/
-.idea/
+output/
+*.zip
+.DS_Store
+Thumbs.db
+Desktop.ini
 .env
 .env.*
 !.env.example
