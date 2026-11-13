@@ -14,17 +14,17 @@ renderer.toneMappingExposure = 1.15;
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
-camera.position.set(0, 0, 5.6);
+camera.position.set(0, 0, 6.4);
 
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.055;
 controls.enablePan = true;
 controls.screenSpacePanning = true;
-controls.minDistance = 2.3;
-controls.maxDistance = 9;
+controls.minDistance = 2.8;
+controls.maxDistance = 10;
 controls.autoRotate = !reducedMotion;
-controls.autoRotateSpeed = 1.25;
+controls.autoRotateSpeed = 1.1;
 controls.target.set(0, 0, 0);
 
 scene.add(new THREE.AmbientLight(0x9ccfff, 1.5));
@@ -41,157 +41,76 @@ scene.add(blueLight);
 const modelRoot = new THREE.Group();
 scene.add(modelRoot);
 
-function traceAlpha(image, targetSize = 150) {
-  const sourceCanvas = document.createElement("canvas");
-  const ratio = Math.min(targetSize / image.naturalWidth, targetSize / image.naturalHeight);
-  const width = Math.max(2, Math.round(image.naturalWidth * ratio));
-  const height = Math.max(2, Math.round(image.naturalHeight * ratio));
-  sourceCanvas.width = width;
-  sourceCanvas.height = height;
-  const context = sourceCanvas.getContext("2d", { willReadFrequently: true });
-  context.drawImage(image, 0, 0, width, height);
-  const pixels = context.getImageData(0, 0, width, height).data;
-  const occupied = new Uint8Array(width * height);
-  let minX = width, minY = height, maxX = 0, maxY = 0;
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      if (pixels[(y * width + x) * 4 + 3] > 24) {
-        occupied[y * width + x] = 1;
-        minX = Math.min(minX, x); maxX = Math.max(maxX, x);
-        minY = Math.min(minY, y); maxY = Math.max(maxY, y);
-      }
-    }
-  }
-  const cropW = maxX - minX + 1, cropH = maxY - minY + 1;
-  if (cropW < 2 || cropH < 2) throw new Error("O arquivo do símbolo não possui transparência utilizável.");
+// A marca é construída como três braços prismáticos que se encontram no
+// mesmo vértice: a peça aberta de um cubo, sem fechar as faces ausentes.
+function createRoundedBeam(length, width, depth, color) {
+  const shape = new THREE.Shape();
+  const half = width / 2;
+  shape.moveTo(-half, 0);
+  shape.lineTo(half, 0);
+  shape.lineTo(half, length);
+  shape.lineTo(-half, length);
+  shape.closePath();
 
-  const has = (x, y) => x >= 0 && y >= 0 && x < width && y < height && occupied[y * width + x] === 1;
-  const edges = [];
-  for (let y = minY; y <= maxY; y++) {
-    for (let x = minX; x <= maxX; x++) {
-      if (!has(x, y)) continue;
-      if (!has(x, y - 1)) edges.push([[x, y], [x + 1, y]]);
-      if (!has(x + 1, y)) edges.push([[x + 1, y], [x + 1, y + 1]]);
-      if (!has(x, y + 1)) edges.push([[x + 1, y + 1], [x, y + 1]]);
-      if (!has(x - 1, y)) edges.push([[x, y + 1], [x, y]]);
-    }
-  }
-
-  const key = point => point[0] + "," + point[1];
-  const starts = new Map();
-  edges.forEach((edge, index) => {
-    const id = key(edge[0]);
-    if (!starts.has(id)) starts.set(id, []);
-    starts.get(id).push(index);
-  });
-  const used = new Uint8Array(edges.length);
-  const loops = [];
-  for (let i = 0; i < edges.length; i++) {
-    if (used[i]) continue;
-    const points = [];
-    let current = i, guard = 0;
-    while (!used[current] && guard++ < edges.length + 2) {
-      used[current] = 1;
-      const edge = edges[current];
-      points.push(edge[0]);
-      const next = starts.get(key(edge[1])) || [];
-      current = next.find(index => !used[index]);
-      if (current === undefined) break;
-      if (key(edges[current][0]) === key(points[0]) && key(edges[current][1]) === key(edge[0])) break;
-    }
-    if (points.length >= 8) loops.push(points);
-  }
-
-  const aspect = cropW / cropH;
-  const paths = loops.map(points => {
-    const vectors = points.map(([x, y]) => new THREE.Vector2(
-      ((x - minX) / cropW - 0.5) * aspect,
-      (0.5 - (y - minY) / cropH)
-    ));
-    const simplified = [];
-    for (let i = 0; i < vectors.length; i++) {
-      const prev = vectors[(i + vectors.length - 1) % vectors.length];
-      const curr = vectors[i];
-      const next = vectors[(i + 1) % vectors.length];
-      const cross = (curr.x - prev.x) * (next.y - curr.y) - (curr.y - prev.y) * (next.x - curr.x);
-      if (Math.abs(cross) > 0.00002) simplified.push(curr);
-    }
-    return simplified;
-  }).filter(points => points.length >= 6);
-
-  paths.sort((a, b) => Math.abs(THREE.ShapeUtils.area(b)) - Math.abs(THREE.ShapeUtils.area(a)));
-  return { paths, aspect };
-}
-
-function makeModel(image) {
-  const { paths, aspect } = traceAlpha(image);
-  if (!paths.length) throw new Error("Não foi possível criar o contorno 3D do símbolo.");
-  const shapes = paths.map(points => {
-    const shape = new THREE.Shape();
-    shape.moveTo(points[0].x, points[0].y);
-    for (let i = 1; i < points.length; i++) shape.lineTo(points[i].x, points[i].y);
-    shape.closePath();
-    return shape;
-  });
-
-  const depth = 0.28;
-  const geometry = new THREE.ExtrudeGeometry(shapes, {
+  const geometry = new THREE.ExtrudeGeometry(shape, {
     depth,
     bevelEnabled: true,
-    bevelSegments: 4,
+    bevelSegments: 3,
     steps: 1,
-    bevelSize: 0.035,
-    bevelThickness: 0.035,
+    bevelSize: 0.055,
+    bevelThickness: 0.055,
     curveSegments: 2
   });
+  geometry.translate(0, 0, -depth / 2);
   geometry.computeVertexNormals();
 
-  const sideMaterial = new THREE.MeshStandardMaterial({
-    color: 0x0754a8, metalness: 0.82, roughness: 0.24
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    metalness: 0.58,
+    roughness: 0.24
   });
-  const faceMaterial = new THREE.MeshStandardMaterial({
-    color: 0x168cff, metalness: 0.42, roughness: 0.26
-  });
-  const solid = new THREE.Mesh(geometry, [sideMaterial, faceMaterial]);
-  modelRoot.add(solid);
-
-  const textureCanvas = document.createElement("canvas");
-  textureCanvas.width = image.naturalWidth;
-  textureCanvas.height = image.naturalHeight;
-  const ctx = textureCanvas.getContext("2d");
-  ctx.drawImage(image, 0, 0);
-  const texture = new THREE.CanvasTexture(textureCanvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-  const front = new THREE.Mesh(
-    new THREE.PlaneGeometry(aspect, 1),
-    new THREE.MeshBasicMaterial({ map: texture, transparent: true, depthWrite: false, side: THREE.DoubleSide })
-  );
-  front.position.z = depth + 0.041;
-  modelRoot.add(front);
-
-  modelRoot.rotation.set(-0.08, -0.22, 0);
-  const box = new THREE.Box3().setFromObject(modelRoot);
-  const center = box.getCenter(new THREE.Vector3());
-  modelRoot.position.sub(center);
+  return new THREE.Mesh(geometry, material);
 }
 
-const image = new Image();
-image.crossOrigin = "anonymous";
-image.onload = () => {
-  try {
-    makeModel(image);
-    stage.classList.add("is-ready");
-  } catch (error) {
-    console.error("Falha ao montar símbolo 3D MORFY:", error);
-    stage.classList.add("viewer-fallback");
-  }
-};
-image.onerror = () => {
-  console.error("Não foi possível carregar o símbolo oficial MORFY.");
-  stage.classList.add("viewer-fallback");
-};
-image.src = "./assets/images/morfy-official-symbol-transparent.png";
+function makeModel() {
+  const beamLength = 1.78;
+  const beamWidth = 0.68;
+  const beamDepth = 0.68;
+  const arms = [
+    { angle: 150, color: 0x21c7f4 },
+    { angle: 30, color: 0x0878e8 },
+    { angle: -90, color: 0x087fc0 }
+  ];
+
+  arms.forEach(({ angle, color }) => {
+    const radians = THREE.MathUtils.degToRad(angle);
+    const beam = createRoundedBeam(beamLength, beamWidth, beamDepth, color);
+    // O eixo local +Y aponta para fora do vértice central.
+    beam.rotation.z = radians - Math.PI / 2;
+    const centerDistance = beamLength / 2 - beamWidth * 0.24;
+    beam.position.set(
+      Math.cos(radians) * centerDistance,
+      Math.sin(radians) * centerDistance,
+      0
+    );
+    modelRoot.add(beam);
+  });
+
+  // Pequeno núcleo arredondado une visualmente os três braços e mantém
+  // a leitura de uma única peça estrutural.
+  const core = new THREE.Mesh(
+    new THREE.BoxGeometry(beamWidth * 0.94, beamWidth * 0.94, beamDepth * 0.94),
+    new THREE.MeshStandardMaterial({ color: 0x078ed2, metalness: 0.62, roughness: 0.22 })
+  );
+  modelRoot.add(core);
+
+  modelRoot.rotation.set(-0.16, -0.28, 0);
+  const bounds = new THREE.Box3().setFromObject(modelRoot);
+  modelRoot.position.sub(bounds.getCenter(new THREE.Vector3()));
+}
+
+makeModel();
+stage.classList.add("is-ready");
 
 function resize() {
   const width = Math.max(1, stage.clientWidth);
@@ -217,9 +136,9 @@ stage.querySelectorAll("[data-viewer-action]").forEach(button => {
       camera.position.multiplyScalar(1.22);
       controls.update();
     } else if (action === "reset") {
-      camera.position.set(0, 0, 5.6);
+      camera.position.set(0, 0, 6.4);
       controls.target.set(0, 0, 0);
-      modelRoot.rotation.set(-0.08, -0.22, 0);
+      modelRoot.rotation.set(-0.16, -0.28, 0);
       controls.autoRotate = !reducedMotion;
       const toggle = stage.querySelector('[data-viewer-action="rotate"]');
       toggle?.setAttribute("aria-pressed", String(controls.autoRotate));
