@@ -93,6 +93,7 @@ class MainActivity : Activity() {
     private fun configureWebView() {
         WebView.setWebContentsDebuggingEnabled(false)
         webView.settings.apply {
+            userAgentString = "$userAgentString MorfyAndroidApp"
             javaScriptEnabled = true
             domStorageEnabled = true
             loadsImagesAutomatically = true
