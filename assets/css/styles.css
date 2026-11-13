@@ -278,3 +278,8 @@
  .deckra-page .deckra-model-copy h3{font-size:30px}
  .deckra-page .deckra-model-copy p{font-size:12px}
 }
+
+/* Mantém a seleção DECKRA visível durante a troca de painéis. */
+.deckra-page .deckra-category-nav{position:sticky;top:85px;z-index:29}
+.deckra-page .deckra-panels-viewport{overflow-anchor:none}
+@media(max-width:700px){.deckra-page .deckra-category-nav{top:72px}}
