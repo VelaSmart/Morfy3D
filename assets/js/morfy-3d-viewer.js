@@ -64,32 +64,42 @@ function frameModel(object) {
   controls.update();
 }
 
-new GLTFLoader().load(
-  "./assets/models/morfy-logo.glb",
-  (gltf) => {
-    const model = gltf.scene;
-    model.traverse((node) => {
-      if (!node.isMesh) return;
-      node.castShadow = true;
-      node.receiveShadow = true;
-      const materials = Array.isArray(node.material) ? node.material : [node.material];
-      for (const material of materials) {
-        if ("roughness" in material) material.roughness = Math.min(material.roughness, 0.42);
-        material.needsUpdate = true;
-      }
+async function loadOriginalModel() {
+  try {
+    const response = await fetch("./assets/models/morfy-logo.glb.gz");
+    if (!response.ok) throw new Error(`HTTP ${response.status} ao buscar o modelo compactado`);
+    if (!("DecompressionStream" in window)) throw new Error("Este navegador não oferece descompactação gzip nativa.");
+    const compressed = await response.arrayBuffer();
+    const stream = new Blob([compressed]).stream().pipeThrough(new DecompressionStream("gzip"));
+    const glbBuffer = await new Response(stream).arrayBuffer();
+    new GLTFLoader().parse(glbBuffer, "./assets/models/", (gltf) => {
+      const model = gltf.scene;
+      model.traverse((node) => {
+        if (!node.isMesh) return;
+        node.castShadow = true;
+        node.receiveShadow = true;
+        const materials = Array.isArray(node.material) ? node.material : [node.material];
+        for (const material of materials) {
+          if ("roughness" in material) material.roughness = Math.min(material.roughness, 0.42);
+          material.needsUpdate = true;
+        }
+      });
+      modelRoot.add(model);
+      frameModel(modelRoot);
+      status.remove();
+      stage.classList.add("is-ready");
+    }, (error) => {
+      console.error("Falha ao interpretar o GLB original da MORFY:", error);
+      status.textContent = "Não foi possível interpretar o modelo 3D original.";
+      stage.classList.add("is-error");
     });
-    modelRoot.add(model);
-    frameModel(modelRoot);
-    status.remove();
-    stage.classList.add("is-ready");
-  },
-  undefined,
-  (error) => {
-    console.error("Não foi possível carregar o GLB original da MORFY:", error);
-    status.textContent = "A malha original ainda precisa ser adicionada em assets/models/morfy-logo.glb. O visualizador não usará uma imitação simplificada.";
+  } catch (error) {
+    console.error("Não foi possível carregar o modelo 3D original da MORFY:", error);
+    status.textContent = "Não foi possível carregar o modelo 3D compactado. Confira se morfy-logo.glb.gz está em assets/models.";
     stage.classList.add("is-error");
   }
-);
+}
+loadOriginalModel();
 
 function resize() {
   const width = Math.max(1, stage.clientWidth);
