@@ -490,43 +490,6 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
 .product-card .product-image-arrow{cursor:pointer}
 
 
-/* Compra dos produtos MORFY no padrão visual do painel DECKRA. */
-.product-dialog{width:min(1080px,calc(100% - 32px))}
-.product-dialog .buy-area{grid-column:1/-1;margin:0 28px 28px;padding:27px;border:1px solid #43374f;border-radius:10px;background:linear-gradient(135deg,#1c1727,#17161e)}
-.product-dialog .purchase-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:22px}
-.product-dialog .purchase-panel-heading .tiny-label{color:#b4a1cc;font-size:8px;letter-spacing:.16em}
-.product-dialog .purchase-panel-heading h3{margin-top:7px;font-size:22px;letter-spacing:-.025em}
-.product-dialog .purchase-panel-heading .demo-label{font-size:9px}
-.product-dialog .marketplace-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.product-dialog .marketplace-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:17px;min-width:0;min-height:220px;aspect-ratio:1;padding:22px;border:1px solid #393644;border-radius:12px;background:#191821;color:#e8e3ef;text-align:center;box-shadow:0 12px 28px #0002;transition:transform .22s ease,background .22s ease,border-color .22s ease,box-shadow .22s ease}
-.product-dialog .marketplace-button.is-available{border-color:#816de0;background:linear-gradient(145deg,#242044,#181b35);box-shadow:0 14px 38px #6346c624}
-.product-dialog .marketplace-button.is-available:hover{transform:translateY(-4px);background:linear-gradient(145deg,#332c5c,#202447);border-color:#b6a4ff;box-shadow:0 18px 42px #6346c63d}
-.product-dialog .marketplace-button.is-unavailable{background:#191821;border-color:#393644;color:#bcb6c8;opacity:1}
-.product-dialog .marketplace-button .marketplace-logo{display:block;width:clamp(62px,7vw,92px);height:clamp(62px,7vw,92px);flex:0 0 auto;object-fit:contain;filter:none;transition:filter .24s ease,transform .24s ease}
-.product-dialog .marketplace-button .marketplace-label{flex:0 1 auto!important;font-size:clamp(14px,1.5vw,20px);font-weight:700;line-height:1.25}
-.product-dialog .marketplace-button .marketplace-status{margin-top:auto;padding:8px 13px;border:1px solid #514a61;border-radius:4px;color:#bbb5c8;font-size:10px;font-weight:600}
-.product-dialog .marketplace-button.is-available .marketplace-status{border-color:#8469eb;background:#7056d8;color:#fff}
-.product-dialog .marketplace-button.is-available .marketplace-logo{transform:scale(1.02)}
-.product-dialog .purchase-panel-foot{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-top:22px;padding-top:18px;border-top:1px solid #3c3049;color:#c1b2d6;font-size:10px}
-.product-dialog .purchase-panel-foot .marketplace-hint{margin:0;color:#a69bb7;font-size:9px;text-align:right}
-.product-dialog .marketplace-empty{grid-column:1/-1}
-@media(max-width:700px){
- .product-dialog .buy-area{margin:0 16px 16px;padding:20px}
- .product-dialog .marketplace-buttons{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
- .product-dialog .marketplace-button{min-height:155px;padding:12px 7px;gap:11px;border-radius:8px}
- .product-dialog .marketplace-button .marketplace-logo{width:clamp(38px,9vw,62px);height:clamp(38px,9vw,62px)}
- .product-dialog .marketplace-button .marketplace-label{font-size:clamp(10px,2.2vw,14px)}
- .product-dialog .marketplace-button .marketplace-status{padding:6px 7px;font-size:8px}
- .product-dialog .purchase-panel-foot{align-items:flex-start;flex-direction:column;gap:8px}
- .product-dialog .purchase-panel-foot .marketplace-hint{text-align:left}
-}
-@media(max-width:460px){
- .product-dialog .purchase-panel-heading{align-items:flex-start}
- .product-dialog .purchase-panel-heading .demo-label{display:none}
- .product-dialog .marketplace-button{min-height:135px}
-}
-@media(prefers-reduced-motion:reduce){.product-dialog .marketplace-button,.product-dialog .marketplace-button .marketplace-logo{transition:none}}
-
 /* Três sistemas lado a lado e opções futuras sem link de download. */
 .deckra-page .deckra-download-block .deckra-download-options{grid-template-columns:repeat(3,minmax(0,1fr))}
 .deckra-page .deckra-download-block .deckra-os-card{grid-template-columns:40px minmax(0,1fr);column-gap:12px;padding:20px 16px}
