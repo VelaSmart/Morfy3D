@@ -398,11 +398,34 @@
       });
     }
 
-    if (search) search.addEventListener("input", renderProducts);
+    // Ao filtrar, mostra os produtos abaixo da faixa fixa sem reiniciar a rolagem a cada tecla.
+    var catalogScrollDestination = null;
+    function showCatalogResults() {
+      var results = document.querySelector(".catalog-meta") || grid;
+      var nav = document.querySelector(".catalog-nav");
+      var header = document.querySelector(".site-header");
+      if (!results) return;
+      var offset = (header ? header.getBoundingClientRect().height : 0) +
+        (nav ? nav.getBoundingClientRect().height : 0) + 16;
+      var destination = Math.max(0, Math.round(window.scrollY + results.getBoundingClientRect().top - offset));
+      if (Math.abs(window.scrollY - destination) < 12 || catalogScrollDestination === destination) return;
+      catalogScrollDestination = destination;
+      window.scrollTo({
+        top: destination,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth"
+      });
+      window.setTimeout(function () { catalogScrollDestination = null; }, 650);
+    }
+
+    if (search) search.addEventListener("input", function () {
+      renderProducts();
+      showCatalogResults();
+    });
     filterButtons.forEach(function (button) {
       button.addEventListener("click", function () {
         activeCategory = button.dataset.category;
         renderProducts();
+        showCatalogResults();
       });
     });
     var resetButton = document.getElementById("reset-filters");
