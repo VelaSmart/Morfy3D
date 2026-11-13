@@ -67,7 +67,8 @@ function frameModel(object) {
   const maxDimension = Math.max(size.x, size.y, size.z) || 1;
   object.scale.setScalar(2.15 / maxDimension);
   const distance = 2.15 * 2.45;
-  camera.position.set(distance * 0.12, distance * 0.18, distance);
+  // Posição inicial frontal, alinhada à referência enviada pelo usuário.
+  camera.position.set(0, distance * 0.18, distance);
   camera.near = 0.01;
   camera.far = 100;
   camera.updateProjectionMatrix();
