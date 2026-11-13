@@ -526,17 +526,17 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   transition:filter .22s ease,transform .22s ease;
   filter:none;
 }
-#product-dialog #modal-marketplaces .marketplace-button[data-marketplace="shopee"]:hover img.marketplace-logo,
+#product-dialog #modal-marketplaces .marketplace-button[data-marketplace="shopee"]:is(:hover,:focus-visible) img.marketplace-logo,
 #product-dialog #modal-marketplaces .marketplace-button[data-marketplace="shopee"]:focus-visible img.marketplace-logo{
   filter:brightness(0) saturate(100%) invert(57%) sepia(91%) saturate(2200%) hue-rotate(337deg) brightness(103%) contrast(104%) drop-shadow(0 0 7px #ff6a34)!important;
   transform:scale(1.12);
 }
-#product-dialog #modal-marketplaces .marketplace-button[data-marketplace="mercadoLivre"]:hover img.marketplace-logo,
+#product-dialog #modal-marketplaces .marketplace-button[data-marketplace="mercadoLivre"]:is(:hover,:focus-visible) img.marketplace-logo,
 #product-dialog #modal-marketplaces .marketplace-button[data-marketplace="mercadoLivre"]:focus-visible img.marketplace-logo{
   filter:brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(1100%) hue-rotate(350deg) brightness(108%) contrast(104%) drop-shadow(0 0 7px #f9d635)!important;
   transform:scale(1.12);
 }
-#product-dialog #modal-marketplaces .marketplace-button[data-marketplace="tiktokShop"]:hover img.marketplace-logo,
+#product-dialog #modal-marketplaces .marketplace-button[data-marketplace="tiktokShop"]:is(:hover,:focus-visible) img.marketplace-logo,
 #product-dialog #modal-marketplaces .marketplace-button[data-marketplace="tiktokShop"]:focus-visible img.marketplace-logo{
   filter:brightness(0) saturate(100%) invert(78%) sepia(77%) saturate(900%) hue-rotate(145deg) brightness(105%) contrast(105%) drop-shadow(0 0 7px #33dff2)!important;
   transform:scale(1.12);
