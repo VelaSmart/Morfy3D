@@ -17,6 +17,24 @@ android {
         versionCode = 2
         versionName = "1.1.0"
     }
+    signingConfigs {
+        val uploadStore = System.getenv("MORFY_KEYSTORE_PATH")
+        if (!uploadStore.isNullOrBlank()) {
+            create("release") {
+                storeFile = file(uploadStore)
+                storePassword = System.getenv("MORFY_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("MORFY_KEY_ALIAS")
+                keyPassword = System.getenv("MORFY_KEY_PASSWORD")
+            }
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            val hasUploadKey = !System.getenv("MORFY_KEYSTORE_PATH").isNullOrBlank()
+            if (hasUploadKey) signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = false
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
