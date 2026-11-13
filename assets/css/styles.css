@@ -311,3 +311,17 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
  .deckra-page .deckra-os-card small{font-size:9px}
  .deckra-page .deckra-os-card .deckra-os-icon{width:32px;height:32px}
 }
+
+/* Galeria de capturas reais do software DECKRA. */
+.deckra-page .deckra-software-gallery{max-width:1200px;margin-inline:auto}
+.deckra-gallery-stage{position:relative;overflow:hidden;aspect-ratio:1037/669;background:#0c0b14}
+.deckra-gallery-track{display:flex;width:100%;height:100%;transition:transform .55s ease}
+.deckra-gallery-track img{display:block;flex:0 0 100%;width:100%;height:100%;object-fit:contain}
+.deckra-gallery-arrow{position:absolute;top:50%;z-index:2;display:grid;place-items:center;width:42px;height:42px;padding:0;transform:translateY(-50%);border:1px solid #9e8ed6;border-radius:50%;background:#11101cc9;color:#fff;font-size:32px;line-height:1;cursor:pointer}
+.deckra-gallery-arrow:hover{background:#694ce5}
+.deckra-gallery-prev{left:14px}.deckra-gallery-next{right:14px}
+.deckra-gallery-dots{position:absolute;z-index:2;bottom:14px;left:50%;display:flex;gap:8px;transform:translateX(-50%);padding:8px 10px;border-radius:20px;background:#11101ccc}
+.deckra-gallery-dot{width:8px;height:8px;padding:0;border:0;border-radius:50%;background:#a7a0b8;cursor:pointer}
+.deckra-gallery-dot.is-active{width:20px;border-radius:8px;background:#9b7cff}
+@media(max-width:600px){.deckra-gallery-arrow{width:30px;height:30px;font-size:24px}.deckra-gallery-prev{left:6px}.deckra-gallery-next{right:6px}.deckra-gallery-dots{bottom:7px}}
+@media(prefers-reduced-motion:reduce){.deckra-gallery-track{transition:none}}
