@@ -219,7 +219,7 @@
 .deckra-page .deckra-category-tab.is-active{color:#c2b6ff}
 .deckra-page .deckra-category-tab.is-active::after{transform:scaleX(1)}
 .deckra-page .deckra-category-tab:focus-visible{outline:2px solid #8c78ff;outline-offset:-4px}
-.deckra-page .deckra-panels-viewport{width:100%;overflow:hidden}
+.deckra-page .deckra-panels-viewport{width:100%;overflow:hidden;transition:height .42s ease}
 .deckra-page .deckra-panels-track{display:flex;align-items:flex-start;width:100%;transform:translateX(0);transition:transform .55s cubic-bezier(.22,.75,.25,1);will-change:transform}
 .deckra-page .deckra-panel{flex:0 0 100%;min-width:0;overflow:hidden}
 .deckra-page .deckra-panel[aria-hidden="true"]{user-select:none}
