@@ -20,6 +20,9 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.FirebaseApp
 import com.google.firebase.messaging.FirebaseMessaging
 
@@ -31,12 +34,16 @@ class MainActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        window.statusBarColor = Color.rgb(11, 15, 20)
-        window.navigationBarColor = Color.rgb(11, 15, 20)
+        // Android 15+ aplica edge-to-edge obrigatoriamente em apps atuais.
+        // Os insets abaixo mantêm o conteúdo do WebView fora das barras do sistema.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
         createNotificationChannel()
         webView = WebView(this)
         webView.setBackgroundColor(Color.rgb(11, 15, 20))
         setContentView(webView)
+        applyWindowInsets()
         configureWebView()
         if (savedInstanceState != null && webView.restoreState(savedInstanceState) != null) {
             // Mantém a navegação existente ao recriar a Activity.
@@ -44,6 +51,23 @@ class MainActivity : Activity() {
             webView.loadUrl(resolveStartUrl(intent))
         }
         requestNotificationConsent()
+    }
+
+    private fun applyWindowInsets() {
+        WindowCompat.getInsetsController(window, webView).apply {
+            isAppearanceLightStatusBars = false
+            isAppearanceLightNavigationBars = false
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(webView) { view, insets ->
+            val safeInsets = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or
+                    WindowInsetsCompat.Type.displayCutout() or
+                    WindowInsetsCompat.Type.ime()
+            )
+            view.setPadding(safeInsets.left, safeInsets.top, safeInsets.right, safeInsets.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(webView)
     }
 
     private fun resolveStartUrl(source: Intent?): String {
