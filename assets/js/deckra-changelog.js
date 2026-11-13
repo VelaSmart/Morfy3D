@@ -58,7 +58,7 @@
     const active = panels[activeIndex];
     if (active) viewport.style.height = active.scrollHeight + "px";
   });
-  function activate(index, updateHash = true) {
+  function activate(index, updateHash = true, scrollToInfo = true) {
     activeIndex = (index + buttons.length) % buttons.length;
     buttons.forEach((button, i) => {
       const selected = i === activeIndex;
@@ -73,6 +73,15 @@
     resizeObserver.disconnect();
     resizeObserver.observe(panels[activeIndex]);
     if (updateHash) history.replaceState(null, "", hashes[activeIndex]);
+    if (scrollToInfo) {
+      requestAnimationFrame(() => {
+        const heading = panels[activeIndex].querySelector(".section-heading") || panels[activeIndex];
+        const header = document.querySelector(".site-header");
+        const offset = (header?.getBoundingClientRect().height || 0) + 22;
+        const top = heading.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: Math.max(0, top), behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+      });
+    }
   }
   buttons.forEach((button, index) => {
     button.addEventListener("click", () => activate(index));
@@ -89,7 +98,7 @@
     });
   });
   const initialIndex = hashes.indexOf(window.location.hash);
-  activate(initialIndex >= 0 ? initialIndex : 0, false);
+  activate(initialIndex >= 0 ? initialIndex : 0, false, false);
   window.addEventListener("hashchange", () => {
     const index = hashes.indexOf(window.location.hash);
     if (index >= 0 && index !== activeIndex) activate(index, false);
@@ -104,7 +113,7 @@ document.addEventListener("click", (event) => {
   if (tab) {
     event.preventDefault();
     tab.click();
-    document.querySelector(".deckra-category-nav")?.scrollIntoView({ behavior: "smooth", block: "center" });
+
   }
 });
 
@@ -115,6 +124,6 @@ document.addEventListener("click", (event) => {
   const tab = document.getElementById("tab-" + target);
   if (tab) {
     tab.click();
-    document.querySelector(".deckra-category-nav")?.scrollIntoView({ behavior: "smooth", block: "center" });
+
   }
 });
