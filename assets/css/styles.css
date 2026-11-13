@@ -366,3 +366,42 @@ html:has(body.deckra-page){scroll-behavior:auto;overflow-anchor:none}
  .deckra-page .software-steps article{padding:22px}
  .deckra-page .deckra-end{flex-direction:column;align-items:flex-start;margin-top:12px;padding-block:32px 55px}
 }
+
+/* Controles discretos da galeria. */
+.deckra-page .deckra-gallery-arrow{opacity:0;pointer-events:none;border:0;background:#151120cc;box-shadow:0 0 0 1px #ffffff13,0 6px 22px #000a,0 0 18px #9273e64d;transition:opacity .2s,background .2s,box-shadow .2s}
+.deckra-page .deckra-gallery-stage:hover .deckra-gallery-arrow,.deckra-page .deckra-gallery-stage:focus-within .deckra-gallery-arrow{opacity:1;pointer-events:auto}
+.deckra-page .deckra-gallery-arrow:hover{background:#322551;box-shadow:0 7px 25px #000b,0 0 22px #9273e680}
+@media(hover:none){.deckra-page .deckra-gallery-arrow{opacity:1;pointer-events:auto}}
+@media(prefers-reduced-motion:reduce){.deckra-page .deckra-gallery-arrow{transition:none}}
+
+/* Histórico de versões DECKRA. */
+.deckra-page .deckra-updates-section{max-width:1320px;padding-block:72px 85px}
+.deckra-page .deckra-updates-section>.section-heading{max-width:1200px;margin:0 auto 30px;align-items:end}
+.deckra-page .deckra-panel .deckra-changelog{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:15px;max-width:1200px;margin-inline:auto}
+.deckra-page .deckra-changelog-entry{min-width:0;overflow:hidden;border:1px solid #373044;border-radius:10px;background:linear-gradient(145deg,#18141f,#111017);transition:border-color .2s,background .2s}
+.deckra-page .deckra-changelog-entry:hover{border-color:#6e5c91}
+.deckra-page .deckra-changelog-entry.is-latest{grid-column:1/-1;border-color:#735ab0;background:linear-gradient(130deg,#211933,#14111e)}
+.deckra-page .deckra-changelog-entry summary{display:flex;align-items:center;gap:13px;min-height:75px;padding:19px 23px;cursor:pointer;list-style:none;color:#f0ebf6}
+.deckra-page .deckra-changelog-entry summary::-webkit-details-marker{display:none}
+.deckra-page .deckra-changelog-entry summary strong{font-size:16px;line-height:1.25}
+.deckra-page .deckra-version-date{margin-left:auto;color:#aba3b8;font-size:11px;white-space:nowrap}
+.deckra-page .deckra-latest-label{order:-1;padding:5px 9px;border-radius:4px;background:#8c78ff20;color:#ad9bff;font-size:9px;font-weight:700;letter-spacing:.1em;white-space:nowrap}
+.deckra-page .deckra-version-chevron{margin-left:3px;color:#ad9bff;font-size:22px;line-height:1;transition:transform .2s}
+.deckra-page .deckra-changelog-entry[open] .deckra-version-chevron{transform:rotate(180deg)}
+.deckra-page .deckra-change-body{padding:0 23px 22px;border-top:1px solid #ffffff0c;color:#bcb5c8}
+.deckra-page .deckra-change-body h4{margin:19px 0 9px;color:#b9a6ff;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.deckra-page .deckra-change-body ul{margin:0;padding-left:19px}
+.deckra-page .deckra-change-body li{margin:8px 0;font-size:12px;line-height:1.8}
+.deckra-page .deckra-change-body li::marker{color:#8c78ff}
+.deckra-page .deckra-changelog>p{grid-column:1/-1;padding:22px;border:1px solid #373044;border-radius:10px;background:#18141f}
+@media(max-width:750px){
+ .deckra-page .deckra-updates-section{padding-block:48px 65px}
+ .deckra-page .deckra-updates-section>.section-heading{flex-direction:column;align-items:flex-start;gap:14px}
+ .deckra-page .deckra-panel .deckra-changelog{grid-template-columns:1fr;gap:11px}
+ .deckra-page .deckra-changelog-entry.is-latest{grid-column:auto}
+ .deckra-page .deckra-changelog-entry summary{flex-wrap:wrap;padding:16px;gap:8px}
+ .deckra-page .deckra-changelog-entry summary strong{font-size:14px}
+ .deckra-page .deckra-version-date{margin-left:0}
+ .deckra-page .deckra-version-chevron{margin-left:auto}
+ .deckra-page .deckra-change-body{padding:0 16px 17px}
+}
