@@ -386,6 +386,15 @@
     renderProducts();
     window.addEventListener("resize", updateCatalogScroll);
 
+    // Abre diretamente o produto indicado por uma notificação push.
+    var notifiedProductId = new URLSearchParams(window.location.search).get("produto");
+    if (notifiedProductId) {
+      var notifiedProduct = products.find(function (product) { return product.id === notifiedProductId; });
+      if (notifiedProduct) {
+        window.setTimeout(function () { openProduct(notifiedProduct, null); }, 120);
+      }
+    }
+
     if (dialog) {
       dialog.querySelectorAll("[data-close-dialog]").forEach(function (button) {
         button.addEventListener("click", closeDialog);
