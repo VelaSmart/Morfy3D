@@ -1,7 +1,7 @@
 {
-  "versao": "1.12",
+  "versao": "1.12.1",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "43c69953b078f56efe279bb95d9f3c898830498aa97c32017a4bd1df318aeadf",
-  "tamanho": 31162967,
-  "notas": "O programa agora se chama DECKRA APP, e o controle físico, DECKRA ONE. Novo: \"Ouvir meu microfone\" na aba Microfone. A janela se ajusta sozinha para caber em telas pequenas. Mensagens dos cartões dos canais mais curtas."
+  "sha256": "cadd21f828d5584b6e36f4e81f33c195da15ec3450843331ec9f531c01c7ea60",
+  "tamanho": 31241082,
+  "notas": "Canais extras agora ficam ao lado dos cartões DECKRA 1-4, com barra de rolagem para o lado. O atalho de teclado abre o DECKRA e, apertando de novo, minimiza. Novo: medidor de áudio na aba Microfone. \"Ouvir meu microfone\" desliga sozinho ao sair da aba Microfone. Correção: o DECKRA às vezes travava ao clicar em Sair e depois dizia \"já está aberto\". Procura atualização também ao abrir a janela e tenta de novo se a internet ainda não conectou."
 }
