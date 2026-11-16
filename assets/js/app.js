@@ -166,6 +166,8 @@
     var pagination = document.getElementById("product-pagination");
     var currentPage = 1;
     var pageSize = 6;
+    var catalogExpanded = false;
+    var expandButton = document.getElementById("catalog-expand");
     var search = document.getElementById("product-search");
     var count = document.getElementById("product-count");
     var emptyState = document.getElementById("empty-state");
@@ -356,7 +358,7 @@
     function updateCatalogScroll() {
       if (!grid) return;
       var cards = Array.prototype.slice.call(grid.children);
-      if (cards.length <= 6) {
+      if (catalogExpanded || cards.length <= pageSize) {
         grid.style.maxHeight = "none";
         grid.style.overflowY = "visible";
         grid.classList.remove("catalog-scroll");
@@ -417,7 +419,7 @@
       grid.replaceChildren();
       grid.style.maxHeight = "none";
       grid.style.overflowY = "visible";
-      if (isAndroidApp) {
+      if (isAndroidApp && !catalogExpanded) {
         var totalPages = Math.max(1, Math.ceil(visible.length / pageSize));
         currentPage = Math.min(currentPage, totalPages);
         visible.slice((currentPage - 1) * pageSize, currentPage * pageSize).forEach(function (product) {
@@ -426,7 +428,13 @@
         renderPagination(totalPages);
       } else {
         visible.forEach(function (product) { grid.appendChild(productCard(product)); });
-        updateCatalogScroll();
+        if (isAndroidApp) renderPagination(1);
+        else updateCatalogScroll();
+      }
+      if (expandButton) {
+        expandButton.hidden = visible.length <= pageSize;
+        expandButton.textContent = catalogExpanded ? "RECOLHER" : "VER TUDO";
+        expandButton.setAttribute("aria-expanded", String(catalogExpanded));
       }
       if (count) count.textContent = visible.length + (visible.length === 1 ? " produto" : " produtos");
       if (emptyState) emptyState.hidden = visible.length !== 0;
@@ -456,13 +464,21 @@
       window.setTimeout(function () { catalogScrollDestination = null; }, 650);
     }
 
+    if (expandButton) expandButton.addEventListener("click", function () {
+      catalogExpanded = !catalogExpanded;
+      renderProducts();
+      if (!catalogExpanded) showCatalogResults();
+    });
+
     if (search) search.addEventListener("input", function () {
+      catalogExpanded = false;
       renderProducts();
       showCatalogResults();
     });
     filterButtons.forEach(function (button) {
       button.addEventListener("click", function () {
         activeCategory = button.dataset.category;
+        catalogExpanded = false;
         renderProducts();
         showCatalogResults();
       });
@@ -474,6 +490,7 @@
         search.value = "";
         search.focus();
       }
+      catalogExpanded = false;
       renderProducts();
     });
     renderProducts();
