@@ -661,3 +661,30 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
 .catalog-expand-button{min-height:38px;padding:9px 21px;border:1px solid #4b88d8;border-radius:5px;background:#14253c;color:#c6e0ff;font:600 10px/1.2 Montserrat,Arial,sans-serif;letter-spacing:.13em;cursor:pointer;transition:background .2s,border-color .2s}
 .catalog-expand-button:hover,.catalog-expand-button:focus-visible{background:#214568;border-color:#7ab5ff;color:#fff}
 @media(max-width:560px){.catalog-meta{grid-template-columns:1fr auto;gap:12px}.catalog-meta .demo-label{grid-column:2;grid-row:1}.catalog-expand-button{grid-column:1/-1;grid-row:2;justify-self:center;width:min(260px,100%)}}
+
+
+/* Links sociais no cabeçalho principal MORFY. */
+.header-brand-group{display:flex;align-items:center;gap:22px;min-width:0}
+.header-social{display:flex;align-items:center;gap:10px}
+.header-social-link{display:grid;place-items:center;width:34px;height:34px;border:1px solid #293442;border-radius:7px;background:#101720;color:#aeb9c8;transition:color .22s ease,border-color .22s ease,background .22s ease,box-shadow .22s ease,transform .22s ease}
+.header-social-link svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:inherit}
+.header-social-link:hover,.header-social-link:focus-visible{transform:translateY(-2px)}
+.header-social-link.social-whatsapp:hover,.header-social-link.social-whatsapp:focus-visible{color:#25d366;border-color:#25d366;background:#25d36612;box-shadow:0 0 9px #25d36688,0 0 22px #25d36645}
+.header-social-link.social-instagram:hover,.header-social-link.social-instagram:focus-visible{color:#fff;border-color:#e1306c;background:linear-gradient(135deg,#833ab4 0%,#e1306c 52%,#f77737 100%);box-shadow:0 0 9px #e1306c99,0 0 22px #c1358490}
+.header-social-link.social-instagram:hover svg,.header-social-link.social-instagram:focus-visible svg{stroke:#fff}
+.header-social-link.social-instagram svg .instagram-dot{fill:currentColor;stroke:none}
+.header-social-link.social-shopee:hover,.header-social-link.social-shopee:focus-visible{color:#ff6538;border-color:#ee4d2d;background:#ee4d2d12;box-shadow:0 0 9px #ee4d2d88,0 0 22px #ee4d2d45}
+@media(max-width:800px){
+  .header-brand-group{gap:14px}
+  .header-social{gap:7px}
+  .header-social-link{width:32px;height:32px}
+}
+@media(max-width:560px){
+  .header-inner{gap:10px}
+  .header-brand-group{gap:10px}
+  .morfy-logo{width:clamp(116px,34vw,160px);height:34px}
+  .header-social{gap:5px}
+  .header-social-link{width:29px;height:29px;border-radius:6px}
+  .header-social-link svg{width:16px;height:16px}
+}
+@media(prefers-reduced-motion:reduce){.header-social-link,.header-social-link svg{transition:none}}
