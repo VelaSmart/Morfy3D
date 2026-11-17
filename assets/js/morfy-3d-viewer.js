@@ -80,7 +80,7 @@ function frameModel(object) {
   controls.minDistance = 1.1;
   controls.maxDistance = 8;
   controls.update();
-  modelReadyAt = performance.now() / 1000;
+  modelReadyAt = animationClock.elapsedTime;
 }
 
 async function loadOriginalModel() {
