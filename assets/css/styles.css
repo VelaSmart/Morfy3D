@@ -791,3 +791,35 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   .header-social-link.social-shopee{width:29px;height:29px;border-radius:6px}
   .header-social-link.social-whatsapp svg{width:19px;height:19px}
 }
+
+
+/* WhatsApp: mesmo tamanho e contorno do Instagram, branco até receber hover. */
+.header-social-link.social-whatsapp{
+  width:34px;
+  height:34px;
+  border:1px solid #293442;
+  border-radius:7px;
+  background:#101720;
+  color:#f3f4f6;
+  box-shadow:none;
+}
+.header-social-link.social-whatsapp svg{
+  width:19px;
+  height:19px;
+  stroke:currentColor;
+  stroke-width:1.8;
+}
+.header-social-link.social-whatsapp:hover,
+.header-social-link.social-whatsapp:focus-visible{
+  color:#25d366;
+  border-color:#25d366;
+  background:#25d36612;
+  box-shadow:0 0 9px #25d36688,0 0 22px #25d36645;
+}
+@media(max-width:800px){
+  .header-social-link.social-whatsapp{width:32px;height:32px;border-radius:7px}
+}
+@media(max-width:560px){
+  .header-social-link.social-whatsapp{width:29px;height:29px;border-radius:6px}
+  .header-social-link.social-whatsapp svg{width:19px;height:19px}
+}
