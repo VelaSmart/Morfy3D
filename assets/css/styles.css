@@ -699,3 +699,46 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   .header-social-link.social-shopee img{width:20px;height:20px}
 }
 @media(prefers-reduced-motion:reduce){.header-social-link.social-shopee img{transition:none}}
+
+
+/* Aparência dos ícones sociais conforme as referências enviadas. */
+.header-social-link.social-whatsapp{
+  color:#20c96b;
+  border-color:transparent;
+  background:transparent;
+  box-shadow:none;
+}
+.header-social-link.social-whatsapp svg{
+  width:20px;
+  height:20px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.65;
+}
+.header-social-link.social-whatsapp:hover,
+.header-social-link.social-whatsapp:focus-visible{
+  color:#25d366;
+  border-color:transparent;
+  background:#25d3660d;
+  box-shadow:0 0 8px #25d36675,0 0 18px #25d36638;
+}
+.header-social-link.social-shopee{
+  border-color:transparent;
+  background:transparent;
+  box-shadow:none;
+}
+.header-social-link.social-shopee:hover,
+.header-social-link.social-shopee:focus-visible{
+  color:#ff6a2a;
+  border-color:transparent;
+  background:radial-gradient(ellipse at center,#ff6a2a35 0%,#ff6a2a18 42%,transparent 76%);
+  box-shadow:0 0 10px #ff6a2a88,0 0 22px #ff6a2a66,0 0 38px #ff6a2a38;
+}
+.header-social-link.social-shopee:hover img,
+.header-social-link.social-shopee:focus-visible img{
+  transform:scale(1.12);
+  filter:brightness(0) saturate(100%) invert(54%) sepia(93%) saturate(2110%) hue-rotate(342deg) brightness(103%) contrast(103%) drop-shadow(0 0 5px #ff6a2a) drop-shadow(0 0 12px #ff6a2a);
+}
+@media(max-width:560px){
+  .header-social-link.social-whatsapp svg{width:19px;height:19px}
+}
