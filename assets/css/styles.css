@@ -742,3 +742,52 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
 @media(max-width:560px){
   .header-social-link.social-whatsapp svg{width:19px;height:19px}
 }
+
+
+/* Alinhamento final dos três atalhos sociais no cabeçalho. */
+.header-social-link.social-whatsapp,
+.header-social-link.social-shopee{
+  width:68px;
+  height:68px;
+  border:1px solid #293442;
+  border-radius:15px;
+  background:#101720;
+}
+.header-social-link.social-whatsapp{
+  color:#20c96b;
+  box-shadow:none;
+}
+.header-social-link.social-whatsapp svg{
+  display:block;
+  width:25px;
+  height:25px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.header-social-link.social-whatsapp:hover,
+.header-social-link.social-whatsapp:focus-visible{
+  border-color:#25d366;
+  background:#25d36612;
+  box-shadow:0 0 9px #25d36688,0 0 22px #25d36645;
+}
+.header-social-link.social-shopee{
+  box-shadow:none;
+}
+.header-social-link.social-shopee:hover,
+.header-social-link.social-shopee:focus-visible{
+  border-color:#ff6a2a;
+  background:radial-gradient(ellipse at center,#ff6a2a35 0%,#ff6a2a18 42%,#101720 78%);
+  box-shadow:0 0 10px #ff6a2a88,0 0 22px #ff6a2a66,0 0 38px #ff6a2a38;
+}
+@media(max-width:800px){
+  .header-social-link.social-whatsapp,
+  .header-social-link.social-shopee{width:32px;height:32px;border-radius:7px}
+}
+@media(max-width:560px){
+  .header-social-link.social-whatsapp,
+  .header-social-link.social-shopee{width:29px;height:29px;border-radius:6px}
+  .header-social-link.social-whatsapp svg{width:19px;height:19px}
+}
