@@ -823,3 +823,24 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   .header-social-link.social-whatsapp{width:29px;height:29px;border-radius:6px}
   .header-social-link.social-whatsapp svg{width:19px;height:19px}
 }
+
+
+/* Shopee: contorno no mesmo tamanho do Instagram, preservando o halo laranja. */
+.header-social-link.social-shopee{
+  width:34px;
+  height:34px;
+  border:1px solid #293442;
+  border-radius:7px;
+  background:#101720;
+}
+.header-social-link.social-shopee img{
+  width:19px;
+  height:19px;
+}
+@media(max-width:800px){
+  .header-social-link.social-shopee{width:32px;height:32px;border-radius:7px}
+}
+@media(max-width:560px){
+  .header-social-link.social-shopee{width:29px;height:29px;border-radius:6px}
+  .header-social-link.social-shopee img{width:20px;height:20px}
+}
