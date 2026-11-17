@@ -27,6 +27,8 @@ controls.autoRotate = false;
 let autoSweepEnabled = !reducedMotion;
 let sweepDirection = -1;
 let isInteracting = false;
+let modelReadyAt = 0;
+const initialPoseHoldSeconds = 1.1;
 const sweepSpeed = THREE.MathUtils.degToRad(7);
 // Limita o giro horizontal a um arco total de 160 graus (80° para cada lado).
 // Mantém o lado esquerdo com o alcance atual e encurta o giro para a direita.
@@ -67,6 +69,7 @@ function frameModel(object) {
   object.scale.setScalar(2.15 / maxDimension);
   const distance = 2.15 * 2.45;
   // Posição inicial frontal, alinhada à referência enviada pelo usuário.
+  // Pose inicial fixa: Y centralizado, levemente visto de cima, como na referência enviada.
   camera.position.set(0, distance * 0.18, distance);
   camera.near = 0.01;
   camera.far = 100;
@@ -77,6 +80,7 @@ function frameModel(object) {
   controls.minDistance = 1.1;
   controls.maxDistance = 8;
   controls.update();
+  modelReadyAt = performance.now() / 1000;
 }
 
 async function loadOriginalModel() {
@@ -157,7 +161,7 @@ function animate() {
   animationFrame = requestAnimationFrame(animate);
   const delta = Math.min(animationClock.getDelta(), 0.05);
 
-  if (autoSweepEnabled && !isInteracting && modelRoot.children.length) {
+  if (autoSweepEnabled && !isInteracting && modelRoot.children.length && (animationClock.elapsedTime - modelReadyAt >= initialPoseHoldSeconds)) {
     const angle = controls.getAzimuthalAngle();
     const minAngle = controls.minAzimuthAngle;
     const maxAngle = controls.maxAzimuthAngle;
