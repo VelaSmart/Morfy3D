@@ -688,3 +688,14 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   .header-social-link svg{width:16px;height:16px}
 }
 @media(prefers-reduced-motion:reduce){.header-social-link,.header-social-link svg{transition:none}}
+
+
+/* Ajustes dos ícones sociais: WhatsApp redesenhado e logo Shopee oficial do catálogo. */
+.header-social-link.social-whatsapp svg{width:20px;height:20px;stroke-width:1.75}
+.header-social-link.social-shopee img{display:block;width:22px;height:22px;object-fit:contain;border-radius:2px;transition:transform .22s ease,filter .22s ease}
+.header-social-link.social-shopee:hover img,.header-social-link.social-shopee:focus-visible img{transform:scale(1.08);filter:drop-shadow(0 0 5px #ee4d2d99)}
+@media(max-width:560px){
+  .header-social-link.social-whatsapp svg{width:18px;height:18px}
+  .header-social-link.social-shopee img{width:20px;height:20px}
+}
+@media(prefers-reduced-motion:reduce){.header-social-link.social-shopee img{transition:none}}
