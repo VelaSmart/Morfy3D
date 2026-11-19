@@ -1,7 +1,7 @@
 {
-  "versao": "1.12.1",
+  "versao": "1.12.2",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "cadd21f828d5584b6e36f4e81f33c195da15ec3450843331ec9f531c01c7ea60",
-  "tamanho": 31241082,
-  "notas": "Canais extras agora ficam ao lado dos cartões DECKRA 1-4, com barra de rolagem para o lado. O atalho de teclado abre o DECKRA e, apertando de novo, minimiza. Novo: medidor de áudio na aba Microfone. \"Ouvir meu microfone\" desliga sozinho ao sair da aba Microfone. Correção: o DECKRA às vezes travava ao clicar em Sair e depois dizia \"já está aberto\". Procura atualização também ao abrir a janela e tenta de novo se a internet ainda não conectou."
+  "sha256": "dc97ca5e8e68f8cef3494d87a39f40099a239aab1027e5dcbe96d0bac767d2c4",
+  "tamanho": 31246594,
+  "notas": "Abrir o DECKRA quando ele já está aberto agora só traz a janela para a frente (sem a mensagem \"já está aberto\"). Correção: o DECKRA podia parar de responder ao controle e aos atalhos depois de um erro; agora ele continua funcionando. Correção: possível fechamento inesperado ao mostrar o mostrador na tela. Correção: um player de música travado não trava mais o DECKRA ao usar os botões de mídia. Título da aba Aplicativos não treme mais ao rolar os canais para o lado. Correção: o DECKRA ONE parava de funcionar depois de abrir alguns jogos; agora ele percebe e reconecta sozinho. Mostrador na tela aparece no monitor onde está o jogo ou a janela em uso, e volta para cima do jogo. Correção: ícone de jogos no mostrador aparecia só com a inicial; agora usa o ícone da janela do jogo quando preciso. Configurações: \"?\" ao lado de \"Mostrador na tela\" explica quando ele pode não aparecer em jogos."
 }

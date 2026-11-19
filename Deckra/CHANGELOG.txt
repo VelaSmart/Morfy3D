@@ -3,6 +3,29 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
+1.12.2 beta - 18/11/2026
+--------------------------------------------------------------------------
+Melhorias
+- Abrir o DECKRA quando ele já está aberto agora só traz a janela para a
+  frente (sem a mensagem "já está aberto").
+- Mostrador na tela aparece no monitor onde está o jogo ou a janela em uso
+  e volta para cima de jogos que ficam "sempre por cima".
+- "?" ao lado de "Mostrador na tela" (Configurações) explica que em jogos
+  em tela cheia exclusiva ele pode não aparecer (use "Janela sem bordas").
+- Título da aba Aplicativos não treme mais ao rolar os canais para o lado.
+
+Correções
+- O DECKRA ONE parava de funcionar depois de abrir alguns jogos; agora o
+  DECKRA percebe e reconecta sozinho.
+- Ícone de jogos no mostrador aparecia só com a inicial do nome; agora usa o
+  ícone da janela do jogo quando o arquivo dele não pode ser lido.
+- O DECKRA podia parar de responder ao controle e aos atalhos depois de um
+  erro interno; agora ele continua funcionando.
+- Possível fechamento inesperado ao mostrar o mostrador na tela.
+- Um player de música travado não trava mais o DECKRA ao usar os botões de
+  mídia.
+
+
 1.12.1 beta - 13/11/2026
 --------------------------------------------------------------------------
 Novidades
