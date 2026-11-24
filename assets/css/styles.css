@@ -844,3 +844,44 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   .header-social-link.social-shopee{width:29px;height:29px;border-radius:6px}
   .header-social-link.social-shopee img{width:20px;height:20px}
 }
+
+
+/* Hover consistente dos atalhos sociais MORFY: Instagram glow e Shopee somente laranja. */
+.header-social-link.social-instagram{
+  color:#f3f4f6;
+  border-color:#293442;
+  background:#101720;
+  box-shadow:none;
+}
+.header-social-link.social-instagram:hover,
+.header-social-link.social-instagram:focus-visible{
+  color:#fff;
+  border-color:#e1306c;
+  background:linear-gradient(135deg,#833ab412 0%,#e1306c18 52%,#f7773712 100%);
+  box-shadow:0 0 9px #e1306c88,0 0 22px #c1358490;
+}
+.header-social-link.social-instagram:hover svg,
+.header-social-link.social-instagram:focus-visible svg{stroke:#fff}
+.header-social-link.social-shopee img{
+  animation:none!important;
+  transition:filter .22s ease,transform .22s ease!important;
+  filter:none!important;
+}
+.header-social-link.social-shopee:hover,
+.header-social-link.social-shopee:focus-visible{
+  color:#ff6a2a;
+  border-color:#ff6a2a;
+  background:#ff6a2a12;
+  box-shadow:0 0 9px #ff6a2a88,0 0 22px #ff6a2a45!important;
+  animation:none!important;
+}
+.header-social-link.social-shopee:hover img,
+.header-social-link.social-shopee:focus-visible img{
+  animation:none!important;
+  transform:scale(1.08);
+  filter:brightness(0) saturate(100%) invert(54%) sepia(93%) saturate(2110%) hue-rotate(342deg) brightness(103%) contrast(103%) drop-shadow(0 0 5px #ff6a2a)!important;
+}
+@media(prefers-reduced-motion:reduce){
+  .header-social-link.social-instagram,.header-social-link.social-instagram svg,
+  .header-social-link.social-shopee,.header-social-link.social-shopee img{transition:none!important}
+}
