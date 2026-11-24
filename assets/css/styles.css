@@ -885,3 +885,28 @@ img{-webkit-user-drag:none;user-select:none;-webkit-user-select:none}
   .header-social-link.social-instagram,.header-social-link.social-instagram svg,
   .header-social-link.social-shopee,.header-social-link.social-shopee img{transition:none!important}
 }
+
+
+/* Correção visual definitiva: brilho também no traço do Instagram e Shopee em laranja. */
+.header-social-link.social-instagram:is(:hover,:focus-visible) svg{
+  filter:drop-shadow(0 0 3px #e1306c)
+       drop-shadow(0 0 6px #e1306c)
+       drop-shadow(0 0 10px #c1358490)!important;
+}
+.header-social-link.social-instagram:is(:hover,:focus-visible) svg rect,
+.header-social-link.social-instagram:is(:hover,:focus-visible) svg circle{
+  stroke:#fff!important;
+}
+.header-social-link.social-shopee img{
+  filter:none!important;
+  opacity:1!important;
+}
+.header-social-link.social-shopee:is(:hover,:focus-visible){
+  border-color:#ff6a2a!important;
+  background:#ff6a2a12!important;
+  box-shadow:0 0 8px #ff6a2a88,0 0 18px #ff6a2a45!important;
+}
+.header-social-link.social-shopee:is(:hover,:focus-visible) img{
+  transform:scale(1.08)!important;
+  filter:brightness(0) saturate(100%) invert(52%) sepia(96%) saturate(1930%) hue-rotate(342deg) brightness(105%) contrast(104%) drop-shadow(0 0 3px #ff6a2a) drop-shadow(0 0 7px #ff6a2a)!important;
+}
