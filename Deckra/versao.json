@@ -1,7 +1,7 @@
 {
-  "versao": "1.12.2",
+  "versao": "1.12.4",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "dc97ca5e8e68f8cef3494d87a39f40099a239aab1027e5dcbe96d0bac767d2c4",
-  "tamanho": 31246594,
-  "notas": "Abrir o DECKRA quando ele já está aberto agora só traz a janela para a frente (sem a mensagem \"já está aberto\"). Correção: o DECKRA podia parar de responder ao controle e aos atalhos depois de um erro; agora ele continua funcionando. Correção: possível fechamento inesperado ao mostrar o mostrador na tela. Correção: um player de música travado não trava mais o DECKRA ao usar os botões de mídia. Título da aba Aplicativos não treme mais ao rolar os canais para o lado. Correção: o DECKRA ONE parava de funcionar depois de abrir alguns jogos; agora ele percebe e reconecta sozinho. Mostrador na tela aparece no monitor onde está o jogo ou a janela em uso, e volta para cima do jogo. Correção: ícone de jogos no mostrador aparecia só com a inicial; agora usa o ícone da janela do jogo quando preciso. Configurações: \"?\" ao lado de \"Mostrador na tela\" explica quando ele pode não aparecer em jogos."
+  "sha256": "a78541fe579a0e8400eaa6f42919a485d50dee5cb73eb18f46b6228289e17a3d",
+  "tamanho": 31265637,
+  "notas": "Tela cheia: nova opção \"Usar em tela cheia\" em Configurações (ou F11). As abas ocupam a tela toda, sem cobrir a barra de tarefas. Mais leve: o DECKRA gasta bem menos processador, principalmente parado perto do relógio, e responde na hora ao DECKRA ONE. Roda do mouse mais suave, no volume e na rolagem das páginas. Equalizador: avisa quando o Equalizer APO não está ativado na saída de som em uso, com botão \"Abrir Configurator\". Potenciômetros do DECKRA ONE com o giro invertido: girar para a direita aumenta o volume. Correções: nomes inteiros nas caixas de seleção, chave desligada no tema claro, e o \"Escutar este dispositivo\" do Windows não é mais desligado sozinho."
 }
