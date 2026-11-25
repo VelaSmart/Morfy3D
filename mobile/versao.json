@@ -1,8 +1,8 @@
 {
-  "versao": "0.2.0",
-  "versionCode": 30,
+  "versao": "0.3.0",
+  "versionCode": 31,
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/mobile/DECKRA-Mobile.apk",
-  "sha256": "b3d413438b2bf9b2804c3c4be604c7ee63c3ef6e33beec7e085f8d725ce8d787",
-  "tamanho": 2330364,
-  "notas": "Novo visual: o DECKRA Mobile agora é igual ao DECKRA APP do PC, com Início, Aplicativos (DECKRA 1 a 4), Microfone, Equalizador e Configurações. Precisa do DECKRA APP 1.12.7 ou mais novo no PC. Atualizações agora chegam pelo próprio app."
+  "sha256": "8823ec7bf5fe6aaf8c4304b747d2a245c0d46c9994f5445464c9170aa2f485da",
+  "tamanho": 2338196,
+  "notas": "Início: o cartão Mídia mostra o que está tocando no PC, com a barrinha de tempo para adiantar ou voltar. Aplicativos: segure um cartão e arraste para trocar canais de lugar. Configurações: novo \"Controle de volume\" (Círculo ou Deslizante). O PIN só é pedido na primeira vez; depois o celular conecta sozinho, até você tocar em Desconectar. Precisa do DECKRA APP 1.13.0 no PC."
 }
