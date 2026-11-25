@@ -1,7 +1,7 @@
 {
-  "versao": "1.12.8",
+  "versao": "1.12.9",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "b90c6de6a3ea9052c496b134f07c6edef51ebfbdd47718e8705369fd88b01e35",
-  "tamanho": 31301348,
-  "notas": "Janela com qualquer tamanho: arraste a borda ou maximize; numa janela grande aparecem mais coisas (mais cartões lado a lado). Saiu a opção \"Usar em tela cheia\" e o F11. Aplicativos: arraste um cartão para trocar canais de lugar (DECKRA 1 a 4 e extras). Nova opção \"Controle de volume\" em Configurações: Círculo ou Deslizante (potenciômetro com o medidor de áudio ao lado)."
+  "sha256": "d67bfa420e99badf75a7ee78efcaf3ff826b695ce00c890a2ace87071fea9202",
+  "tamanho": 31312533,
+  "notas": "Início: o cartão do Equalizador deu lugar ao cartão Mídia, com o que está tocando agora (título, artista, botões) e a barrinha de tempo: clique ou arraste para adiantar ou voltar a música/vídeo. Maximizar a janela não trava mais. Aplicativos: o cartão inteiro acompanha o mouse ao trocar canais de lugar. O mostrador na tela não aparece mais ao escolher um aplicativo na lista."
 }
