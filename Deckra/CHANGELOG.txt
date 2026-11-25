@@ -3,6 +3,14 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
+1.12.7 beta - 24/11/2026
+--------------------------------------------------------------------------
+Novidades
+- DECKRA Mobile (acesso antecipado): o app do celular agora é igual ao
+  DECKRA APP, com os canais DECKRA 1 a 4, os aplicativos, o microfone e o
+  equalizador. Precisa do DECKRA Mobile 0.2.0 ou mais novo no celular.
+
+
 1.12.6 beta - 24/11/2026
 --------------------------------------------------------------------------
 Novidades
