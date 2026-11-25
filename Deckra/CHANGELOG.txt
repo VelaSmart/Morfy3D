@@ -3,6 +3,24 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
+1.12.8 beta - 25/11/2026
+--------------------------------------------------------------------------
+Novidades
+- A janela agora pode ter qualquer tamanho: arraste a borda ou maximize.
+  Numa janela grande aparecem mais coisas (mais cartões lado a lado) em
+  vez de tudo ficar maior. O tamanho fica salvo para a próxima vez.
+- Aplicativos: arraste um cartão e solte em cima de outro para trocar os
+  canais de lugar (DECKRA 1 a 4 e os extras), com o aplicativo e o mudo.
+- Configurações: nova opção "Controle de volume", com Círculo ou
+  Deslizante (potenciômetro que sobe e desce, com o medidor de áudio ao
+  lado e o volume embaixo).
+
+Melhorias
+- Saiu a opção "Usar em tela cheia" e o F11: agora é só maximizar.
+- Canais extras: as setinhas para mudar a ordem saíram (agora é
+  arrastando).
+
+
 1.12.7 beta - 24/11/2026
 --------------------------------------------------------------------------
 Novidades
