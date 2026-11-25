@@ -1,7 +1,7 @@
 {
-  "versao": "1.12.6",
+  "versao": "1.12.7",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "b64cb60a94bd70749d63ed5dbb38aa0f97c004910118b31dd145a85a354edc88",
-  "tamanho": 31278988,
-  "notas": "Equalizador: o botão \"Ativar nesta saída\" agora abre o Device Selector do Equalizer APO (nas versões novas, o antigo Configurator mudou de nome). Tema claro: os círculos de volume ficaram lisos, sem bordas serrilhadas. A barra lateral mostra o nome do aparelho só quando ele conecta; enquanto isso, \"Procurando o controle…\". DECKRA Mobile (acesso antecipado): nova opção em Configurações para conectar o celular pela rede Wi-Fi. Vem desligada e ainda não está disponível para todos."
+  "sha256": "454008452e9433ccf017ffdff1e442ff962590793ca68fece70a1fd0186d74df",
+  "tamanho": 31289462,
+  "notas": "DECKRA Mobile (acesso antecipado): o app do celular agora é igual ao DECKRA APP, com canais, aplicativos, microfone e equalizador. Precisa do DECKRA Mobile 0.2.0 ou mais novo no celular."
 }
