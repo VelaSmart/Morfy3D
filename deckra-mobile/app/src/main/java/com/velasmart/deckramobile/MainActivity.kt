@@ -3,665 +3,1166 @@ package com.velasmart.deckramobile
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.BlurMaskFilter
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
+import android.graphics.Shader
+import android.graphics.SweepGradient
+import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
-import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
+import android.text.InputType
+import android.text.TextUtils
+import android.util.Base64
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.FileProvider
 import okhttp3.*
-import org.json.JSONObject
 import org.json.JSONArray
+import org.json.JSONObject
 import java.io.File
 import java.net.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.log10
+import kotlin.math.min
+import kotlin.math.sin
 
+/**
+ * DECKRA Mobile: um clone do DECKRA APP do PC no celular. As mesmas abas (Início, Aplicativos,
+ * Microfone, Equalizador, Configurações), os mesmos canais DECKRA 1 a 4 e o mesmo visual. Conversa
+ * pelo Wi-Fi com o DECKRA APP (Configurações › DECKRA Mobile), que manda o estado de tudo.
+ */
 class MainActivity : Activity() {
+    // ---------- conexão ----------
     private val client = OkHttpClient.Builder().pingInterval(20, TimeUnit.SECONDS).build()
     private var socket: WebSocket? = null
     private var host = ""
     private var paired = false
-    private var currentPage = "Início"
+    private var deckra: JSONObject? = null           // estado completo do DECKRA APP (protocolo 3)
+    private var antigo = false                       // conectado a um PC sem o protocolo 3
+    private var statusText = "Não conectado"
+    private var statusColor = 0
+    private val handler = Handler(Looper.getMainLooper())
+    private val poll = object : Runnable {
+        override fun run() {
+            if (paired) { send("get_deckra", silencioso = true); handler.postDelayed(this, 450) }
+        }
+    }
+    private val icones = mutableMapOf<String, Bitmap?>()
+
+    // ---------- tela ----------
+    private var page = "inicio"
     private var themeMode = "system"
+    private var light = false
     private lateinit var root: LinearLayout
+    private lateinit var sidebar: LinearLayout
+    private lateinit var nav: LinearLayout
+    private lateinit var statusDot: View
+    private lateinit var statusLabel: TextView
     private lateinit var content: LinearLayout
-    private lateinit var pageScroll: ScrollView
-    private val audioMeters = mutableMapOf<Int, AudioActivityIndicatorView>()
-    private val audioHandler = Handler(Looper.getMainLooper())
-    private val audioPoll = object : Runnable { override fun run() { if (paired && currentPage == "Início") { send("get_state"); audioHandler.postDelayed(this, 350) } } }
+    private lateinit var scroll: ScrollView
+    private var hostInput: EditText? = null
+    private var pinInput: EditText? = null
+    private var updateButton: TextView? = null
     private var awaitingInstallPermission = false
-    private lateinit var status: TextView
-    private lateinit var pin: EditText
-    private lateinit var hostInput: EditText
-    private lateinit var updateButton: Button
-    private lateinit var navBar: LinearLayout
-    private lateinit var connectionPanel: LinearLayout
-    private var latestState: JSONObject? = null
-    private var bg = Color.rgb(14,15,24)
-    private var surface = Color.rgb(16,18,27)
-    private var panel = Color.rgb(23,25,39)
-    private var card = Color.rgb(18,20,29)
-    private var stroke = Color.rgb(43,45,61)
-    private var primaryText = Color.rgb(241,241,248)
-    private var secondaryText = Color.rgb(157,160,184)
-    private var purple = Color.rgb(137,101,255)
-    private var muted = Color.rgb(157,160,184)
-    private var isLightTheme = false
+    private var assinatura = ""                       // muda quando a estrutura da tela precisa ser refeita
+    private val atualizadores = mutableListOf<(JSONObject) -> Unit>()
+
+    // ---------- cores (as mesmas do DECKRA APP) ----------
+    private var cFundo = 0; private var cLateral = 0; private var cPainel = 0; private var cBorda = 0
+    private var cTexto = 0; private var cSuave = 0; private var cFraco = 0; private var cSelecao = 0
+    private var cDisco = 0; private var cTrilho = 0; private var cBotaoTopo = 0; private var cBotaoBase = 0
+    private var cBotaoBorda = 0; private var cMarca = 0; private var cCampo = 0
+    private val cRoxo = Color.rgb(140, 107, 255)
+    private val cRoxoClaro = Color.rgb(165, 140, 255)
+    private val cAzul = Color.rgb(61, 123, 255)
+    private val cRoxoArco = Color.rgb(140, 82, 255)
+    private val cOk = Color.rgb(92, 201, 138)
+    private val cMudo = Color.rgb(255, 107, 129)
+    private val cAlerta = Color.rgb(224, 168, 74)
+
+    private val d get() = resources.displayMetrics.density
+    private fun dp(v: Float) = (v * d).toInt()
+    private fun dp(v: Int) = (v * d).toInt()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        loadThemePreference()
+        val prefs = getSharedPreferences("deckra_preferences", Context.MODE_PRIVATE)
+        themeMode = prefs.getString("theme_mode", "system") ?: "system"
+        host = prefs.getString("last_host", "") ?: ""
         applyTheme()
         buildShell()
         renderPage()
+        handler.postDelayed({ checkForUpdates(manual = false) }, 2500)
     }
 
+    // =====================================================================
+    //  Tema
+    // =====================================================================
+    private fun applyTheme() {
+        val night = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+            android.content.res.Configuration.UI_MODE_NIGHT_YES
+        light = when (themeMode) { "light" -> true; "dark" -> false; else -> !night }
+        if (light) {
+            cFundo = Color.rgb(238, 239, 249); cLateral = Color.rgb(232, 233, 246); cPainel = Color.rgb(246, 246, 255)
+            cBorda = Color.rgb(214, 216, 236); cTexto = Color.rgb(28, 29, 44); cSuave = Color.rgb(96, 98, 122)
+            cFraco = Color.rgb(140, 142, 166); cSelecao = Color.rgb(221, 212, 255); cDisco = Color.rgb(232, 233, 246)
+            cTrilho = Color.rgb(214, 216, 236); cBotaoTopo = Color.rgb(250, 250, 255); cBotaoBase = Color.rgb(226, 227, 242)
+            cBotaoBorda = Color.rgb(190, 192, 214); cMarca = Color.rgb(36, 37, 56); cCampo = Color.rgb(240, 240, 252)
+        } else {
+            cFundo = Color.rgb(15, 15, 25); cLateral = Color.rgb(18, 18, 30); cPainel = Color.rgb(22, 23, 37)
+            cBorda = Color.rgb(38, 40, 62); cTexto = Color.rgb(236, 236, 244); cSuave = Color.rgb(139, 141, 166)
+            cFraco = Color.rgb(92, 94, 120); cSelecao = Color.rgb(40, 32, 84); cDisco = Color.rgb(19, 20, 33)
+            cTrilho = Color.rgb(38, 40, 64); cBotaoTopo = Color.rgb(44, 45, 66); cBotaoBase = Color.rgb(21, 22, 35)
+            cBotaoBorda = Color.rgb(62, 64, 92); cMarca = Color.rgb(235, 236, 248); cCampo = Color.rgb(27, 28, 44)
+        }
+        statusColor = cAlerta
+        window.statusBarColor = cFundo
+        window.navigationBarColor = cFundo
+    }
+
+    // =====================================================================
+    //  Estrutura: menu lateral + página (igual ao DECKRA APP)
+    // =====================================================================
     private fun buildShell() {
-        val d=resources.displayMetrics.density
-        root=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setBackgroundColor(bg); setPadding((4*d).toInt(),(4*d).toInt(),(4*d).toInt(),(4*d).toInt()) }
-        val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((12*d).toInt(),0,(10*d).toInt(),0); background=rounded(surface,9,stroke) }
-        val logo=ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType=ImageView.ScaleType.FIT_CENTER; adjustViewBounds=true; contentDescription="DECKRA" }
-        header.addView(logo,LinearLayout.LayoutParams((82*d).toInt(),(34*d).toInt()))
-        val divider=View(this).apply { setBackgroundColor(Color.rgb(65,65,81)) }
-        header.addView(divider,LinearLayout.LayoutParams((1*d).toInt(),(24*d).toInt()).apply { leftMargin=(12*d).toInt(); rightMargin=(12*d).toInt() })
-        header.addView(label("CONTROL CENTER",8,muted),LinearLayout.LayoutParams(0,-2,1f))
-        status=label("●  PC NÃO CONECTADO",10,Color.rgb(255,190,80))
-        header.addView(status)
-        val toggle=action("CONECTAR") { connectionPanel.visibility=if(connectionPanel.visibility==View.VISIBLE) View.GONE else View.VISIBLE }
-        header.addView(toggle,LinearLayout.LayoutParams((72*d).toInt(),(32*d).toInt()).apply { leftMargin=(8*d).toInt() })
-        root.addView(header,LinearLayout.LayoutParams(-1,(44*d).toInt()))
-        connectionPanel=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((8*d).toInt(),(3*d).toInt(),(8*d).toInt(),(3*d).toInt()); background=rounded(surface,9,stroke); visibility=View.GONE }
-        hostInput=EditText(this).apply { hint="IP do PC"; setTextColor(primaryText); setHintTextColor(secondaryText); inputType=android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI; setSingleLine(true); textSize=12f }
-        connectionPanel.addView(hostInput,LinearLayout.LayoutParams(0,(40*d).toInt(),1f))
-        pin=EditText(this).apply { hint="PIN de 6 dígitos"; setTextColor(Color.WHITE); setHintTextColor(muted); inputType=2; setSingleLine(true); textSize=12f }
-        connectionPanel.addView(pin,LinearLayout.LayoutParams(0,(40*d).toInt(),1f).apply { leftMargin=(7*d).toInt() })
-        connectionPanel.addView(action("PROCURAR") { discoverPc() },LinearLayout.LayoutParams((82*d).toInt(),(34*d).toInt()).apply { leftMargin=(7*d).toInt() })
-        connectionPanel.addView(action("PAREAR") { connectPc() },LinearLayout.LayoutParams((82*d).toInt(),(34*d).toInt()).apply { leftMargin=(5*d).toInt() })
-        root.addView(connectionPanel,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(5*d).toInt() })
-        val body=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL }
-        val sidebar=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((3*d).toInt(),(8*d).toInt(),(3*d).toInt(),(4*d).toInt()); background=rounded(surface,9,stroke) }
-        navBar=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
-        sidebar.addView(navBar,LinearLayout.LayoutParams(-1,0,1f))
-        sidebar.addView(label("DECKRA MOBILE",8,muted).apply { gravity=Gravity.CENTER })
-        body.addView(sidebar,LinearLayout.LayoutParams((94*d).toInt(),-1).apply { rightMargin=(8*d).toInt() })
-        val pageFrame=FrameLayout(this).apply { clipChildren=true; clipToPadding=true }
-        content=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((5*d).toInt(),(7*d).toInt(),(5*d).toInt(),(5*d).toInt()) }
-        pageScroll=ScrollView(this).apply { isFillViewport=true; isVerticalScrollBarEnabled=false; overScrollMode=View.OVER_SCROLL_NEVER }
-        pageScroll.addView(content,FrameLayout.LayoutParams(-1,-1))
-        pageFrame.addView(pageScroll,FrameLayout.LayoutParams(-1,-1))
-        body.addView(pageFrame,LinearLayout.LayoutParams(0,-1,1f))
-        root.addView(body,LinearLayout.LayoutParams(-1,0,1f).apply { topMargin=(7*d).toInt() })
-        renderNavigation()
+        root = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setBackgroundColor(cFundo) }
+        sidebar = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL; setBackgroundColor(cLateral); setPadding(dp(12), dp(14), dp(12), dp(12))
+        }
+        val marca = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        marca.addView(ImageView(this).apply {
+            setImageResource(R.drawable.deckra_logo); scaleType = ImageView.ScaleType.FIT_CENTER; adjustViewBounds = true
+        }, LinearLayout.LayoutParams(dp(26), dp(26)))
+        marca.addView(text("D E C K R A", 13f, cTexto, bold = true).apply { letterSpacing = 0.12f },
+            LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(10) })
+        sidebar.addView(marca, LinearLayout.LayoutParams(-1, dp(36)))
+        sidebar.addView(View(this).apply { setBackgroundColor(cBorda) },
+            LinearLayout.LayoutParams(-1, dp(1)).apply { topMargin = dp(10); bottomMargin = dp(10) })
+        nav = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        sidebar.addView(nav, LinearLayout.LayoutParams(-1, 0, 1f))
+        sidebar.addView(View(this).apply { setBackgroundColor(cBorda) },
+            LinearLayout.LayoutParams(-1, dp(1)).apply { bottomMargin = dp(8) })
+        val linhaStatus = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        statusDot = View(this).apply { background = oval(statusColor) }
+        linhaStatus.addView(statusDot, LinearLayout.LayoutParams(dp(8), dp(8)))
+        statusLabel = text(statusText, 11f, cTexto).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        linhaStatus.addView(statusLabel, LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(8) })
+        sidebar.addView(linhaStatus)
+        sidebar.addView(text("v${versionName()} beta · Morfy3D", 10f, cFraco), LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(4) })
+        root.addView(sidebar, LinearLayout.LayoutParams(dp(178), -1))
+        scroll = ScrollView(this).apply { isFillViewport = true; overScrollMode = View.OVER_SCROLL_NEVER; isVerticalScrollBarEnabled = false }
+        content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(22), dp(16), dp(22), dp(18)) }
+        scroll.addView(content, FrameLayout.LayoutParams(-1, -2))
+        root.addView(scroll, LinearLayout.LayoutParams(0, -1, 1f))
         setContentView(root)
+        renderNav()
     }
 
+    private val pages = listOf("inicio" to ("⌂" to "Início"), "apps" to ("☰" to "Aplicativos"),
+        "mic" to ("◉" to "Microfone"), "eq" to ("♫" to "Equalizador"), "ajustes" to ("⚙" to "Configurações"))
+
+    private fun renderNav() {
+        nav.removeAllViews()
+        for ((chave, par) in pages) {
+            val sel = chave == page
+            val item = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL; setPadding(dp(12), 0, dp(8), 0)
+                background = if (sel) rounded(cSelecao, 10, cRoxo) else null
+                isClickable = true
+                setOnClickListener { if (page != chave) { page = chave; renderNav(); renderPage() } }
+            }
+            item.addView(text(par.first, 16f, if (sel) cRoxoClaro else cSuave).apply { gravity = Gravity.CENTER },
+                LinearLayout.LayoutParams(dp(22), -2))
+            item.addView(text(par.second, 13f, if (sel) cTexto else cSuave), LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(10) })
+            nav.addView(item, LinearLayout.LayoutParams(-1, dp(40)).apply { bottomMargin = dp(5) })
+        }
+    }
+
+    private fun setStatus(texto: String, cor: Int) {
+        statusText = texto; statusColor = cor
+        statusLabel.text = texto
+        statusDot.background = oval(cor)
+    }
+
+    // =====================================================================
+    //  Páginas: cada uma monta a estrutura e registra "atualizadores" que pintam os valores
+    // =====================================================================
     private fun renderPage() {
         content.removeAllViews()
-        audioMeters.clear()
-        val d=resources.displayMetrics.density
-        pageScroll.isVerticalScrollBarEnabled = currentPage != "Início"
-        content.layoutParams = content.layoutParams.apply { height = if(currentPage == "Início") ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT }
-        pageScroll.scrollTo(0,0)
-        refreshAudioPolling()
-        if(currentPage!="Início") content.addView(label(currentPage,23,primaryText).apply { typeface=android.graphics.Typeface.DEFAULT_BOLD })
-        when(currentPage) {
-            "Início" -> renderHome(d)
-            "Aplicativos" -> renderApplications(d)
-            "Microfone" -> renderMicrophone(d)
-            "Teclas" -> renderKeys(d)
-            else -> renderSettings(d)
+        atualizadores.clear()
+        hostInput = null; pinInput = null; updateButton = null
+        assinatura = estrutura(deckra)
+        scroll.scrollTo(0, 0)
+        when (page) {
+            "inicio" -> renderHome()
+            "apps" -> renderApps()
+            "mic" -> renderMic()
+            "eq" -> renderEq()
+            else -> renderSettings()
         }
+        deckra?.let { s -> atualizadores.forEach { it(s) } }
+        refreshPolling()
     }
 
-    private fun renderHome(d:Float) {
-        val apps=latestState?.optJSONArray("applications") ?: JSONArray()
-        val channels=createCard("♫","Canais de áudio",d)
-        channels.first.getChildAt(0).layoutParams=channels.first.getChildAt(0).layoutParams.apply { height=(34*d).toInt() }
-        channels.second.setPadding((7*d).toInt(),(3*d).toInt(),(7*d).toInt(),(4*d).toInt())
-        channels.second.layoutParams = LinearLayout.LayoutParams(-1,0,1f)
-        channels.second.addView(label("Controle individual dos aplicativos ativos",9,secondaryText))
-        if(apps.length()==0) {
-            channels.second.addView(label("Nenhum aplicativo com áudio ativo. Abra um programa no PC para controlá-lo aqui.",11,secondaryText))
-        } else {
-            val rows=(apps.length()+3)/4
-            val grid=GridLayout(this).apply { columnCount=4; rowCount=rows; useDefaultMargins=false }
-            grid.layoutParams=LinearLayout.LayoutParams(-1,0,1f)
-            for(i in 0 until apps.length()) {
-                val app=apps.optJSONObject(i) ?: continue
-                val tile=LinearLayout(this).apply {
-                    orientation=LinearLayout.VERTICAL
-                    gravity=Gravity.CENTER
-                    setPadding((4*d).toInt(),(3*d).toInt(),(4*d).toInt(),(3*d).toInt())
-                    background=rounded(surface,10,stroke)
-                }
-                val initial=(app.optDouble("volume",1.0)*100).toInt().coerceIn(0,100)
-                val pid=app.optInt("processId")
-                val meter=AudioActivityIndicatorView(this,app.optDouble("level",0.0).toFloat())
-                audioMeters[pid]=meter
-                tile.addView(meter,LinearLayout.LayoutParams((74*d).toInt(),(27*d).toInt()))
-                tile.addView(RotaryDialView(this,initial) { volume ->
-                    send("set_app_volume",JSONObject().put("processId",pid).put("value",volume/100f))
-                },LinearLayout.LayoutParams((74*d).toInt(),(74*d).toInt()))
-                tile.addView(label(app.optString("name","Aplicativo"),10,primaryText).apply {
-                    gravity=Gravity.CENTER
-                    maxLines=1
-                    ellipsize=android.text.TextUtils.TruncateAt.END
-                },LinearLayout.LayoutParams(-1,-2).apply { topMargin=(2*d).toInt() })
-                tile.addView(action(if(app.optBoolean("mute")) "ATIVAR SOM" else "MUTAR") {
-                    send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute")))
-                }.apply { textSize=9f; minHeight=(23*d).toInt(); setPadding(2,0,2,0) },
-                    LinearLayout.LayoutParams(-1,(23*d).toInt()).apply { topMargin=(2*d).toInt() })
-                grid.addView(tile,GridLayout.LayoutParams().apply {
-                    width=0
-                    height=0
-                    columnSpec=GridLayout.spec(GridLayout.UNDEFINED,1f)
-                    rowSpec=GridLayout.spec(GridLayout.UNDEFINED,1f)
-                    setMargins((3*d).toInt(),(3*d).toInt(),(3*d).toInt(),(3*d).toInt())
-                })
-            }
-            channels.second.addView(grid)
-        }
-        content.addView(channels.first,LinearLayout.LayoutParams(-1,-1))
+    /** O que muda a estrutura da tela (quais canais e aplicativos existem). */
+    private fun estrutura(s: JSONObject?): String {
+        val canais = s?.optJSONArray("canais") ?: return "-"
+        return (0 until canais.length()).joinToString(",") { canais.optJSONObject(it)?.optString("alvo") ?: "" }
     }
 
-    private fun renderApplications(d:Float) {
-        val apps=latestState?.optJSONArray("applications") ?: JSONArray()
-        if(apps.length()==0) content.addView(label("Nenhum aplicativo com áudio ativo.",11,secondaryText))
-        for(i in 0 until apps.length()) {
-            val app=apps.optJSONObject(i) ?: continue
-            val item=createCard("♫",app.optString("name","Aplicativo"),d)
-            val volume=(app.optDouble("volume",1.0)*100).toInt().coerceIn(0,100)
-            item.second.addView(RotaryDialView(this,volume) { value ->
-                send("set_app_volume",JSONObject().put("processId",app.optInt("processId")).put("value",value/100f))
-            },LinearLayout.LayoutParams((88*d).toInt(),(88*d).toInt()).apply { gravity=Gravity.CENTER_HORIZONTAL })
-            item.second.addView(action(if(app.optBoolean("mute")) "ATIVAR SOM" else "SILENCIAR") {
-                send("set_app_mute",JSONObject().put("processId",app.optInt("processId")).put("value",!app.optBoolean("mute")))
-            })
-            content.addView(item.first,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(5*d).toInt() })
-        }
-        content.addView(action("ATUALIZAR LISTA") { send("get_state") })
+    private fun aoReceberEstado(s: JSONObject) {
+        deckra = s
+        if (estrutura(s) != assinatura) renderPage() else atualizadores.forEach { it(s) }
+        val controle = s.optString("controle").takeIf { it.isNotBlank() && it != "null" }
+        setStatus("PC conectado", cOk)
+        statusLabel.text = if (controle != null) "PC · $controle" else "PC conectado"
     }
 
-    private fun renderMicrophone(d:Float) {
-        val mic=latestState?.optJSONObject("microphone")
-        val item=createCard("♩","Entrada de áudio",d)
-        item.second.addView(label(mic?.optString("name") ?: "Microfone não identificado",11,secondaryText))
-        val volume=((mic?.optDouble("volume",0.0) ?: 0.0)*100).toInt().coerceIn(0,100)
-        item.second.addView(RotaryDialView(this,volume) { value ->
-            send("set_mic_volume",JSONObject().put("value",value/100f))
-        },LinearLayout.LayoutParams((100*d).toInt(),(100*d).toInt()).apply { gravity=Gravity.CENTER_HORIZONTAL })
-        item.second.addView(action(if(mic?.optBoolean("mute")==true) "ATIVAR MICROFONE" else "SILENCIAR MICROFONE") {
-            send("set_mic_mute",JSONObject().put("value",mic?.optBoolean("mute")!=true))
+    private fun header(titulo: String, subtitulo: String) {
+        content.addView(text(titulo, 24f, cTexto, bold = true))
+        content.addView(text(subtitulo, 12f, cSuave), LinearLayout.LayoutParams(-2, -2).apply { bottomMargin = dp(12) })
+    }
+
+    /** Sem conexão (ou PC antigo): mostra como conectar e para por aí. */
+    private fun precisaConexao(): Boolean {
+        avisoAtualizacao()?.let { content.addView(it, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) }) }
+        if (!paired) { content.addView(connectCard(compacto = true)); return true }
+        if (antigo) {
+            val c = card("↻", "Atualize o DECKRA APP do PC")
+            c.second.addView(text("Este celular é um clone do DECKRA APP e precisa da versão 1.12.7 ou mais nova no PC. " +
+                "Abra o DECKRA no PC › Configurações › Atualizações.", 12f, cSuave))
+            content.addView(c.first); return true
+        }
+        if (deckra == null) { content.addView(text("Carregando…", 13f, cSuave)); return true }
+        return false
+    }
+
+    private fun canais(): List<JSONObject> {
+        val arr = deckra?.optJSONArray("canais") ?: return emptyList()
+        return (0 until arr.length()).mapNotNull { arr.optJSONObject(it) }
+    }
+
+    // ---------- Início ----------
+    private fun renderHome() {
+        header("Início", "Tudo do seu DECKRA em um só lugar.")
+        if (precisaConexao()) return
+        // Canais (os 4 do DECKRA)
+        val c = card("🔊", "Canais", link = "Escolher aplicativos  ›") { page = "apps"; renderNav(); renderPage() }
+        val linha = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        for (canal in canais().take(4)) {
+            val i = canal.optInt("indice")
+            val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL }
+            val dial = DialView(this).apply { onChange = { v -> send("canal_volume", JSONObject().put("indice", i).put("valor", v / 100.0), true) } }
+            col.addView(dial, LinearLayout.LayoutParams(dp(96), dp(96)))
+            val icone = ImageView(this)
+            col.addView(icone, LinearLayout.LayoutParams(dp(22), dp(22)).apply { topMargin = dp(6) })
+            val nome = text("", 12f, cTexto, bold = true).apply { gravity = Gravity.CENTER; maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+            col.addView(nome, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(2) })
+            val mudo = PillButton(this) { send("canal_mudo", JSONObject().put("indice", i)) }
+            col.addView(mudo, LinearLayout.LayoutParams(dp(96), dp(30)).apply { topMargin = dp(6) })
+            linha.addView(col, LinearLayout.LayoutParams(0, -2, 1f))
+            atualizadores += { s -> canalDe(s, i)?.let { k ->
+                if (!dial.dragging) dial.setValue(k.optValor(), k.optBoolean("ativo") && !k.optBoolean("mudo"))
+                nome.text = k.optString("nome"); mudo.setMuted(k.optBoolean("mudo")); pintarIcone(icone, k.optString("alvo"))
+            } }
+        }
+        c.second.addView(linha)
+        content.addView(c.first, LinearLayout.LayoutParams(-1, -2))
+
+        val baixo = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        // Microfone
+        val mic = card("◉", "Microfone")
+        val micNome = text("", 10f, cSuave).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        mic.second.addView(micNome)
+        val micDial = DialView(this).apply { onChange = { v -> send("mic_volume", JSONObject().put("valor", v / 100.0), true) } }
+        mic.second.addView(micDial, LinearLayout.LayoutParams(dp(96), dp(96)).apply { gravity = Gravity.CENTER_HORIZONTAL; topMargin = dp(4) })
+        val micMudo = PillButton(this) { send("mic_mudo") }
+        mic.second.addView(micMudo, LinearLayout.LayoutParams(dp(100), dp(30)).apply { gravity = Gravity.CENTER_HORIZONTAL; topMargin = dp(6) })
+        atualizadores += { s -> s.optJSONObject("mic")?.let { m ->
+            micNome.text = m.optString("nome").ifBlank { "Nenhum microfone" }
+            if (!micDial.dragging) micDial.setValue(m.optValor(), m.optBoolean("existe") && !m.optBoolean("mudo"))
+            micMudo.setMuted(m.optBoolean("mudo"))
+        } }
+        baixo.addView(mic.first, LinearLayout.LayoutParams(0, -1, 1f).apply { rightMargin = dp(10) })
+        // Equalizador
+        val eq = card("♫", "Equalizador")
+        val eqChave = Chave(this) { send("eq_ligar") }
+        eq.third.addView(eqChave, LinearLayout.LayoutParams(dp(40), dp(22)))
+        val eqPerfil = text("", 13f, cTexto, bold = true)
+        eq.second.addView(eqPerfil)
+        val curva = CurvaView(this, mini = true)
+        eq.second.addView(curva, LinearLayout.LayoutParams(-1, dp(70)).apply { topMargin = dp(6) })
+        eq.second.addView(link("Ajustar equalizador  ›") { page = "eq"; renderNav(); renderPage() })
+        atualizadores += { s -> s.optJSONObject("eq")?.let { e ->
+            eqChave.ligado = e.optBoolean("ligado")
+            val aviso = when { e.optString("estado") == "ausente" -> "Equalizer APO não instalado"
+                e.optString("aviso").isNotBlank() && e.optBoolean("ligado") -> "Não ativado nesta saída de som"
+                !e.optBoolean("ligado") -> "Desligado"; else -> "Perfil: ${e.optString("perfil")}" }
+            eqPerfil.text = aviso; eqPerfil.setTextColor(if (aviso.startsWith("Perfil")) cTexto else if (aviso == "Desligado") cSuave else cAlerta)
+            curva.definir(e.optJSONArray("curva"), e.optBoolean("ligado") && e.optString("estado") == "ok")
+        } }
+        baixo.addView(eq.first, LinearLayout.LayoutParams(0, -1, 1f).apply { rightMargin = dp(10) })
+        // Dispositivos
+        val disp = card("⚙", "Dispositivos")
+        val ponto = View(this); val ctrl = text("", 12f, cTexto); val saida = text("", 12f, cTexto); val entrada = text("", 12f, cTexto)
+        disp.second.addView(text("Controle", 10f, cFraco))
+        disp.second.addView(LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
+            addView(ponto, LinearLayout.LayoutParams(dp(8), dp(8))); addView(ctrl, LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(8) })
         })
-        content.addView(item.first)
+        for ((rot, v) in listOf("Saída de som" to saida, "Microfone" to entrada)) {
+            disp.second.addView(text(rot, 10f, cFraco), LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(6) })
+            disp.second.addView(v.apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END })
+        }
+        disp.second.addView(link("Configurações  ›") { page = "ajustes"; renderNav(); renderPage() })
+        atualizadores += { s ->
+            val nome = s.optString("controle").takeIf { it.isNotBlank() && it != "null" }
+            ponto.background = oval(if (nome != null) cOk else cAlerta)
+            ctrl.text = if (nome != null) "$nome conectado" else "Procurando o controle…"
+            saida.text = s.optString("saida").ifBlank { "—" }; entrada.text = s.optString("entrada").ifBlank { "—" }
+        }
+        baixo.addView(disp.first, LinearLayout.LayoutParams(0, -1, 1.05f))
+        content.addView(baixo, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
     }
 
-    private fun renderKeys(d:Float) {
-        val keys=createCard("▦","Atalhos das teclas",d)
-        val grid=GridLayout(this).apply { columnCount=3; rowCount=2 }
-        for(i in 1..6) {
-            val key=TextView(this).apply { text=i.toString().padStart(2,'0'); gravity=Gravity.CENTER; textSize=15f; setTextColor(secondaryText); background=rounded(panel,9,stroke) }
-            grid.addView(key,GridLayout.LayoutParams().apply { width=0; height=(52*d).toInt(); columnSpec=GridLayout.spec(GridLayout.UNDEFINED,1f); setMargins(3,3,3,3) })
-        }
-        keys.second.addView(grid)
-        keys.second.addView(label("CONTROLADOR NÃO INTEGRADO",10,purple))
-        keys.second.addView(label("As atribuições serão habilitadas após a integração do firmware e do protocolo do controlador. Estes elementos são apenas indicadores visuais.",10,secondaryText))
-        val eq=latestState?.optJSONObject("equalizer")
-        keys.second.addView(label("EQUALIZADOR",10,purple))
-        keys.second.addView(label(if(eq?.optBoolean("available")==true) "Disponível na Bridge." else "Requer driver APO ou dispositivo virtual no Windows.",10,secondaryText))
-        content.addView(keys.first)
-    }
-
-    private fun renderSettings(d:Float) {
-        val appearance=createCard("◐","Aparência",d)
-        appearance.second.addView(label("Por padrão, o aplicativo acompanha o tema do celular.",10,secondaryText))
-        val group=RadioGroup(this).apply { orientation=RadioGroup.VERTICAL }
-        listOf("system" to "Automático (seguir sistema)","dark" to "Escuro","light" to "Claro").forEach { (mode,title) ->
-            val radio=RadioButton(this).apply { id=View.generateViewId(); tag=mode; text=title; setTextColor(primaryText); buttonTintList=android.content.res.ColorStateList.valueOf(purple) }
-            group.addView(radio); if(themeMode==mode) group.check(radio.id)
-        }
-        group.setOnCheckedChangeListener { g,id ->
-            themeMode=g.findViewById<RadioButton>(id)?.tag?.toString() ?: "system"
-            getSharedPreferences("deckra_preferences",Context.MODE_PRIVATE).edit().putString("theme_mode",themeMode).apply()
-            applyTheme(); renderNavigation(); renderPage()
-        }
-        appearance.second.addView(group); content.addView(appearance.first)
-        val updates=createCard("↻","Atualizações",d)
-        updates.second.addView(label("Verifique e instale novas versões do DECKRA Mobile.",10,secondaryText))
-        updateButton=action("VERIFICAR ATUALIZAÇÃO") { checkForUpdates() }.apply { textSize=11f }
-        updates.second.addView(updateButton); content.addView(updates.first)
-        val about=createCard("ⓘ","Sobre o aplicativo",d)
-        about.second.addView(label("DECKRA Mobile • Controle de áudio para Windows",10,secondaryText))
-        content.addView(about.first)
-    }
-
-    private fun renderNavigation() {
-        if(!::navBar.isInitialized) return
-        navBar.removeAllViews()
-        val pages=listOf("Início","Aplicativos","Microfone","Teclas","Configurações")
-        val icons=listOf("⌂","▦","♩","▤","⚙")
-        pages.forEachIndexed { index,page ->
-            val selected=page==currentPage
-            val item=LinearLayout(this).apply {
-                orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding(8,9,4,9)
-                background=rounded(if(selected) if(isLightTheme) Color.rgb(235,228,255) else Color.rgb(36,32,62) else Color.TRANSPARENT,8,if(selected) purple else Color.TRANSPARENT)
-                addView(label(icons[index],17,purple))
-                addView(label(page,10,if(selected) primaryText else secondaryText),LinearLayout.LayoutParams(-1,-2).apply { leftMargin=6 })
-                setOnClickListener { currentPage=page; renderNavigation(); renderPage() }
+    // ---------- Aplicativos ----------
+    private fun renderApps() {
+        header("Aplicativos", "Arraste o círculo para ajustar o volume e escolha o aplicativo de cada canal na caixa abaixo dele.")
+        if (precisaConexao()) return
+        val linha = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        for (canal in canais()) {
+            val i = canal.optInt("indice")
+            val v = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL
+                background = rounded(cPainel, 14, cBorda); setPadding(dp(10), dp(12), dp(10), dp(12))
             }
-            navBar.addView(item,LinearLayout.LayoutParams(-1,(43*resources.displayMetrics.density).toInt()).apply { bottomMargin=4 })
-        }
-    }
-
-    private fun loadThemePreference() {
-        themeMode=getSharedPreferences("deckra_preferences",Context.MODE_PRIVATE).getString("theme_mode","system") ?: "system"
-    }
-
-    private fun applyTheme() {
-        val night=(resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK)==android.content.res.Configuration.UI_MODE_NIGHT_YES
-        isLightTheme=when(themeMode) { "light" -> true; "dark" -> false; else -> !night }
-        if(isLightTheme) {
-            bg=Color.rgb(244,245,250); surface=Color.WHITE; panel=Color.rgb(248,248,252); card=Color.WHITE
-            stroke=Color.rgb(222,223,235); primaryText=Color.rgb(31,31,45); secondaryText=Color.rgb(105,107,128); muted=secondaryText
-        } else {
-            bg=Color.rgb(9,10,16); surface=Color.rgb(16,18,27); panel=Color.rgb(23,25,39); card=Color.rgb(18,20,29)
-            stroke=Color.rgb(43,45,61); primaryText=Color.rgb(241,241,248); secondaryText=Color.rgb(157,160,184); muted=secondaryText
-        }
-        purple=Color.rgb(137,101,255)
-        window.statusBarColor=bg; window.navigationBarColor=bg
-        if(::root.isInitialized) {
-            root.setBackgroundColor(bg)
-            if(root.childCount>0) root.getChildAt(0).background=rounded(surface,9,stroke)
-            if(root.childCount>2) {
-                val body=root.getChildAt(2) as? LinearLayout
-                if(body!=null && body.childCount>0) body.getChildAt(0).background=rounded(surface,9,stroke)
+            v.addView(text(canal.optString("titulo"), 13f, cRoxoClaro, bold = true))
+            val vu = VuView(this)
+            v.addView(vu, LinearLayout.LayoutParams(dp(120), dp(6)).apply { topMargin = dp(8) })
+            val dial = DialView(this).apply { marcador = true; onChange = { x -> send("canal_volume", JSONObject().put("indice", i).put("valor", x / 100.0), true) } }
+            v.addView(dial, LinearLayout.LayoutParams(dp(128), dp(128)).apply { topMargin = dp(6) })
+            v.addView(text("Aplicativo", 10f, cFraco), LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(6) })
+            val seletor = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
+                background = rounded(cCampo, 9, cBorda); setPadding(dp(8), 0, dp(8), 0); isClickable = true
+                setOnClickListener { escolherAplicativo(i) }
             }
+            val icone = ImageView(this)
+            seletor.addView(icone, LinearLayout.LayoutParams(dp(20), dp(20)))
+            val nome = text("", 12f, cTexto).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+            seletor.addView(nome, LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(6) })
+            seletor.addView(text("⌄", 13f, cSuave))
+            v.addView(seletor, LinearLayout.LayoutParams(-1, dp(38)).apply { topMargin = dp(3) })
+            val estado = text("", 11f, cSuave).apply { gravity = Gravity.CENTER; maxLines = 2 }
+            v.addView(estado, LinearLayout.LayoutParams(-1, dp(32)).apply { topMargin = dp(6) })
+            val mudo = PillButton(this) { send("canal_mudo", JSONObject().put("indice", i)) }
+            v.addView(mudo, LinearLayout.LayoutParams(dp(112), dp(34)).apply { topMargin = dp(4) })
+            linha.addView(v, LinearLayout.LayoutParams(dp(170), -2).apply { rightMargin = dp(12) })
+            atualizadores += { s -> canalDe(s, i)?.let { k ->
+                if (!dial.dragging) dial.setValue(k.optValor(), k.optBoolean("ativo") && !k.optBoolean("mudo"))
+                nome.text = k.optString("nome"); estado.text = k.optString("estado"); mudo.setMuted(k.optBoolean("mudo"))
+                vu.setLevel(k.optDouble("nivel", 0.0).toFloat()); pintarIcone(icone, k.optString("alvo"))
+            } }
         }
-        if(::connectionPanel.isInitialized) connectionPanel.background=rounded(surface,9,stroke)
+        content.addView(HorizontalScrollView(this).apply {
+            isHorizontalScrollBarEnabled = false; overScrollMode = View.OVER_SCROLL_NEVER; addView(linha)
+        }, LinearLayout.LayoutParams(-1, -2))
     }
-    private inner class RotaryDialView(
-        context:Context,
-        initialValue:Int,
-        private val onCommit:(Int)->Unit
-    ):View(context) {
-        private var value=initialValue.coerceIn(0,100)
-        private val density=resources.displayMetrics.density
-        private val track=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            style=android.graphics.Paint.Style.STROKE
-            strokeWidth=5.5f*density
-            strokeCap=android.graphics.Paint.Cap.ROUND
-            color=if(isLightTheme) Color.rgb(215,211,229) else Color.rgb(54,53,72)
-        }
-        private val active=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            style=android.graphics.Paint.Style.STROKE
-            strokeWidth=5.5f*density
-            strokeCap=android.graphics.Paint.Cap.ROUND
-            color=purple
-        }
-        private val pointer=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            color=purple
-            strokeWidth=3.5f*density
-            strokeCap=android.graphics.Paint.Cap.ROUND
-        }
-        private val center=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { color=if(isLightTheme) Color.rgb(235,232,244) else Color.rgb(35,34,48) }
-        private val text=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-            color=primaryText
-            textAlign=android.graphics.Paint.Align.CENTER
-            textSize=15f*density
-            typeface=android.graphics.Typeface.create("sans-serif-medium",android.graphics.Typeface.NORMAL)
-        }
-        private val bounds=android.graphics.RectF()
 
-        override fun onDraw(canvas:android.graphics.Canvas) {
-            super.onDraw(canvas)
-            val cx=width/2f
-            val cy=height/2f
-            val radius=(minOf(width,height)*0.37f)
-            bounds.set(cx-radius,cy-radius,cx+radius,cy+radius)
-            canvas.drawArc(bounds,135f,270f,false,track)
-            canvas.drawArc(bounds,135f,270f*value/100f,false,active)
-            val angle=Math.toRadians((135.0+270.0*value/100.0))
-            val px=cx+ kotlin.math.cos(angle).toFloat()*(radius-1f*density)
-            val py=cy+ kotlin.math.sin(angle).toFloat()*(radius-1f*density)
-            canvas.drawLine(cx,cy,px,py,pointer)
-            canvas.drawCircle(cx,cy,5f*density,center)
-            canvas.drawText("$value%",cx,cy+5f*density,text)
-        }
+    private var escolhendo = -1
+    private fun escolherAplicativo(indice: Int) { escolhendo = indice; send("get_opcoes") }
 
-        override fun onTouchEvent(event:android.view.MotionEvent):Boolean {
-            when(event.action) {
-                android.view.MotionEvent.ACTION_DOWN,android.view.MotionEvent.ACTION_MOVE -> {
-                    val dx=event.x-width/2f
-                    val dy=event.y-height/2f
-                    var angle=Math.toDegrees(kotlin.math.atan2(dy.toDouble(),dx.toDouble()))
-                    if(angle<135.0) angle+=360.0
-                    value=(((angle-135.0)/270.0)*100.0).toInt().coerceIn(0,100)
+    private fun mostrarOpcoes(opcoes: JSONArray) {
+        val itens = mutableListOf<Pair<String?, String>>()
+        for (k in 0 until opcoes.length()) {
+            val o = opcoes.optJSONObject(k) ?: continue
+            itens += Pair(if (o.isNull("alvo")) null else o.optString("alvo"), o.optString("nome"))
+        }
+        val escolhiveis = itens.filter { it.first != null }
+        if (escolhendo < 0 || escolhiveis.isEmpty()) return
+        val indice = escolhendo
+        android.app.AlertDialog.Builder(this)
+            .setTitle("Aplicativo do ${canalDe(deckra, indice)?.optString("titulo") ?: "canal"}")
+            .setItems(escolhiveis.map { it.second }.toTypedArray()) { _, k ->
+                send("canal_alvo", JSONObject().put("indice", indice).put("alvo", escolhiveis[k].first))
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+        escolhendo = -1
+    }
+
+    // ---------- Microfone ----------
+    private fun renderMic() {
+        header("Microfone", "Regule o volume de captação e silencie o microfone.")
+        if (precisaConexao()) return
+        val painel = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
+            background = rounded(cPainel, 14, cBorda); setPadding(dp(20), dp(18), dp(20), dp(18))
+        }
+        val esq = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        esq.addView(text("◉  Microfone em uso", 15f, cTexto, bold = true))
+        val nome = text("", 12f, cSuave).apply { maxLines = 2; ellipsize = TextUtils.TruncateAt.END }
+        esq.addView(nome, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(6) })
+        val linhaEstado = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val ponto = View(this); val estado = text("", 12f, cSuave)
+        linhaEstado.addView(ponto, LinearLayout.LayoutParams(dp(8), dp(8)))
+        linhaEstado.addView(estado, LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(8) })
+        esq.addView(linhaEstado, LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(12) })
+        esq.addView(text("O ajuste vale para o microfone padrão do Windows, em qualquer programa (Discord, Teams, jogos, gravação…). " +
+            "Para controlar pelo potenciômetro, escolha \"Microfone\" em um dos canais.", 11f, cFraco),
+            LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+        painel.addView(esq, LinearLayout.LayoutParams(0, -2, 1f).apply { rightMargin = dp(16) })
+        val dir = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL }
+        val vu = VuView(this)
+        dir.addView(vu, LinearLayout.LayoutParams(dp(150), dp(6)))
+        val dial = DialView(this).apply { big = true; marcador = true; onChange = { v -> send("mic_volume", JSONObject().put("valor", v / 100.0), true) } }
+        dir.addView(dial, LinearLayout.LayoutParams(dp(170), dp(170)).apply { topMargin = dp(8) })
+        val mudo = PillButton(this) { send("mic_mudo") }
+        dir.addView(mudo, LinearLayout.LayoutParams(dp(130), dp(38)).apply { topMargin = dp(10) })
+        painel.addView(dir, LinearLayout.LayoutParams(-2, -2))
+        content.addView(painel, LinearLayout.LayoutParams(-1, -2))
+        atualizadores += { s -> s.optJSONObject("mic")?.let { m ->
+            val existe = m.optBoolean("existe"); val mud = m.optBoolean("mudo")
+            nome.text = m.optString("nome").ifBlank { "Nenhum microfone encontrado" }
+            ponto.background = oval(if (!existe) cAlerta else if (mud) cMudo else cOk)
+            estado.text = if (!existe) "Nenhum microfone encontrado" else if (mud) "Microfone mudo" else "Microfone ativo"
+            if (!dial.dragging) dial.setValue(m.optValor(), existe && !mud)
+            mudo.setMuted(mud); vu.setLevel(m.optDouble("nivel", 0.0).toFloat())
+        } }
+    }
+
+    // ---------- Equalizador ----------
+    private fun renderEq() {
+        val cab = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val titulos = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        titulos.addView(text("Equalizador", 24f, cTexto, bold = true))
+        titulos.addView(text("Ajuste graves, médios e agudos do som de todo o Windows.", 12f, cSuave))
+        cab.addView(titulos, LinearLayout.LayoutParams(0, -2, 1f))
+        val rotulo = text("", 13f, cSuave, bold = true)
+        val chave = Chave(this) { send("eq_ligar") }
+        if (paired && !antigo && deckra != null) {
+            cab.addView(rotulo); cab.addView(chave, LinearLayout.LayoutParams(dp(40), dp(22)).apply { leftMargin = dp(10) })
+        }
+        content.addView(cab, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) })
+        if (precisaConexao()) return
+        val painel = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL; background = rounded(cPainel, 14, cBorda); setPadding(dp(18), dp(14), dp(18), dp(16))
+        }
+        val linhaStatus = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val ponto = View(this); val status = text("", 12f, cSuave)
+        linhaStatus.addView(ponto, LinearLayout.LayoutParams(dp(8), dp(8)))
+        linhaStatus.addView(status, LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(8) })
+        painel.addView(linhaStatus)
+        val perfis = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val pillsPerfil = mutableListOf<Pair<String, TextView>>()
+        for (k in 0 until (deckra?.optJSONObject("eq")?.optJSONArray("perfis")?.length() ?: 0)) {
+            val nome = deckra!!.optJSONObject("eq")!!.optJSONArray("perfis")!!.optString(k)
+            val p = pill(nome, false) { send("eq_perfil", JSONObject().put("nome", nome)) }
+            pillsPerfil += Pair(nome, p)
+            perfis.addView(p, LinearLayout.LayoutParams(dp(92), dp(30)).apply { rightMargin = dp(8) })
+        }
+        painel.addView(HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled = false; addView(perfis) },
+            LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10) })
+        val curva = CurvaView(this, mini = false)
+        painel.addView(curva, LinearLayout.LayoutParams(-1, dp(110)).apply { topMargin = dp(10) })
+        val bandas = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val bArr = deckra?.optJSONObject("eq")?.optJSONArray("bandas") ?: JSONArray()
+        val sliders = mutableListOf<Pair<String, BandaView>>()
+        for (k in 0 until bArr.length()) {
+            val b = bArr.optJSONObject(k) ?: continue
+            val chaveB = b.optString("chave")
+            val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL }
+            val valor = text("", 13f, cTexto, bold = true)
+            col.addView(valor)
+            val bv = BandaView(this, valor) { g -> send("eq_ganho", JSONObject().put("banda", chaveB).put("valor", g), true) }
+            col.addView(bv, LinearLayout.LayoutParams(dp(56), dp(130)).apply { topMargin = dp(4) })
+            col.addView(text(b.optString("nome"), 12f, cTexto, bold = true), LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(4) })
+            col.addView(text(b.optString("freq"), 10f, cSuave))
+            bandas.addView(col, LinearLayout.LayoutParams(0, -2, 1f))
+            sliders += Pair(chaveB, bv)
+        }
+        painel.addView(bandas, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
+        content.addView(painel, LinearLayout.LayoutParams(-1, -2))
+        atualizadores += { s -> s.optJSONObject("eq")?.let { e ->
+            val ligado = e.optBoolean("ligado"); val pronto = e.optString("estado") == "ok"
+            chave.ligado = ligado; rotulo.text = if (ligado) "Ligado" else "Desligado"; rotulo.setTextColor(if (ligado) cTexto else cSuave)
+            val aviso = when { e.optString("estado") == "ausente" -> "Equalizer APO não encontrado no PC. Ele é gratuito; instale pelo DECKRA no PC."
+                e.optString("aviso").isNotBlank() -> e.optString("aviso") + " Abra o Device Selector no PC e marque essa saída."
+                ligado -> "Equalizador ativo no Windows"; else -> "Equalizador desligado" }
+            status.text = aviso
+            ponto.background = oval(if (e.optString("aviso").isNotBlank() || e.optString("estado") == "ausente") cAlerta else if (ligado) cOk else cFraco)
+            for ((nome, p) in pillsPerfil) {
+                val sel = nome == e.optString("perfil")
+                p.background = rounded(if (sel) cSelecao else cCampo, 40, if (sel) cRoxo else cBorda); p.setTextColor(if (sel) cTexto else cSuave)
+            }
+            curva.definir(e.optJSONArray("curva"), ligado && pronto)
+            val bs = e.optJSONArray("bandas") ?: JSONArray()
+            for (k in 0 until bs.length()) {
+                val b = bs.optJSONObject(k) ?: continue
+                sliders.firstOrNull { it.first == b.optString("chave") }?.second?.definir(b.optDouble("ganho", 0.0).toFloat(),
+                    e.optDouble("min", -12.0).toFloat(), e.optDouble("max", 12.0).toFloat(), ligado && pronto)
+            }
+        } }
+    }
+
+    // ---------- Configurações ----------
+    private fun renderSettings() {
+        header("Configurações", "Conexão com o PC, tema e atualizações.")
+        avisoAtualizacao()?.let { content.addView(it, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) }) }
+        content.addView(connectCard(compacto = false))
+        val aparencia = card("◐", "Tema")
+        aparencia.second.addView(text("Deixa o DECKRA Mobile escuro, claro ou igual ao tema do celular.", 12f, cSuave))
+        val temas = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        for ((modo, nome) in listOf("system" to "Automático", "dark" to "Modo escuro", "light" to "Modo claro")) {
+            temas.addView(pill(nome, modo == themeMode) {
+                themeMode = modo
+                getSharedPreferences("deckra_preferences", Context.MODE_PRIVATE).edit().putString("theme_mode", modo).apply()
+                applyTheme(); buildShell(); renderPage()
+            }, LinearLayout.LayoutParams(dp(118), dp(34)).apply { rightMargin = dp(8); topMargin = dp(8) })
+        }
+        aparencia.second.addView(temas)
+        content.addView(aparencia.first, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+        val att = card("↻", "Atualizações")
+        att.second.addView(text("Versão instalada: ${versionName()} beta", 12f, cSuave))
+        updateButton = pill(estadoAtualizacao.takeIf { novaVersao != null || it != "Ainda não verificado" } ?: "Verificar agora",
+            novaVersao != null) { if (novaVersao != null) confirmarAtualizacao() else checkForUpdates(manual = true) }
+        att.second.addView(updateButton, LinearLayout.LayoutParams(dp(240), dp(36)).apply { topMargin = dp(8) })
+        content.addView(att.first, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+        val sobre = card("ⓘ", "Sobre")
+        sobre.second.addView(text("DECKRA Mobile · acesso antecipado. O mesmo DECKRA APP do PC, no celular, pela rede Wi-Fi. " +
+            "Morfy3D · morfy3d.com.br/deckra", 12f, cSuave))
+        content.addView(sobre.first, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+    }
+
+    /** Cartão de conexão: procurar o PC, IP, PIN e conectar. */
+    private fun connectCard(compacto: Boolean): View {
+        val c = card("📶", if (paired) "Conectado ao PC" else "Conectar ao PC")
+        if (paired) {
+            c.second.addView(text("Conectado a ${deckra?.optString("pc")?.ifBlank { null } ?: host} ($host).", 12f, cSuave))
+            c.second.addView(pill("Desconectar", false) { disconnect() }, LinearLayout.LayoutParams(dp(160), dp(36)).apply { topMargin = dp(10) })
+            return c.first
+        }
+        c.second.addView(text("No PC, abra o DECKRA APP › Configurações › DECKRA Mobile e toque em \"Procurar celular\". " +
+            "Depois toque em Procurar aqui e digite o PIN que aparece no PC.", 12f, cSuave))
+        val linha = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        hostInput = field("IP do PC", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI).apply { setText(host) }
+        pinInput = field("PIN de 6 dígitos", InputType.TYPE_CLASS_NUMBER)
+        linha.addView(hostInput, LinearLayout.LayoutParams(0, dp(40), 1f))
+        linha.addView(pinInput, LinearLayout.LayoutParams(0, dp(40), 1f).apply { leftMargin = dp(8) })
+        linha.addView(pill("Procurar", false) { discoverPc() }, LinearLayout.LayoutParams(dp(104), dp(40)).apply { leftMargin = dp(8) })
+        linha.addView(pill("Conectar", true) { connectPc() }, LinearLayout.LayoutParams(dp(104), dp(40)).apply { leftMargin = dp(8) })
+        c.second.addView(linha, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+        if (!compacto) c.second.addView(text("Celular e PC precisam estar na mesma rede Wi-Fi. Na primeira vez, o Windows pergunta " +
+            "se o DECKRA pode usar a rede: permita para redes privadas.", 11f, cFraco),
+            LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10) })
+        return c.first
+    }
+
+    // =====================================================================
+    //  Ajudantes dos dados
+    // =====================================================================
+    private fun canalDe(s: JSONObject?, indice: Int): JSONObject? {
+        val arr = s?.optJSONArray("canais") ?: return null
+        for (k in 0 until arr.length()) arr.optJSONObject(k)?.let { if (it.optInt("indice") == indice) return it }
+        return null
+    }
+
+    private fun JSONObject.optValor(): Int? = if (isNull("valor")) null else optInt("valor").coerceIn(0, 100)
+
+    private fun pintarIcone(v: ImageView, alvo: String) {
+        if (alvo.isBlank() || alvo == "nenhum") { v.setImageDrawable(null); return }
+        if (icones.containsKey(alvo)) { v.setImageBitmap(icones[alvo]); return }
+        icones[alvo] = null
+        send("get_icone", JSONObject().put("alvo", alvo), silencioso = true)
+    }
+
+    // =====================================================================
+    //  Peças visuais
+    // =====================================================================
+    private fun text(valor: String, tam: Float, cor: Int, bold: Boolean = false) = TextView(this).apply {
+        text = valor; textSize = tam; setTextColor(cor)
+        typeface = if (bold) Typeface.create("sans-serif-medium", Typeface.NORMAL) else Typeface.DEFAULT
+    }
+
+    private fun rounded(cor: Int, raio: Int, borda: Int = Color.TRANSPARENT) = GradientDrawable().apply {
+        setColor(cor); cornerRadius = raio * d
+        if (borda != Color.TRANSPARENT) setStroke(dp(1).coerceAtLeast(1), borda)
+    }
+
+    private fun oval(cor: Int) = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(cor) }
+
+    private fun link(rotulo: String, acao: () -> Unit) = text(rotulo, 11f, cSuave).apply {
+        isClickable = true; setPadding(0, dp(8), 0, 0); setOnClickListener { acao() }
+    }
+
+    /** Cartão: (cartão, corpo, canto direito do cabeçalho). */
+    private fun card(icone: String, titulo: String, link: String? = null, acaoLink: (() -> Unit)? = null): Triple<LinearLayout, LinearLayout, LinearLayout> {
+        val c = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL; background = rounded(cPainel, 14, cBorda); setPadding(dp(16), dp(14), dp(16), dp(16))
+        }
+        val cab = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        cab.addView(text(icone, 15f, cRoxoClaro))
+        cab.addView(text(titulo, 15f, cTexto, bold = true), LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(10) })
+        val canto = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        if (link != null && acaoLink != null) canto.addView(link(link, acaoLink).apply { setPadding(0, 0, 0, 0) })
+        cab.addView(canto)
+        c.addView(cab, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(10) })
+        val corpo = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        c.addView(corpo)
+        return Triple(c, corpo, canto)
+    }
+
+    private fun pill(rotulo: String, destaque: Boolean, acao: () -> Unit) = TextView(this).apply {
+        text = rotulo; gravity = Gravity.CENTER; textSize = 13f; isClickable = true
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+        setTextColor(cTexto)
+        background = rounded(if (destaque) cSelecao else cCampo, 40, if (destaque) cRoxo else cBorda)
+        setOnClickListener { acao() }
+    }
+
+    private fun field(dica: String, tipo: Int) = EditText(this).apply {
+        hint = dica; inputType = tipo; setSingleLine(true); textSize = 13f
+        setTextColor(cTexto); setHintTextColor(cFraco)
+        background = rounded(cCampo, 10, cBorda); setPadding(dp(12), 0, dp(12), 0)
+    }
+
+    /** Interruptor liga/desliga igual ao do DECKRA APP. */
+    private inner class Chave(ctx: Context, acao: () -> Unit) : View(ctx) {
+        var ligado = false
+            set(v) { if (field != v) { field = v; invalidate() } }
+        private val p = Paint(Paint.ANTI_ALIAS_FLAG)
+        init { isClickable = true; setOnClickListener { acao() } }
+        override fun onDraw(c: Canvas) {
+            val w = width.toFloat(); val h = height.toFloat(); val r = h / 2
+            if (ligado) p.shader = LinearGradient(0f, 0f, w, 0f, cAzul, cRoxoArco, Shader.TileMode.CLAMP)
+            else { p.shader = null; p.color = if (light) Color.rgb(215, 217, 239) else Color.rgb(42, 44, 66) }
+            c.drawRoundRect(0f, 0f, w, h, r, r, p)
+            p.shader = null; p.color = if (ligado || light) Color.WHITE else Color.rgb(160, 162, 186)
+            c.drawCircle(if (ligado) w - r else r, r, r * 0.7f, p)
+        }
+    }
+
+    /** Curva de resposta do equalizador (os pontos vêm do PC). */
+    private inner class CurvaView(ctx: Context, val mini: Boolean) : View(ctx) {
+        private var pontos: JSONArray? = null
+        private var ativo = false
+        private val pLinha = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
+        private val pGrade = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeWidth = 1f }
+        private val caminho = Path()
+        fun definir(p: JSONArray?, ativo: Boolean) { pontos = p; this.ativo = ativo; invalidate() }
+        override fun onDraw(c: Canvas) {
+            val w = width.toFloat(); val h = height.toFloat(); val meio = h / 2
+            pGrade.color = cTrilho
+            if (!mini) for (k in listOf(0.1f, 0.3f, 0.7f, 0.9f)) c.drawLine(0f, h * k, w, h * k, pGrade)
+            c.drawLine(0f, meio, w, meio, pGrade)
+            val p = pontos ?: return
+            caminho.reset()
+            val faixa = if (mini) 12f else 15f
+            for (k in 0 until p.length()) {
+                val ponto = p.optJSONArray(k) ?: continue
+                val f = ponto.optDouble(0, 20.0); val db = ponto.optDouble(1, 0.0).toFloat().coerceIn(-faixa, faixa)
+                val x = (w * log10(f / 20.0) / 3.0).toFloat(); val y = meio - db / faixa * (h / 2 - 3 * d)
+                if (k == 0) caminho.moveTo(x, y) else caminho.lineTo(x, y)
+            }
+            pLinha.strokeWidth = if (mini) 2.5f * d else 3f * d
+            pLinha.color = if (ativo) misturar(cAzul, cRoxoArco, 0.6f) else misturar(cTrilho, cSuave, 0.5f)
+            c.drawPath(caminho, pLinha)
+        }
+    }
+
+    /** Controle deslizante vertical de uma banda do equalizador. */
+    private inner class BandaView(ctx: Context, val rotulo: TextView, val aoMudar: (Double) -> Unit) : View(ctx) {
+        private var ganho = 0f; private var gMin = -12f; private var gMax = 12f; private var ativo = false
+        var arrastando = false
+        private var ultimo = 0L
+        private val p = Paint(Paint.ANTI_ALIAS_FLAG)
+        fun definir(g: Float, mn: Float, mx: Float, at: Boolean) {
+            gMin = mn; gMax = mx; ativo = at
+            if (!arrastando) ganho = g
+            rotulo.text = "%s%.1f dB".format(if (ganho > 0) "+" else "", ganho).replace(".", ",")
+            rotulo.setTextColor(if (ativo) cTexto else cSuave)
+            invalidate()
+        }
+        private fun y(g: Float): Float { val t = (g - gMin) / (gMax - gMin); return height - 12 * d - t * (height - 24 * d) }
+        override fun onDraw(c: Canvas) {
+            val cx = width / 2f; val meio = y(0f); val yv = y(ganho)
+            p.color = cTrilho; c.drawRoundRect(cx - 3 * d, 12 * d, cx + 3 * d, height - 12 * d, 3 * d, 3 * d, p)
+            p.color = if (ativo) (if (ganho >= 0) cRoxoArco else cAzul) else cFraco
+            c.drawRect(cx - 3 * d, min(yv, meio), cx + 3 * d, maxOf(yv, meio), p)
+            p.color = if (ativo) cRoxo else Color.rgb(90, 92, 120); c.drawCircle(cx, yv, 11 * d, p)
+            p.color = if (ativo) Color.rgb(245, 245, 252) else Color.rgb(150, 152, 172); c.drawCircle(cx, yv, 6 * d, p)
+        }
+        override fun onTouchEvent(e: MotionEvent): Boolean {
+            when (e.actionMasked) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    arrastando = true; parent?.requestDisallowInterceptTouchEvent(true)
+                    val t = ((height - 12 * d - e.y) / (height - 24 * d)).coerceIn(0f, 1f)
+                    ganho = Math.round((gMin + t * (gMax - gMin)) * 2) / 2f
+                    rotulo.text = "%s%.1f dB".format(if (ganho > 0) "+" else "", ganho).replace(".", ",")
                     invalidate()
-                    return true
+                    val agora = System.currentTimeMillis()
+                    if (agora - ultimo > 90) { ultimo = agora; aoMudar(ganho.toDouble()) }
                 }
-                android.view.MotionEvent.ACTION_UP -> {
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    arrastando = false; parent?.requestDisallowInterceptTouchEvent(false); aoMudar(ganho.toDouble())
+                }
+            }
+            return true
+        }
+    }
+
+    /** Botão "Mutar / Mudo" igual ao do DECKRA APP. */
+    private inner class PillButton(ctx: Context, acao: () -> Unit) : TextView(ctx) {
+        private var mudo = false
+        init {
+            gravity = Gravity.CENTER; textSize = 13f; isClickable = true
+            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            setOnClickListener { acao() }
+            pintar()
+        }
+        fun setMuted(m: Boolean) { if (m != mudo || text.isNullOrEmpty()) { mudo = m; pintar() } }
+        private fun pintar() {
+            text = if (mudo) "🔇  Mudo" else "🔊  Mutar"
+            setTextColor(if (mudo) Color.rgb(255, 214, 220) else cTexto)
+            background = if (mudo) rounded(Color.rgb(64, 24, 40), 40, cMudo) else rounded(cCampo, 40, cBorda)
+        }
+    }
+
+    /** Barrinha de nível (verde, amarelo, vermelho) igual à dos cartões do DECKRA APP. */
+    private inner class VuView(ctx: Context) : View(ctx) {
+        private var nivel = 0f
+        private val p = Paint(Paint.ANTI_ALIAS_FLAG)
+        fun setLevel(v: Float) {
+            val alvo = if (v <= 0.016f) 0f else (1f + 20f * kotlin.math.log10(v) / 36f).coerceIn(0f, 1f)
+            nivel = if (alvo >= nivel) alvo else maxOf(alvo, nivel - 0.18f)
+            invalidate()
+        }
+        override fun onDraw(c: Canvas) {
+            val n = 20
+            val passo = width.toFloat() / n
+            val acesos = (nivel * n).toInt()
+            for (k in 0 until n) {
+                val f = (k + 1f) / n
+                p.color = if (k < acesos) (if (f > 0.88f) Color.rgb(255, 90, 110) else if (f > 0.7f) Color.rgb(232, 197, 71) else Color.rgb(79, 209, 139)) else cTrilho
+                c.drawRoundRect(k * passo, 0f, k * passo + passo - 2 * d, height.toFloat(), d, d, p)
+            }
+        }
+    }
+
+    /** Círculo de volume do DECKRA APP: disco, trilho, arco em gradiente com brilho, botão e marcador. */
+    private inner class DialView(ctx: Context) : View(ctx) {
+        var value = 0; private set
+        private var vazio = false
+        private var ativo = true
+        var big = false
+        var marcador = false
+        var dragging = false; private set
+        var onChange: ((Int) -> Unit)? = null
+        private var ultimoEnvio = 0L
+        private val pDisco = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val pTrilho = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
+        private val pArco = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
+        private val pBrilho = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeCap = Paint.Cap.ROUND }
+        private val pBotao = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val pContorno = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
+        private val pMarca = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeCap = Paint.Cap.ROUND }
+        private val pNum = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER; typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL) }
+        private val pPct = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.LEFT }
+        private val caixa = RectF()
+        init { setLayerType(LAYER_TYPE_SOFTWARE, null) }        // o brilho (blur) precisa de software
+
+        fun setValue(v: Int?, ativo: Boolean) {
+            val novoVazio = v == null
+            val novo = (v ?: 0).coerceIn(0, 100)
+            if (novo != value || ativo != this.ativo || novoVazio != vazio) { value = novo; vazio = novoVazio; this.ativo = ativo; invalidate() }
+        }
+
+        override fun onDraw(c: Canvas) {
+            val w = min(width, height).toFloat()
+            val cx = width / 2f; val cy = height / 2f
+            val r0 = w * 0.485f
+            pDisco.color = cDisco
+            c.drawCircle(cx, cy, r0, pDisco)
+            val lw = w * 0.058f
+            val raio = w * 0.405f
+            caixa.set(cx - raio, cy - raio, cx + raio, cy + raio)
+            pTrilho.strokeWidth = lw; pTrilho.color = cTrilho
+            c.drawArc(caixa, 135f, 270f, false, pTrilho)
+            if (value > 0 && !vazio) {
+                val a0 = if (ativo) cAzul else misturar(cTrilho, cFraco, 0.55f)
+                val a1 = if (ativo) cRoxoArco else misturar(cTrilho, cSuave, 0.55f)
+                val grad = SweepGradient(cx, cy, intArrayOf(a0, a1, a1, a0), floatArrayOf(0f, 0.75f, 0.76f, 1f))
+                val m = android.graphics.Matrix(); m.setRotate(135f, cx, cy); grad.setLocalMatrix(m)
+                pArco.shader = grad; pArco.strokeWidth = lw
+                if (ativo) {
+                    pBrilho.shader = grad; pBrilho.strokeWidth = lw * 1.6f; pBrilho.alpha = if (light) 110 else 170
+                    pBrilho.maskFilter = BlurMaskFilter(w * 0.045f, BlurMaskFilter.Blur.NORMAL)
+                    c.drawArc(caixa, 135f, 270f * value / 100f, false, pBrilho)
+                }
+                c.drawArc(caixa, 135f, 270f * value / 100f, false, pArco)
+            }
+            val rk = w * 0.30f
+            pBotao.shader = LinearGradient(0f, cy - rk, 0f, cy + rk, cBotaoTopo, cBotaoBase, Shader.TileMode.CLAMP)
+            c.drawCircle(cx, cy, rk, pBotao)
+            pContorno.color = cBotaoBorda; pContorno.strokeWidth = maxOf(1f, d)
+            c.drawCircle(cx, cy, rk, pContorno)
+            // número
+            pNum.color = if (ativo) cTexto else cSuave
+            pNum.textSize = w * (if (big) 0.17f else 0.18f)
+            pPct.color = pNum.color; pPct.textSize = pNum.textSize * 0.45f
+            val num = if (vazio) "—" else value.toString()
+            val wn = pNum.measureText(num); val wp = pPct.measureText("%")
+            val x0 = cx - (wn + wp) / 2f
+            pNum.textAlign = Paint.Align.LEFT
+            c.drawText(num, x0, cy + pNum.textSize * 0.35f, pNum)
+            if (!vazio) c.drawText("%", x0 + wn + d, cy + pNum.textSize * 0.35f, pPct)
+            if (vazio || !marcador) return
+            // marcador
+            val ang = Math.toRadians(135.0 + 270.0 * value / 100.0)
+            pMarca.color = if (ativo) cMarca else cSuave; pMarca.strokeWidth = w * 0.025f
+            c.drawLine(cx + (rk * 0.72f * cos(ang)).toFloat(), cy + (rk * 0.72f * sin(ang)).toFloat(),
+                cx + (rk * 0.9f * cos(ang)).toFloat(), cy + (rk * 0.9f * sin(ang)).toFloat(), pMarca)
+        }
+
+        override fun onTouchEvent(e: MotionEvent): Boolean {
+            when (e.actionMasked) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    dragging = true
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                    var ang = Math.toDegrees(atan2((e.y - height / 2f).toDouble(), (e.x - width / 2f).toDouble()))
+                    if (ang < 135.0) ang += 360.0
+                    if (ang > 405.0) ang = if (ang > 427.5) 135.0 else 405.0     // vão de baixo: encosta na ponta
+                    val novo = (((ang - 135.0) / 270.0) * 100.0).toInt().coerceIn(0, 100)
+                    if (kotlin.math.abs(novo - value) > 60 && e.actionMasked == MotionEvent.ACTION_MOVE) return true   // não pula 0↔100
+                    value = novo; vazio = false; invalidate()
+                    val agora = System.currentTimeMillis()
+                    if (agora - ultimoEnvio > 70) { ultimoEnvio = agora; onChange?.invoke(value) }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    dragging = false
                     parent?.requestDisallowInterceptTouchEvent(false)
-                    onCommit(value)
+                    onChange?.invoke(value)
                     performClick()
-                    return true
                 }
-                android.view.MotionEvent.ACTION_CANCEL -> return true
             }
             return true
         }
-
-        override fun performClick():Boolean {
-            super.performClick()
-            return true
-        }
+        override fun performClick(): Boolean { super.performClick(); return true }
     }
 
-    private fun rounded(color:Int,radius:Int,stroke:Int=Color.TRANSPARENT)=GradientDrawable().apply {
-        setColor(color); cornerRadius=radius*resources.displayMetrics.density
-        if(stroke!=Color.TRANSPARENT) setStroke((1*resources.displayMetrics.density).toInt().coerceAtLeast(1),stroke)
-    }
-    private fun createCard(icon:String,title:String,density:Float):Pair<LinearLayout,LinearLayout> {
-        val cardView=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; background=rounded(this@MainActivity.card,11,stroke) }
-        val header=LinearLayout(this).apply { orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL; setPadding((10*density).toInt(),0,(8*density).toInt(),0) }
-        header.addView(label(icon,20,Color.rgb(143,112,255)))
-        header.addView(label(title,14,primaryText),LinearLayout.LayoutParams(0,-2,1f).apply { leftMargin=(8*density).toInt() })
-        cardView.addView(header,LinearLayout.LayoutParams(-1,(43*density).toInt()))
-        val body=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((10*density).toInt(),(7*density).toInt(),(10*density).toInt(),(9*density).toInt()) }
-        cardView.addView(body)
-        return Pair(cardView,body)
-    }
+    private fun misturar(a: Int, b: Int, t: Float): Int = Color.rgb(
+        (Color.red(a) + (Color.red(b) - Color.red(a)) * t).toInt(),
+        (Color.green(a) + (Color.green(b) - Color.green(a)) * t).toInt(),
+        (Color.blue(a) + (Color.blue(b) - Color.blue(a)) * t).toInt())
 
-    private fun addPanel(title:String, build:LinearLayout.()->Unit) {
-        val d=resources.displayMetrics.density
-        val card=LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding((14*d).toInt(),(11*d).toInt(),(14*d).toInt(),(11*d).toInt()); background=rounded(panel,16,Color.rgb(43,45,61)) }
-        card.addView(label(title,17,Color.WHITE)); card.build()
-        content.addView(card,LinearLayout.LayoutParams(-1,-2).apply { topMargin=(9*d).toInt(); bottomMargin=(3*d).toInt() })
-    }
-    private fun actionRow(first:String, firstRun:()->Unit, second:String, secondRun:()->Unit)=LinearLayout(this).apply {
-        orientation=LinearLayout.HORIZONTAL; gravity=Gravity.CENTER_VERTICAL
-        addView(action(first,firstRun),LinearLayout.LayoutParams(0,(40*resources.displayMetrics.density).toInt(),1f).apply { rightMargin=(5*resources.displayMetrics.density).toInt() })
-        addView(action(second,secondRun),LinearLayout.LayoutParams(0,(40*resources.displayMetrics.density).toInt(),1f).apply { leftMargin=(5*resources.displayMetrics.density).toInt() })
-    }
-    private fun label(value:String,size:Int,color:Int)=TextView(this).apply { text=value; textSize=size.toFloat(); setTextColor(color); setPadding(3,5,3,5) }
-    private fun action(value:String, run:()->Unit)=Button(this).apply {
-        text=value; isAllCaps=false; textSize=13f; minHeight=(40*resources.displayMetrics.density).toInt(); minWidth=0
-        setPadding(8,5,8,5); setTextColor(Color.WHITE); background=rounded(purple,12); stateListAnimator=null
-        setOnClickListener { run() }
-    }
+    private fun versionName(): String = try { packageManager.getPackageInfo(packageName, 0).versionName ?: "" } catch (_: Exception) { "" }
 
-    private fun installedVersionCode():Long =
-        androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(packageManager.getPackageInfo(packageName,0))
-
-    private fun checkForUpdates() {
-        updateButton.isEnabled=false
-        updateButton.text="VERIFICANDO..."
-        val request=Request.Builder()
-            .url("https://api.github.com/repos/VelaSmart/Morfy3D/releases/tags/deckra-mobile-latest")
-            .header("Accept","application/vnd.github+json")
-            .header("User-Agent","DECKRA-Mobile")
-            .build()
-        client.newCall(request).enqueue(object:Callback {
-            override fun onFailure(call:Call,e:java.io.IOException) {
-                runOnUiThread {
-                    updateButton.isEnabled=true
-                    updateButton.text="ERRO DE REDE • TENTAR NOVAMENTE"
-                    updateButton.setOnClickListener { checkForUpdates() }
-                }
-            }
-            override fun onResponse(call:Call,response:Response) {
-                response.use {
-                    val body=it.body?.string().orEmpty()
-                    if(!it.isSuccessful) {
-                        runOnUiThread {
-                            updateButton.isEnabled=true
-                            updateButton.text=if(it.code==404) "CANAL ESTÁVEL INDISPONÍVEL" else "ERRO \${it.code} • TENTAR NOVAMENTE"
-                            updateButton.setOnClickListener { checkForUpdates() }
-                            if(it.code==404) Toast.makeText(this@MainActivity,"Ainda não há uma versão estável assinada publicada. A atualização automática exige uma chave de assinatura permanente.",Toast.LENGTH_LONG).show()
-                        }
-                        return
-                    }
-                    try {
-                        val json=JSONObject(body)
-                        val code=Regex("versionCode=(\\d+)").find(json.optString("body"))?.groupValues?.get(1)?.toLongOrNull() ?: 0L
-                        val assets=json.optJSONArray("assets") ?: JSONArray()
-                        var url=""
-                        for(i in 0 until assets.length()) {
-                            val asset=assets.optJSONObject(i) ?: continue
-                            if(asset.optString("name")=="deckra-mobile.apk") url=asset.optString("browser_download_url")
-                        }
-                        val validUrl=url.startsWith("https://github.com/VelaSmart/Morfy3D/releases/download/")
-                        runOnUiThread {
-                            updateButton.isEnabled=true
-                            if(code>installedVersionCode() && validUrl) {
-                                updateButton.text="BAIXAR ATUALIZAÇÃO • $code"
-                                updateButton.setOnClickListener {
-                                    android.app.AlertDialog.Builder(this@MainActivity)
-                                        .setTitle("Atualização DECKRA")
-                                        .setMessage("A nova versão será baixada e o Android abrirá o instalador para atualizar o aplicativo, preservando os dados. Não é necessário desinstalar.")
-                                        .setNegativeButton("CANCELAR",null)
-                                        .setPositiveButton("BAIXAR") { _,_ -> downloadAndInstall(url) }
-                                        .show()
-                                }
-                            } else {
-                                updateButton.text="APP ATUALIZADO"
-                                updateButton.setOnClickListener { checkForUpdates() }
-                            }
-                        }
-                    } catch(_:Exception) {
-                        runOnUiThread {
-                            updateButton.isEnabled=true
-                            updateButton.text="RESPOSTA INVÁLIDA • TENTAR NOVAMENTE"
-                            updateButton.setOnClickListener { checkForUpdates() }
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    private fun downloadAndInstall(url:String) {
-        updateButton.isEnabled=false
-        updateButton.text="BAIXANDO..."
-        client.newCall(Request.Builder().url(url).build()).enqueue(object:Callback {
-            override fun onFailure(call:Call,e:java.io.IOException) {
-                runOnUiThread {
-                    updateButton.isEnabled=true
-                    updateButton.text="FALHA NO DOWNLOAD • TENTAR NOVAMENTE"
-                    updateButton.setOnClickListener { downloadAndInstall(url) }
-                }
-            }
-            override fun onResponse(call:Call,response:Response) {
-                response.use {
-                    if(!it.isSuccessful) {
-                        runOnUiThread {
-                            updateButton.isEnabled=true
-                            updateButton.text="DOWNLOAD FALHOU • TENTAR NOVAMENTE"
-                            updateButton.setOnClickListener { downloadAndInstall(url) }
-                        }
-                        return
-                    }
-                    val apk=File(cacheDir,"deckra-mobile-update.apk")
-                    if(apk.exists() && !apk.delete()) {
-                        runOnUiThread { updateButton.isEnabled=true; updateButton.text="NÃO FOI POSSÍVEL SUBSTITUIR O APK" }
-                        return
-                    }
-                    val body=it.body
-                    if(body==null) {
-                        runOnUiThread { updateButton.isEnabled=true; updateButton.text="ARQUIVO INVÁLIDO" }
-                        return
-                    }
-                    val expectedLength=body.contentLength()
-                    body.byteStream().use { input -> apk.outputStream().use { output -> input.copyTo(output) } }
-                    if(!apk.exists() || apk.length()==0L || (expectedLength>0 && apk.length()!=expectedLength)) {
-                        apk.delete()
-                        runOnUiThread { updateButton.isEnabled=true; updateButton.text="DOWNLOAD INCOMPLETO • TENTAR NOVAMENTE" }
-                        return
-                    }
-                    runOnUiThread {
-                        if(!packageManager.canRequestPackageInstalls()) {
-                            awaitingInstallPermission=true
-                            startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,Uri.parse("package:$packageName")))
-                            updateButton.isEnabled=true
-                            updateButton.text="AUTORIZE A INSTALAÇÃO NAS CONFIGURAÇÕES"
-                            return@runOnUiThread
-                        }
-                        installDownloadedUpdate(apk)
-                    }
-                }
-            }
-        })
-    }
-
-    private fun installDownloadedUpdate(apk:File) {
-        try {
-            if(!apk.exists() || apk.length()==0L) throw IllegalStateException("O APK baixado não está disponível.")
-            val uri=FileProvider.getUriForFile(this,"$packageName.fileprovider",apk)
-            val intent=Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
-                data=uri
-                flags=Intent.FLAG_GRANT_READ_URI_PERMISSION
-            }
-            startActivity(intent)
-            if(::updateButton.isInitialized) {
-                updateButton.isEnabled=true
-                updateButton.text="INSTALADOR DO ANDROID ABERTO"
-            }
-        } catch(e:Exception) {
-            if(::updateButton.isInitialized) {
-                updateButton.isEnabled=true
-                updateButton.text="NÃO FOI POSSÍVEL ABRIR O INSTALADOR"
-            }
-            Toast.makeText(this,e.message ?: "Falha ao iniciar atualização.",Toast.LENGTH_LONG).show()
-        }
-    }
-
+    // =====================================================================
+    //  Conexão com o PC (mesmo protocolo da DECKRA Bridge)
+    // =====================================================================
     private fun discoverPc() {
-        status.text="●  Procurando computadores na rede..."
+        setStatus("Procurando o PC…", cAlerta)
         thread {
-            var found:InetAddress?=null
-            val wifi=getSystemService(Context.WIFI_SERVICE) as WifiManager
-            val lock=wifi.createMulticastLock("deckra-discovery").apply { setReferenceCounted(false); acquire() }
+            var found: InetAddress? = null
+            val wifi = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            val lock = wifi.createMulticastLock("deckra-discovery").apply { setReferenceCounted(false); acquire() }
             try {
                 DatagramSocket(null).use { ds ->
-                    ds.reuseAddress=true; ds.broadcast=true; ds.soTimeout=650
+                    ds.reuseAddress = true; ds.broadcast = true; ds.soTimeout = 650
                     val wifiAddress = NetworkInterface.getNetworkInterfaces().toList()
                         .filter { it.isUp && !it.isLoopback && (it.name.startsWith("wlan", true) || it.name.startsWith("wifi", true)) }
                         .flatMap { it.interfaceAddresses }
                         .firstOrNull { it.address is Inet4Address && !it.address.isLoopbackAddress }
-                    if(wifiAddress==null) throw IllegalStateException("Wi-Fi IPv4 não disponível. Conecte o celular à mesma rede do PC.")
-                    ds.bind(InetSocketAddress(wifiAddress.address,0))
-                    val targets=linkedSetOf<InetAddress>()
+                        ?: throw IllegalStateException("Wi-Fi IPv4 não disponível.")
+                    ds.bind(InetSocketAddress(wifiAddress.address, 0))
+                    val targets = linkedSetOf<InetAddress>()
                     wifiAddress.broadcast?.let { targets.add(it) }
                     targets.add(InetAddress.getByName("255.255.255.255"))
-                    val data="DECKRA_DISCOVER_V2".toByteArray()
-                    for(attempt in 1..5) {
-                        if(found!=null) break
-                        for(target in targets) try { ds.send(DatagramPacket(data,data.size,target,37891)) } catch(_:Exception) {}
-                        val deadline=System.currentTimeMillis()+900
-                        while(System.currentTimeMillis()<deadline && found==null) {
+                    val data = "DECKRA_DISCOVER_V2".toByteArray()
+                    for (attempt in 1..5) {
+                        if (found != null) break
+                        for (t in targets) try { ds.send(DatagramPacket(data, data.size, t, 37891)) } catch (_: Exception) {}
+                        val limite = System.currentTimeMillis() + 900
+                        while (System.currentTimeMillis() < limite && found == null) {
                             try {
-                                val buf=ByteArray(1024); val packet=DatagramPacket(buf,buf.size); ds.receive(packet)
-                                val reply=String(packet.data,0,packet.length,Charsets.UTF_8)
-                                val payload=runCatching { JSONObject(reply) }.getOrNull()
-                                if(payload?.optString("type")=="deckra_bridge" && payload.optInt("port",0)==37892) found=packet.address
-                            } catch(_:SocketTimeoutException) { break }
+                                val buf = ByteArray(1024); val pk = DatagramPacket(buf, buf.size); ds.receive(pk)
+                                val payload = runCatching { JSONObject(String(pk.data, 0, pk.length, Charsets.UTF_8)) }.getOrNull()
+                                if (payload?.optString("type") == "deckra_bridge" && payload.optInt("port", 0) == 37892) found = pk.address
+                            } catch (_: SocketTimeoutException) { break }
                         }
                     }
                 }
-            } catch(_:Exception) {} finally { try { lock.release() } catch(_:Exception) {} }
+            } catch (_: Exception) {
+            } finally { try { lock.release() } catch (_: Exception) {} }
             runOnUiThread {
-                if(found!=null) { host=found!!.hostAddress ?: ""; hostInput.setText(host); status.text="●  PC encontrado: $host"; Toast.makeText(this,"PC encontrado. Digite o PIN.",Toast.LENGTH_LONG).show() }
-                else { status.text="●  PC não encontrado"; Toast.makeText(this,"Verifique se a Bridge está aberta e se o Firewall permite UDP 37891 e TCP 37892 em rede privada.",Toast.LENGTH_LONG).show() }
+                val achado = found
+                if (achado != null) {
+                    host = achado.hostAddress ?: ""
+                    hostInput?.setText(host)
+                    setStatus("PC encontrado", cOk)
+                    if (pinInput?.text?.toString()?.trim()?.matches(Regex("\\d{6}")) == true) connectPc()
+                    else { pinInput?.requestFocus(); toast("PC encontrado. Digite o PIN que aparece no DECKRA.") }
+                } else {
+                    setStatus("PC não encontrado", cAlerta)
+                    toast("No PC, toque em \"Procurar celular\" no DECKRA (Configurações) e tente de novo.")
+                }
             }
         }
     }
 
     private fun connectPc() {
-        val typedHost=hostInput.text.toString().trim()
-        if(typedHost.isNotBlank()) host=typedHost
-        if(host.isBlank() || runCatching { InetAddress.getByName(host) }.isFailure){ Toast.makeText(this,"Informe um IP válido ou procure o PC primeiro.",Toast.LENGTH_SHORT).show(); return }
-        val code=pin.text.toString().trim()
-        if(!code.matches(Regex("\\d{6}"))){ Toast.makeText(this,"O PIN deve conter 6 dígitos.",Toast.LENGTH_SHORT).show(); return }
-        socket=client.newWebSocket(Request.Builder().url("ws://$host:37892/").build(),object:WebSocketListener() {
-            override fun onOpen(webSocket:WebSocket,response:Response){ webSocket.send(JSONObject().put("type","pair").put("pin",code).toString()) }
-            override fun onMessage(webSocket:WebSocket,text:String) {
-                try {
-                    val msg=JSONObject(text)
-                    when(msg.optString("type")) {
-                        "pair_result" -> { paired=msg.optBoolean("paired"); runOnUiThread { status.text=if(paired) "●  Conectado ao DECKRA • $host" else "●  PIN incorreto"; refreshAudioPolling(); if(paired) send("get_state") } }
-                        "state" -> { latestState=msg.optJSONObject("data"); runOnUiThread { renderPage() } }
-                        "result" -> {
-                            val data=msg.optJSONObject("data")
-                            if(data!=null && data.has("applications")) latestState=data
-                            runOnUiThread {
-                                if(currentPage=="Início" && data?.has("applications")==true) updateAudioMeters(data)
-                                else if(data?.has("applications")==true) renderPage()
+        hostInput?.text?.toString()?.trim()?.takeIf { it.isNotBlank() }?.let { host = it }
+        if (host.isBlank() || runCatching { InetAddress.getByName(host) }.isFailure) { toast("Informe o IP do PC ou toque em Procurar."); return }
+        val code = pinInput?.text?.toString()?.trim().orEmpty()
+        if (!code.matches(Regex("\\d{6}"))) { toast("O PIN tem 6 dígitos."); return }
+        setStatus("Conectando…", cAlerta)
+        socket?.cancel()
+        socket = client.newWebSocket(Request.Builder().url("ws://$host:37892/").build(), object : WebSocketListener() {
+            override fun onOpen(ws: WebSocket, response: Response) { ws.send(JSONObject().put("type", "pair").put("pin", code).toString()) }
+            override fun onMessage(ws: WebSocket, text: String) {
+                val msg = runCatching { JSONObject(text) }.getOrNull() ?: return
+                when (msg.optString("type")) {
+                    "pair_result" -> runOnUiThread {
+                        paired = msg.optBoolean("paired")
+                        if (paired) {
+                            getSharedPreferences("deckra_preferences", Context.MODE_PRIVATE).edit().putString("last_host", host).apply()
+                            setStatus("PC conectado", cOk)
+                            antigo = false; deckra = null; icones.clear()
+                            if (page == "ajustes") page = "inicio"
+                            renderNav(); renderPage()
+                            send("get_deckra", silencioso = true)
+                        } else { setStatus("PIN incorreto", cMudo); toast("PIN incorreto. Confira o PIN no DECKRA do PC.") }
+                    }
+                    "state" -> {}
+                    "result" -> {
+                        val data = msg.optJSONObject("data")
+                        val comando = msg.optString("command")
+                        runOnUiThread {
+                            if (!msg.optBoolean("ok", true)) {
+                                if (comando == "get_deckra") { if (!antigo) { antigo = true; renderPage() } }
+                                else if (comando != "get_icone") toast(msg.optString("message", "O PC recusou o comando."))
+                                return@runOnUiThread
+                            }
+                            when {
+                                data == null -> {}
+                                comando == "get_opcoes" -> mostrarOpcoes(data.optJSONArray("opcoes") ?: JSONArray())
+                                comando == "get_icone" -> {
+                                    val bytes = runCatching { Base64.decode(data.optString("png"), Base64.DEFAULT) }.getOrNull()
+                                    icones[data.optString("alvo")] = bytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
+                                    deckra?.let { st -> atualizadores.forEach { it(st) } }
+                                }
+                                data.optBoolean("deckra") -> { val era = deckra == null; aoReceberEstado(data); if (era) renderPage() }
                             }
                         }
-                        "error" -> runOnUiThread { Toast.makeText(this@MainActivity,msg.optString("message"),Toast.LENGTH_LONG).show() }
                     }
-                } catch(_:Exception) {}
+                    "error" -> runOnUiThread { toast(msg.optString("message")) }
+                }
             }
-            override fun onFailure(webSocket:WebSocket,t:Throwable,response:Response?){ paired=false; runOnUiThread { refreshAudioPolling(); status.text="●  Falha na conexão"; Toast.makeText(this@MainActivity,t.message ?: "Erro de rede",Toast.LENGTH_LONG).show() } }
-            override fun onClosed(webSocket:WebSocket,code:Int,reason:String){ paired=false; runOnUiThread { refreshAudioPolling(); status.text="●  PC desconectado" } }
+            override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
+                runOnUiThread {
+                    val estava = paired
+                    paired = false; refreshPolling()
+                    setStatus(if (estava) "PC desconectado" else "Falha na conexão", cAlerta)
+                    if (!estava) toast("Não conectou. No PC, abra a procura do DECKRA Mobile e tente de novo.")
+                    renderPage()
+                }
+            }
+            override fun onClosed(ws: WebSocket, code: Int, reason: String) {
+                runOnUiThread { paired = false; refreshPolling(); setStatus("PC desconectado", cAlerta); renderPage() }
+            }
         })
     }
-    private fun refreshAudioPolling() {
-        audioHandler.removeCallbacks(audioPoll)
-        if(paired && currentPage=="Início") audioHandler.postDelayed(audioPoll,350)
+
+    private fun disconnect() {
+        socket?.close(1000, "desconectado pelo usuário"); socket = null
+        paired = false; refreshPolling(); setStatus("Não conectado", cAlerta); renderPage()
     }
 
-    private fun updateAudioMeters(data:JSONObject) {
-        val apps=data.optJSONArray("applications") ?: return
-        for(i in 0 until apps.length()) {
-            val app=apps.optJSONObject(i) ?: continue
-            audioMeters[app.optInt("processId")]?.setLevel(app.optDouble("level",0.0).toFloat())
+    private fun refreshPolling() {
+        handler.removeCallbacks(poll)
+        if (paired) handler.postDelayed(poll, 450)
+    }
+
+    private fun send(command: String, extra: JSONObject = JSONObject(), silencioso: Boolean = false) {
+        if (!paired) { if (!silencioso) toast("Conecte ao PC primeiro."); return }
+        extra.put("type", "command").put("command", command)
+        if (socket?.send(extra.toString()) != true && !silencioso) toast("Falha ao enviar o comando.")
+    }
+
+    private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+
+    // =====================================================================
+    //  Atualização do próprio aplicativo: mesmo esquema do DECKRA APP do PC. Um versao.json no
+    //  GitHub diz a versão nova, o link do APK, o sha256, o tamanho e as notas; o app confere ao
+    //  abrir, avisa, baixa, confere o arquivo e abre o instalador do Android.
+    // =====================================================================
+    private val urlManifesto = "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/mobile/versao.json"
+    private var novaVersao: JSONObject? = null           // manifesto de uma versão mais nova, se houver
+    private var estadoAtualizacao = "Ainda não verificado"
+    private var ultimaVerificacao = 0L
+
+    private fun installedVersionCode(): Long =
+        androidx.core.content.pm.PackageInfoCompat.getLongVersionCode(packageManager.getPackageInfo(packageName, 0))
+
+    private fun setUpdate(texto: String, acao: (() -> Unit)? = null) {
+        estadoAtualizacao = texto
+        updateButton?.let { b ->
+            b.text = texto
+            b.setOnClickListener { (acao ?: { checkForUpdates(manual = true) })() }
         }
     }
 
-    private inner class AudioActivityIndicatorView(context:Context, level:Float):View(context) {
-        private var peak=level.coerceIn(0f,1f)
-        private val d=resources.displayMetrics.density
-        private val paint=android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
-        fun setLevel(value:Float) { peak=value.coerceIn(0f,1f); invalidate() }
-        override fun onDraw(canvas:android.graphics.Canvas) {
-            super.onDraw(canvas)
-            val active=peak>0.018f
-            val count=5
-            val barWidth=5f*d
-            val gap=4f*d
-            val total=count*barWidth+(count-1)*gap
-            val start=(width-total)/2f
-            val base=height-3f*d
-            val maxHeight=height-7f*d
-            for(i in 0 until count) {
-                val fraction=(0.22f+peak*(0.55f+0.09f*i)).coerceIn(0.18f,1f)
-                val h=maxHeight*fraction
-                paint.color=if(active) Color.rgb(90,210,150) else if(isLightTheme) Color.rgb(185,185,198) else Color.rgb(72,72,88)
-                canvas.drawRoundRect(start+i*(barWidth+gap),base-h,start+i*(barWidth+gap)+barWidth,base,barWidth/2,barWidth/2,paint)
+    /** Confere o versao.json. manual = false: só avisa se houver versão nova (como ao abrir o app). */
+    private fun checkForUpdates(manual: Boolean) {
+        ultimaVerificacao = System.currentTimeMillis()
+        if (manual) setUpdate("Verificando…")
+        val pedido = Request.Builder().url("$urlManifesto?t=${System.currentTimeMillis()}")
+            .header("Cache-Control", "no-cache").header("User-Agent", "DECKRA-Mobile/${versionName()}").build()
+        client.newCall(pedido).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: java.io.IOException) {
+                runOnUiThread { if (manual) setUpdate("Sem internet · tentar de novo") }
             }
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    val texto = it.body?.string().orEmpty()
+                    val json = if (it.isSuccessful) runCatching { JSONObject(texto) }.getOrNull() else null
+                    runOnUiThread {
+                        if (json == null) {
+                            if (manual) setUpdate(if (it.code == 404) "Nenhuma versão publicada ainda" else "Não foi possível verificar · tentar de novo")
+                            return@runOnUiThread
+                        }
+                        val codigo = json.optLong("versionCode", 0L)
+                        val url = json.optString("url")
+                        val valido = url.startsWith("https://raw.githubusercontent.com/VelaSmart/Morfy3D/") &&
+                            json.optString("sha256").matches(Regex("[0-9a-fA-F]{64}")) && json.optLong("tamanho", 0L) > 0
+                        if (codigo > installedVersionCode() && valido) {
+                            val primeiraVez = novaVersao == null
+                            novaVersao = json
+                            setUpdate("Baixar e instalar a versão ${json.optString("versao")}") { confirmarAtualizacao() }
+                            if (primeiraVez && page == "inicio") renderPage()        // mostra o aviso no Início
+                        } else {
+                            novaVersao = null
+                            setUpdate("Você está com a versão mais recente")
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun confirmarAtualizacao() {
+        val json = novaVersao ?: return
+        val notas = json.optString("notas").ifBlank { "Melhorias e correções." }
+        android.app.AlertDialog.Builder(this)
+            .setTitle("DECKRA Mobile ${json.optString("versao")}")
+            .setMessage("$notas\n\nO Android vai abrir o instalador. Seus dados são mantidos.")
+            .setNegativeButton("Agora não", null)
+            .setPositiveButton("Baixar e instalar") { _, _ -> downloadAndInstall(json) }
+            .show()
+    }
+
+    /** Aviso de versão nova no Início, igual ao "Nova versão disponível" do DECKRA APP. */
+    private fun avisoAtualizacao(): View? {
+        val json = novaVersao ?: return null
+        val c = card("↻", "Nova versão ${json.optString("versao")} disponível")
+        c.second.addView(text(json.optString("notas").ifBlank { "Melhorias e correções." }, 12f, cSuave).apply { maxLines = 4; ellipsize = TextUtils.TruncateAt.END })
+        c.second.addView(pill("Baixar e instalar", true) { confirmarAtualizacao() },
+            LinearLayout.LayoutParams(dp(180), dp(36)).apply { topMargin = dp(10) })
+        return c.first
+    }
+
+    private fun downloadAndInstall(json: JSONObject) {
+        val url = json.optString("url")
+        val esperadoSha = json.optString("sha256").lowercase()
+        val esperadoTam = json.optLong("tamanho", 0L)
+        setUpdate("Baixando… 0%")
+        client.newCall(Request.Builder().url("$url?t=${System.currentTimeMillis()}").header("Cache-Control", "no-cache").build())
+            .enqueue(object : Callback {
+                override fun onFailure(call: Call, e: java.io.IOException) {
+                    runOnUiThread { setUpdate("Falha no download · tentar de novo") { downloadAndInstall(json) } }
+                }
+                override fun onResponse(call: Call, response: Response) {
+                    response.use {
+                        val body = it.body
+                        if (!it.isSuccessful || body == null) {
+                            runOnUiThread { setUpdate("Download falhou · tentar de novo") { downloadAndInstall(json) } }; return
+                        }
+                        val apk = File(cacheDir, "deckra-mobile-update.apk")
+                        apk.delete()
+                        val resumo = java.security.MessageDigest.getInstance("SHA-256")
+                        var lido = 0L; var ultimo = -1
+                        body.byteStream().use { input ->
+                            apk.outputStream().use { output ->
+                                val buf = ByteArray(64 * 1024)
+                                while (true) {
+                                    val n = input.read(buf); if (n < 0) break
+                                    output.write(buf, 0, n); resumo.update(buf, 0, n); lido += n
+                                    val pct = (lido * 100 / maxOf(1L, esperadoTam)).toInt().coerceAtMost(100)
+                                    if (pct != ultimo) { ultimo = pct; runOnUiThread { setUpdate("Baixando… $pct%") } }
+                                }
+                            }
+                        }
+                        val sha = resumo.digest().joinToString("") { b -> "%02x".format(b) }
+                        if (lido != esperadoTam || sha != esperadoSha) {
+                            apk.delete()
+                            runOnUiThread { setUpdate("Arquivo não confere · tentar de novo") { downloadAndInstall(json) } }
+                            return
+                        }
+                        runOnUiThread {
+                            if (!packageManager.canRequestPackageInstalls()) {
+                                awaitingInstallPermission = true
+                                startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                                setUpdate("Autorize a instalação e volte ao app") { downloadAndInstall(json) }
+                                return@runOnUiThread
+                            }
+                            installDownloadedUpdate(apk)
+                        }
+                    }
+                }
+            })
+    }
+
+    private fun installDownloadedUpdate(apk: File) {
+        try {
+            if (!apk.exists() || apk.length() == 0L) throw IllegalStateException("O arquivo baixado não está disponível.")
+            val uri = FileProvider.getUriForFile(this, "$packageName.fileprovider", apk)
+            startActivity(Intent(Intent.ACTION_INSTALL_PACKAGE).apply { data = uri; flags = Intent.FLAG_GRANT_READ_URI_PERMISSION })
+            setUpdate("Instalador do Android aberto")
+        } catch (e: Exception) {
+            setUpdate("Não foi possível abrir o instalador")
+            toast(e.message ?: "Falha ao iniciar a atualização.")
         }
     }
 
-    private fun send(command:String,extra:JSONObject=JSONObject()) {
-        if(!paired){ Toast.makeText(this,"Conecte ao PC primeiro.",Toast.LENGTH_SHORT).show(); return }
-        extra.put("type","command").put("command",command)
-        if(socket?.send(extra.toString())!=true) Toast.makeText(this,"Falha ao enviar comando.",Toast.LENGTH_SHORT).show()
-    }
     override fun onResume() {
         super.onResume()
-        val cached=File(cacheDir,"deckra-mobile-update.apk")
-        if(awaitingInstallPermission && packageManager.canRequestPackageInstalls()) {
-            awaitingInstallPermission=false
-            installDownloadedUpdate(cached)
+        if (ultimaVerificacao > 0 && System.currentTimeMillis() - ultimaVerificacao > 30 * 60 * 1000L) checkForUpdates(manual = false)
+        if (awaitingInstallPermission && packageManager.canRequestPackageInstalls()) {
+            awaitingInstallPermission = false
+            installDownloadedUpdate(File(cacheDir, "deckra-mobile-update.apk"))
         }
     }
-    override fun onDestroy(){ audioHandler.removeCallbacks(audioPoll); socket?.close(1000,"app closed"); client.dispatcher.executorService.shutdown(); super.onDestroy() }
+
+    override fun onDestroy() {
+        handler.removeCallbacks(poll)
+        socket?.close(1000, "app fechado")
+        client.dispatcher.executorService.shutdown()
+        super.onDestroy()
+    }
 }
