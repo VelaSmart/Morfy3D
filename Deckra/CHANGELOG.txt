@@ -3,6 +3,23 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
+1.12.6 beta - 24/11/2026
+--------------------------------------------------------------------------
+Novidades
+- DECKRA Mobile (acesso antecipado): nova opção em Configurações para
+  conectar o celular pela rede Wi-Fi, com PIN. Vem desligada e ainda não
+  está disponível para todos.
+
+Melhorias
+- A barra lateral mostra o nome do aparelho só quando ele conecta; enquanto
+  isso, aparece "Procurando o controle…".
+
+Correções
+- Equalizador: o botão "Ativar nesta saída" agora abre o Device Selector
+  do Equalizer APO (nas versões novas, o antigo Configurator mudou de nome).
+- Tema claro: os círculos de volume ficavam com as bordas serrilhadas.
+
+
 1.12.5 beta - 24/11/2026
 --------------------------------------------------------------------------
 (A 1.12.4 ficou no ar poucos minutos e foi retirada por causa do
