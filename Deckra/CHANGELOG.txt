@@ -3,6 +3,25 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
+1.12.9 beta - 25/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Início: o cartão do Equalizador deu lugar ao cartão Mídia. Ele mostra o
+  que está tocando agora (Spotify, YouTube no navegador e outros players),
+  com título, artista, botões voltar/tocar/avançar e a barrinha de tempo
+  com o tempo passado e o total. Clique ou arraste na barrinha para
+  adiantar ou voltar. O equalizador continua na aba Equalizador.
+
+Melhorias
+- Aplicativos: ao trocar canais de lugar, o cartão inteiro acompanha o
+  mouse e o outro cartão desliza para o lugar vago.
+- Maximizar ou mudar o tamanho da janela ficou bem mais rápido.
+
+Correções
+- Maximizar a janela travava o DECKRA por cerca de 1 segundo.
+- O mostrador na tela aparecia ao escolher um aplicativo na lista.
+
+
 1.12.8 beta - 25/11/2026
 --------------------------------------------------------------------------
 Novidades
