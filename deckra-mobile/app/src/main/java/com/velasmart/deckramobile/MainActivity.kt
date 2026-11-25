@@ -1,6 +1,7 @@
 package com.velasmart.deckramobile
 
 import android.app.Activity
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -18,6 +19,7 @@ import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -25,6 +27,7 @@ import android.provider.Settings
 import android.text.InputType
 import android.text.TextUtils
 import android.util.Base64
+import android.view.DragEvent
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
@@ -35,6 +38,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.net.*
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 import kotlin.math.atan2
@@ -65,6 +69,16 @@ class MainActivity : Activity() {
         }
     }
     private val icones = mutableMapOf<String, Bitmap?>()
+    private val prefs get() = getSharedPreferences("deckra_preferences", Context.MODE_PRIVATE)
+    /** Identificador deste celular (aleatório, criado uma vez) e a chave que o PC deu ao acertar o PIN. */
+    private val deviceId: String by lazy {
+        prefs.getString("device_id", null) ?: UUID.randomUUID().toString().also { prefs.edit().putString("device_id", it).apply() }
+    }
+    private var chavePc = ""
+    private var tentando = false                     // conexão em andamento
+    private var automatico = false                   // esta conexão é a volta automática (com a chave)
+    private var jaProcurou = false                   // a volta automática já procurou o PC pela rede
+    private var estiloVolume = "circulo"             // aba Aplicativos: "circulo" ou "deslizante"
 
     // ---------- tela ----------
     private var page = "inicio"
@@ -106,10 +120,13 @@ class MainActivity : Activity() {
         val prefs = getSharedPreferences("deckra_preferences", Context.MODE_PRIVATE)
         themeMode = prefs.getString("theme_mode", "system") ?: "system"
         host = prefs.getString("last_host", "") ?: ""
+        chavePc = prefs.getString("pc_token", "") ?: ""
+        estiloVolume = prefs.getString("estilo_volume", "circulo") ?: "circulo"
         applyTheme()
         buildShell()
         renderPage()
         handler.postDelayed({ checkForUpdates(manual = false) }, 2500)
+        voltarSozinho(400)
     }
 
     // =====================================================================
@@ -300,24 +317,57 @@ class MainActivity : Activity() {
             micMudo.setMuted(m.optBoolean("mudo"))
         } }
         baixo.addView(mic.first, LinearLayout.LayoutParams(0, -1, 1f).apply { rightMargin = dp(10) })
-        // Equalizador
-        val eq = card("♫", "Equalizador")
-        val eqChave = Chave(this) { send("eq_ligar") }
-        eq.third.addView(eqChave, LinearLayout.LayoutParams(dp(40), dp(22)))
-        val eqPerfil = text("", 13f, cTexto, bold = true)
-        eq.second.addView(eqPerfil)
-        val curva = CurvaView(this, mini = true)
-        eq.second.addView(curva, LinearLayout.LayoutParams(-1, dp(70)).apply { topMargin = dp(6) })
-        eq.second.addView(link("Ajustar equalizador  ›") { page = "eq"; renderNav(); renderPage() })
-        atualizadores += { s -> s.optJSONObject("eq")?.let { e ->
-            eqChave.ligado = e.optBoolean("ligado")
-            val aviso = when { e.optString("estado") == "ausente" -> "Equalizer APO não instalado"
-                e.optString("aviso").isNotBlank() && e.optBoolean("ligado") -> "Não ativado nesta saída de som"
-                !e.optBoolean("ligado") -> "Desligado"; else -> "Perfil: ${e.optString("perfil")}" }
-            eqPerfil.text = aviso; eqPerfil.setTextColor(if (aviso.startsWith("Perfil")) cTexto else if (aviso == "Desligado") cSuave else cAlerta)
-            curva.definir(e.optJSONArray("curva"), e.optBoolean("ligado") && e.optString("estado") == "ok")
-        } }
-        baixo.addView(eq.first, LinearLayout.LayoutParams(0, -1, 1f).apply { rightMargin = dp(10) })
+        // Mídia: o que está tocando no PC agora
+        val md = card("♫", "Mídia")
+        val mdApp = text("", 11f, cFraco).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        md.third.addView(mdApp)
+        val mdInfo = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val mdIcone = ImageView(this)
+        mdInfo.addView(mdIcone, LinearLayout.LayoutParams(dp(32), dp(32)))
+        val mdTextos = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        val mdTitulo = text("", 14f, cTexto, bold = true).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        val mdArtista = text("", 11f, cSuave).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        mdTextos.addView(mdTitulo); mdTextos.addView(mdArtista)
+        mdInfo.addView(mdTextos, LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(10) })
+        md.second.addView(mdInfo)
+        val mdVazio = text("Nada tocando agora", 13f, cSuave).apply { gravity = Gravity.CENTER }
+        md.second.addView(mdVazio, LinearLayout.LayoutParams(-1, dp(60)))
+        val mdT0 = text("0:00", 10f, cSuave); val mdT1 = text("", 10f, cSuave)
+        val prog = ProgressoView(this).apply {
+            aoArrastar = { seg -> mdT0.text = tempo(seg) }
+            aoSoltar = { seg -> send("midia_buscar", JSONObject().put("segundos", seg)) }
+        }
+        md.second.addView(prog, LinearLayout.LayoutParams(-1, dp(26)).apply { topMargin = dp(8) })
+        val mdTempos = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        mdTempos.addView(mdT0, LinearLayout.LayoutParams(0, -2, 1f)); mdTempos.addView(mdT1)
+        md.second.addView(mdTempos)
+        val mdBotoes = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER }
+        val mdTocar = botaoMidia("▶", true) { send("midia_comando", JSONObject().put("acao", "tocar")) }
+        mdBotoes.addView(botaoMidia("⏮", false) { send("midia_comando", JSONObject().put("acao", "anterior")) }, LinearLayout.LayoutParams(dp(38), dp(38)))
+        mdBotoes.addView(mdTocar, LinearLayout.LayoutParams(dp(46), dp(46)).apply { leftMargin = dp(12); rightMargin = dp(12) })
+        mdBotoes.addView(botaoMidia("⏭", false) { send("midia_comando", JSONObject().put("acao", "proxima")) }, LinearLayout.LayoutParams(dp(38), dp(38)))
+        md.second.addView(mdBotoes, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
+        atualizadores += { s ->
+            val suporta = temRecurso(s, "midia")
+            val m = if (suporta) s.optJSONObject("midia") else null
+            val tem = m != null
+            for (v in listOf(mdInfo, prog, mdTempos, mdBotoes)) v.visibility = if (tem) View.VISIBLE else View.GONE
+            mdVazio.visibility = if (tem) View.GONE else View.VISIBLE
+            mdVazio.text = if (suporta) "Nada tocando agora" else "Atualize o DECKRA APP do PC (1.13.0 ou mais nova) para ver a mídia aqui."
+            mdApp.text = m?.optString("app") ?: ""
+            if (m != null) {
+                mdTitulo.text = m.optString("titulo").ifBlank { "Sem título" }
+                mdArtista.text = m.optString("artista")
+                pintarIcone(mdIcone, m.optString("alvo"))
+                val dur = m.optDouble("dur", 0.0); val pos = m.optDouble("pos", 0.0)
+                prog.definir(pos, dur, m.optBoolean("pode_buscar"))
+                if (!prog.arrastando) mdT0.text = tempo(pos)
+                mdT1.text = if (dur > 0) tempo(dur) else ""
+                prog.visibility = if (dur > 0) View.VISIBLE else View.INVISIBLE
+                mdTocar.text = if (m.optBoolean("tocando")) "⏸" else "▶"
+            }
+        }
+        baixo.addView(md.first, LinearLayout.LayoutParams(0, -1, 1f).apply { rightMargin = dp(10) })
         // Dispositivos
         val disp = card("⚙", "Dispositivos")
         val ponto = View(this); val ctrl = text("", 12f, cTexto); val saida = text("", 12f, cTexto); val entrada = text("", 12f, cTexto)
@@ -343,20 +393,36 @@ class MainActivity : Activity() {
 
     // ---------- Aplicativos ----------
     private fun renderApps() {
-        header("Aplicativos", "Arraste o círculo para ajustar o volume e escolha o aplicativo de cada canal na caixa abaixo dele.")
+        val deslizante = estiloVolume == "deslizante"
+        header("Aplicativos", "Arraste o ${if (deslizante) "deslizante" else "círculo"} para ajustar o volume e escolha o aplicativo na caixa. " +
+            "Para trocar canais de lugar, segure o cartão e arraste.")
         if (precisaConexao()) return
         val linha = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val rolagem = HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled = false; overScrollMode = View.OVER_SCROLL_NEVER }
         for (canal in canais()) {
             val i = canal.optInt("indice")
             val v = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL
                 background = rounded(cPainel, 14, cBorda); setPadding(dp(10), dp(12), dp(10), dp(12))
             }
+            ligarArrasto(v, i, rolagem)
             v.addView(text(canal.optString("titulo"), 13f, cRoxoClaro, bold = true))
-            val vu = VuView(this)
-            v.addView(vu, LinearLayout.LayoutParams(dp(120), dp(6)).apply { topMargin = dp(8) })
-            val dial = DialView(this).apply { marcador = true; onChange = { x -> send("canal_volume", JSONObject().put("indice", i).put("valor", x / 100.0), true) } }
-            v.addView(dial, LinearLayout.LayoutParams(dp(128), dp(128)).apply { topMargin = dp(6) })
+            val envio: (Int) -> Unit = { x -> send("canal_volume", JSONObject().put("indice", i).put("valor", x / 100.0), true) }
+            val vu = VuView(this).apply { vertical = deslizante }
+            val dial = DialView(this).apply { marcador = true; onChange = envio }
+            val fader = FaderView(this).apply { onChange = envio }
+            val pct = text("", 15f, cTexto, bold = true).apply { gravity = Gravity.CENTER }
+            if (deslizante) {
+                // potenciômetro deslizante com o medidor em pé ao lado e o volume embaixo
+                val par = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER }
+                par.addView(fader, LinearLayout.LayoutParams(dp(56), dp(136)))
+                par.addView(vu, LinearLayout.LayoutParams(dp(6), dp(118)).apply { leftMargin = dp(14) })
+                v.addView(par, LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(8) })
+                v.addView(pct, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(2) })
+            } else {
+                v.addView(vu, LinearLayout.LayoutParams(dp(120), dp(6)).apply { topMargin = dp(8) })
+                v.addView(dial, LinearLayout.LayoutParams(dp(128), dp(128)).apply { topMargin = dp(6) })
+            }
             v.addView(text("Aplicativo", 10f, cFraco), LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(6) })
             val seletor = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
@@ -375,14 +441,67 @@ class MainActivity : Activity() {
             v.addView(mudo, LinearLayout.LayoutParams(dp(112), dp(34)).apply { topMargin = dp(4) })
             linha.addView(v, LinearLayout.LayoutParams(dp(170), -2).apply { rightMargin = dp(12) })
             atualizadores += { s -> canalDe(s, i)?.let { k ->
-                if (!dial.dragging) dial.setValue(k.optValor(), k.optBoolean("ativo") && !k.optBoolean("mudo"))
+                val ativo = k.optBoolean("ativo") && !k.optBoolean("mudo")
+                if (!dial.dragging) dial.setValue(k.optValor(), ativo)
+                if (!fader.dragging) fader.setValue(k.optValor(), ativo, k.optBoolean("mudo"))
+                val valor = if (fader.dragging) fader.value else k.optValor()
+                pct.text = if (valor == null) "—" else "$valor%"
+                pct.setTextColor(if (ativo) cTexto else cSuave)
                 nome.text = k.optString("nome"); estado.text = k.optString("estado"); mudo.setMuted(k.optBoolean("mudo"))
                 vu.setLevel(k.optDouble("nivel", 0.0).toFloat()); pintarIcone(icone, k.optString("alvo"))
             } }
         }
-        content.addView(HorizontalScrollView(this).apply {
-            isHorizontalScrollBarEnabled = false; overScrollMode = View.OVER_SCROLL_NEVER; addView(linha)
-        }, LinearLayout.LayoutParams(-1, -2))
+        rolagem.addView(linha)
+        content.addView(rolagem, LinearLayout.LayoutParams(-1, -2))
+    }
+
+    /** Segurar o cartão e arrastar até outro: os dois canais trocam de lugar (igual ao DECKRA APP). */
+    private fun ligarArrasto(cartao: View, indice: Int, rolagem: HorizontalScrollView) {
+        cartao.setOnLongClickListener {
+            if (!temRecurso(deckra, "trocar")) { toast("Atualize o DECKRA APP do PC (1.13.0 ou mais nova) para trocar canais de lugar."); return@setOnLongClickListener true }
+            cartao.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+            cartao.startDragAndDrop(ClipData.newPlainText("canal", indice.toString()), View.DragShadowBuilder(cartao), indice, 0)
+            cartao.alpha = 0.3f
+            true
+        }
+        cartao.setOnDragListener { alvo, ev ->
+            val de = ev.localState as? Int
+            when (ev.action) {
+                DragEvent.ACTION_DRAG_ENTERED -> if (de != indice) alvo.background = rounded(cSelecao, 14, cRoxo)
+                DragEvent.ACTION_DRAG_EXITED -> alvo.background = rounded(cPainel, 14, cBorda)
+                DragEvent.ACTION_DRAG_LOCATION -> {
+                    // perto da borda: a fileira rola sozinha
+                    val x = alvo.left + ev.x - rolagem.scrollX
+                    if (x < dp(56)) rolagem.scrollBy(-dp(14), 0) else if (x > rolagem.width - dp(56)) rolagem.scrollBy(dp(14), 0)
+                }
+                DragEvent.ACTION_DROP -> {
+                    alvo.background = rounded(cPainel, 14, cBorda)
+                    if (de != null && de != indice) send("canal_trocar", JSONObject().put("de", de).put("para", indice))
+                }
+                DragEvent.ACTION_DRAG_ENDED -> { alvo.alpha = 1f; alvo.background = rounded(cPainel, 14, cBorda) }
+            }
+            true
+        }
+    }
+
+    private fun temRecurso(s: JSONObject?, nome: String): Boolean {
+        val r = s?.optJSONArray("recursos") ?: return false
+        for (k in 0 until r.length()) if (r.optString(k) == nome) return true
+        return false
+    }
+
+    private fun tempo(seg: Double): String {
+        val t = seg.toLong().coerceAtLeast(0)
+        val h = t / 3600; val m = (t % 3600) / 60; val s_ = t % 60
+        return if (h > 0) "%d:%02d:%02d".format(h, m, s_) else "%d:%02d".format(m, s_)
+    }
+
+    private fun botaoMidia(simbolo: String, principal: Boolean, acao: () -> Unit) = TextView(this).apply {
+        text = simbolo; gravity = Gravity.CENTER; textSize = if (principal) 17f else 14f; isClickable = true
+        setTextColor(if (principal) Color.WHITE else cTexto)
+        background = if (principal) GradientDrawable(GradientDrawable.Orientation.TL_BR, intArrayOf(cAzul, cRoxoArco)).apply { shape = GradientDrawable.OVAL }
+            else GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(cCampo); setStroke(dp(1).coerceAtLeast(1), cBorda) }
+        setOnClickListener { acao() }
     }
 
     private var escolhendo = -1
@@ -538,6 +657,19 @@ class MainActivity : Activity() {
         }
         aparencia.second.addView(temas)
         content.addView(aparencia.first, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+        val estilo = card("◎", "Controle de volume")
+        estilo.second.addView(text("Como o volume aparece na aba Aplicativos: um círculo para girar ou um potenciômetro " +
+            "deslizante, que sobe e desce.", 12f, cSuave))
+        val estilos = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        for ((modo, nome) in listOf("circulo" to "Círculo", "deslizante" to "Deslizante")) {
+            estilos.addView(pill(nome, modo == estiloVolume) {
+                estiloVolume = modo
+                prefs.edit().putString("estilo_volume", modo).apply()
+                renderPage()
+            }, LinearLayout.LayoutParams(dp(118), dp(34)).apply { rightMargin = dp(8); topMargin = dp(8) })
+        }
+        estilo.second.addView(estilos)
+        content.addView(estilo.first, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
         val att = card("↻", "Atualizações")
         att.second.addView(text("Versão instalada: ${versionName()} beta", 12f, cSuave))
         updateButton = pill(estadoAtualizacao.takeIf { novaVersao != null || it != "Ainda não verificado" } ?: "Verificar agora",
@@ -554,15 +686,18 @@ class MainActivity : Activity() {
     private fun connectCard(compacto: Boolean): View {
         val c = card("📶", if (paired) "Conectado ao PC" else "Conectar ao PC")
         if (paired) {
-            c.second.addView(text("Conectado a ${deckra?.optString("pc")?.ifBlank { null } ?: host} ($host).", 12f, cSuave))
+            c.second.addView(text("Conectado a ${deckra?.optString("pc")?.ifBlank { null } ?: host} ($host). Da próxima vez ele " +
+                "conecta sozinho, sem PIN. Desconectar faz o PC esquecer este celular (aí precisa do PIN de novo).", 12f, cSuave))
             c.second.addView(pill("Desconectar", false) { disconnect() }, LinearLayout.LayoutParams(dp(160), dp(36)).apply { topMargin = dp(10) })
             return c.first
         }
-        c.second.addView(text("No PC, abra o DECKRA APP › Configurações › DECKRA Mobile e toque em \"Procurar celular\". " +
-            "Depois toque em Procurar aqui e digite o PIN que aparece no PC.", 12f, cSuave))
+        c.second.addView(text(if (chavePc.isNotBlank())
+            "Este celular já foi pareado: toque em Procurar ou Conectar, sem PIN. O DECKRA Mobile precisa estar ligado nas Configurações do DECKRA no PC."
+        else "No PC, abra o DECKRA APP › Configurações › DECKRA Mobile e toque em \"Procurar celular\". " +
+            "Depois toque em Procurar aqui e digite o PIN que aparece no PC. O PIN só é pedido na primeira vez.", 12f, cSuave))
         val linha = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
         hostInput = field("IP do PC", InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI).apply { setText(host) }
-        pinInput = field("PIN de 6 dígitos", InputType.TYPE_CLASS_NUMBER)
+        pinInput = field(if (chavePc.isNotBlank()) "PIN (não precisa)" else "PIN de 6 dígitos", InputType.TYPE_CLASS_NUMBER)
         linha.addView(hostInput, LinearLayout.LayoutParams(0, dp(40), 1f))
         linha.addView(pinInput, LinearLayout.LayoutParams(0, dp(40), 1f).apply { leftMargin = dp(8) })
         linha.addView(pill("Procurar", false) { discoverPc() }, LinearLayout.LayoutParams(dp(104), dp(40)).apply { leftMargin = dp(8) })
@@ -746,6 +881,7 @@ class MainActivity : Activity() {
 
     /** Barrinha de nível (verde, amarelo, vermelho) igual à dos cartões do DECKRA APP. */
     private inner class VuView(ctx: Context) : View(ctx) {
+        var vertical = false                          // em pé ao lado do deslizante (o segmento 0 é o de baixo)
         private var nivel = 0f
         private val p = Paint(Paint.ANTI_ALIAS_FLAG)
         fun setLevel(v: Float) {
@@ -755,12 +891,15 @@ class MainActivity : Activity() {
         }
         override fun onDraw(c: Canvas) {
             val n = 20
-            val passo = width.toFloat() / n
+            val passo = (if (vertical) height else width).toFloat() / n
             val acesos = (nivel * n).toInt()
             for (k in 0 until n) {
                 val f = (k + 1f) / n
                 p.color = if (k < acesos) (if (f > 0.88f) Color.rgb(255, 90, 110) else if (f > 0.7f) Color.rgb(232, 197, 71) else Color.rgb(79, 209, 139)) else cTrilho
-                c.drawRoundRect(k * passo, 0f, k * passo + passo - 2 * d, height.toFloat(), d, d, p)
+                if (vertical) {
+                    val y1 = height - k * passo
+                    c.drawRoundRect(0f, y1 - passo + 2 * d, width.toFloat(), y1, d, d, p)
+                } else c.drawRoundRect(k * passo, 0f, k * passo + passo - 2 * d, height.toFloat(), d, d, p)
             }
         }
     }
@@ -866,6 +1005,127 @@ class MainActivity : Activity() {
         override fun performClick(): Boolean { super.performClick(); return true }
     }
 
+    /** Potenciômetro deslizante (vertical), igual ao do DECKRA APP: escala, trilho, preenchimento e puxador. */
+    private inner class FaderView(ctx: Context) : View(ctx) {
+        var value: Int? = null; private set
+        private var ativo = true
+        private var mudo = false
+        var dragging = false; private set
+        var onChange: ((Int) -> Unit)? = null
+        private var ultimoEnvio = 0L
+        private val p = Paint(Paint.ANTI_ALIAS_FLAG)
+        private fun yTopo() = height * 0.065f + d
+        private fun yBase() = height - height * 0.065f - d
+
+        fun setValue(v: Int?, ativo: Boolean, mudo: Boolean) {
+            val novo = v?.coerceIn(0, 100)
+            if (novo != value || ativo != this.ativo || mudo != this.mudo) { value = novo; this.ativo = ativo; this.mudo = mudo; invalidate() }
+        }
+
+        override fun onDraw(c: Canvas) {
+            val w = width.toFloat(); val cx = w / 2f
+            val y0 = yTopo(); val y1 = yBase()
+            val esp = w * 0.13f
+            p.shader = null; p.color = cTrilho; p.strokeWidth = maxOf(1f, d)
+            for (k in 0..10) {                                         // escala
+                val y = y1 - (y1 - y0) * k / 10f
+                val comp = w * (if (k % 5 == 0) 0.13f else 0.08f)
+                for (lado in listOf(-1f, 1f)) {
+                    val x = cx + lado * (esp / 2 + w * 0.07f)
+                    c.drawLine(x, y, x + lado * comp, y, p)
+                }
+            }
+            p.color = cDisco
+            c.drawRoundRect(cx - esp / 2, y0 - esp / 2, cx + esp / 2, y1 + esp / 2, esp / 2, esp / 2, p)
+            val frac = (value ?: 0) / 100f
+            val yv = y1 - (y1 - y0) * frac
+            if (frac > 0f) {
+                val a0 = when { mudo -> Color.rgb(110, 60, 78); ativo -> cAzul; else -> misturar(cTrilho, cFraco, 0.55f) }
+                val a1 = when { mudo -> Color.rgb(110, 60, 78); ativo -> cRoxoArco; else -> misturar(cTrilho, cSuave, 0.55f) }
+                p.shader = LinearGradient(0f, y1, 0f, y0, a0, a1, Shader.TileMode.CLAMP)
+                val m = esp * 0.32f
+                c.drawRoundRect(cx - m, yv, cx + m, y1 + m, m, m, p)
+                p.shader = null
+            }
+            val lc = w * 0.66f; val ac = height * 0.13f
+            val caixa = RectF(cx - lc / 2, yv - ac / 2, cx + lc / 2, yv + ac / 2)
+            p.shader = LinearGradient(0f, caixa.top, 0f, caixa.bottom, cBotaoTopo, cBotaoBase, Shader.TileMode.CLAMP)
+            c.drawRoundRect(caixa, 3 * d, 3 * d, p)
+            p.shader = null; p.style = Paint.Style.STROKE; p.color = cBotaoBorda
+            c.drawRoundRect(caixa, 3 * d, 3 * d, p)
+            p.style = Paint.Style.FILL; p.strokeWidth = 1.6f * d
+            p.color = if (ativo && !mudo) misturar(cAzul, cRoxoArco, frac) else cSuave
+            c.drawLine(cx - lc * 0.32f, yv, cx + lc * 0.32f, yv, p)
+        }
+
+        override fun onTouchEvent(e: MotionEvent): Boolean {
+            when (e.actionMasked) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    dragging = true
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                    val frac = (yBase() - e.y) / (yBase() - yTopo())
+                    value = (frac * 100).toInt().coerceIn(0, 100); invalidate()
+                    val agora = System.currentTimeMillis()
+                    if (agora - ultimoEnvio > 70) { ultimoEnvio = agora; onChange?.invoke(value ?: 0) }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    dragging = false
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                    onChange?.invoke(value ?: 0)
+                    performClick()
+                }
+            }
+            return true
+        }
+        override fun performClick(): Boolean { super.performClick(); return true }
+    }
+
+    /** Barrinha de tempo do cartão Mídia: arrastar ou tocar leva o vídeo/música para aquele ponto. */
+    private inner class ProgressoView(ctx: Context) : View(ctx) {
+        private var pos = 0.0; private var dur = 0.0; private var pode = false
+        var arrastando = false; private set
+        var aoArrastar: ((Double) -> Unit)? = null
+        var aoSoltar: ((Double) -> Unit)? = null
+        private val p = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeCap = Paint.Cap.ROUND }
+        private fun margem() = 7 * d
+
+        fun definir(pos: Double, dur: Double, pode: Boolean) {
+            this.dur = dur; this.pode = pode
+            if (!arrastando) this.pos = pos
+            invalidate()
+        }
+
+        override fun onDraw(c: Canvas) {
+            val y = height / 2f; val x0 = margem(); val x1 = width - margem()
+            val frac = if (dur > 0) (pos / dur).toFloat().coerceIn(0f, 1f) else 0f
+            val xv = x0 + (x1 - x0) * frac
+            p.strokeWidth = 4 * d; p.shader = null; p.color = cTrilho
+            c.drawLine(x0, y, x1, y, p)
+            p.shader = LinearGradient(x0, 0f, x1, 0f, cAzul, cRoxoArco, Shader.TileMode.CLAMP)
+            if (frac > 0f) c.drawLine(x0, y, xv, y, p)
+            p.shader = null; p.color = if (pode) cRoxoArco else cSuave
+            c.drawCircle(xv, y, (if (arrastando) 8 else 6) * d, p)
+        }
+
+        override fun onTouchEvent(e: MotionEvent): Boolean {
+            if (!pode || dur <= 0) return false
+            val frac = ((e.x - margem()) / (width - 2 * margem())).coerceIn(0f, 1f)
+            when (e.actionMasked) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                    arrastando = true; parent?.requestDisallowInterceptTouchEvent(true)
+                    pos = dur * frac; aoArrastar?.invoke(pos); invalidate()
+                }
+                MotionEvent.ACTION_UP -> {
+                    arrastando = false; parent?.requestDisallowInterceptTouchEvent(false)
+                    pos = dur * frac; aoSoltar?.invoke(pos); invalidate(); performClick()
+                }
+                MotionEvent.ACTION_CANCEL -> { arrastando = false; invalidate() }
+            }
+            return true
+        }
+        override fun performClick(): Boolean { super.performClick(); return true }
+    }
+
     private fun misturar(a: Int, b: Int, t: Float): Int = Color.rgb(
         (Color.red(a) + (Color.red(b) - Color.red(a)) * t).toInt(),
         (Color.green(a) + (Color.green(b) - Color.green(a)) * t).toInt(),
@@ -876,7 +1136,7 @@ class MainActivity : Activity() {
     // =====================================================================
     //  Conexão com o PC (mesmo protocolo da DECKRA Bridge)
     // =====================================================================
-    private fun discoverPc() {
+    private fun discoverPc(silencioso: Boolean = false) {
         setStatus("Procurando o PC…", cAlerta)
         thread {
             var found: InetAddress? = null
@@ -916,38 +1176,61 @@ class MainActivity : Activity() {
                     host = achado.hostAddress ?: ""
                     hostInput?.setText(host)
                     setStatus("PC encontrado", cOk)
-                    if (pinInput?.text?.toString()?.trim()?.matches(Regex("\\d{6}")) == true) connectPc()
+                    if (chavePc.isNotBlank()) connectPc(automatico = true)          // já pareado: sem PIN
+                    else if (pinInput?.text?.toString()?.trim()?.matches(Regex("\\d{6}")) == true) connectPc()
                     else { pinInput?.requestFocus(); toast("PC encontrado. Digite o PIN que aparece no DECKRA.") }
                 } else {
                     setStatus("PC não encontrado", cAlerta)
-                    toast("No PC, toque em \"Procurar celular\" no DECKRA (Configurações) e tente de novo.")
+                    if (!silencioso) toast("No PC, toque em \"Procurar celular\" no DECKRA (Configurações) e tente de novo.")
                 }
             }
         }
     }
 
-    private fun connectPc() {
-        hostInput?.text?.toString()?.trim()?.takeIf { it.isNotBlank() }?.let { host = it }
-        if (host.isBlank() || runCatching { InetAddress.getByName(host) }.isFailure) { toast("Informe o IP do PC ou toque em Procurar."); return }
+    /** Celular já pareado: conecta sozinho ao abrir (sem PIN). */
+    private fun voltarSozinho(atraso: Long) {
+        if (chavePc.isBlank()) return
+        handler.postDelayed({
+            if (paired || tentando) return@postDelayed
+            jaProcurou = false
+            if (host.isNotBlank()) connectPc(automatico = true) else { jaProcurou = true; discoverPc(silencioso = true) }
+        }, atraso)
+    }
+
+    private fun connectPc(automatico: Boolean = false) {
+        if (!automatico) hostInput?.text?.toString()?.trim()?.takeIf { it.isNotBlank() }?.let { host = it }
+        if (host.isBlank() || runCatching { InetAddress.getByName(host) }.isFailure) { if (!automatico) toast("Informe o IP do PC ou toque em Procurar."); return }
         val code = pinInput?.text?.toString()?.trim().orEmpty()
-        if (!code.matches(Regex("\\d{6}"))) { toast("O PIN tem 6 dígitos."); return }
-        setStatus("Conectando…", cAlerta)
+        val usarChave = chavePc.isNotBlank() && (automatico || code.isBlank())
+        if (!usarChave && !code.matches(Regex("\\d{6}"))) { toast("O PIN tem 6 dígitos."); return }
+        this.automatico = automatico; tentando = true
+        setStatus(if (usarChave) "Reconectando…" else "Conectando…", cAlerta)
         socket?.cancel()
+        val pedido = JSONObject().put("type", "pair").put("device", deviceId).put("nome", Build.MODEL ?: "Celular")
+        if (usarChave) pedido.put("token", chavePc) else pedido.put("pin", code)
         socket = client.newWebSocket(Request.Builder().url("ws://$host:37892/").build(), object : WebSocketListener() {
-            override fun onOpen(ws: WebSocket, response: Response) { ws.send(JSONObject().put("type", "pair").put("pin", code).toString()) }
+            override fun onOpen(ws: WebSocket, response: Response) { ws.send(pedido.toString()) }
             override fun onMessage(ws: WebSocket, text: String) {
                 val msg = runCatching { JSONObject(text) }.getOrNull() ?: return
                 when (msg.optString("type")) {
                     "pair_result" -> runOnUiThread {
-                        paired = msg.optBoolean("paired")
+                        paired = msg.optBoolean("paired"); tentando = false
                         if (paired) {
-                            getSharedPreferences("deckra_preferences", Context.MODE_PRIVATE).edit().putString("last_host", host).apply()
+                            prefs.edit().putString("last_host", host).apply()
+                            msg.optString("token").takeIf { it.isNotBlank() }?.let {       // PIN certo: o PC deu a chave
+                                chavePc = it; prefs.edit().putString("pc_token", it).apply()
+                            }
                             setStatus("PC conectado", cOk)
                             antigo = false; deckra = null; icones.clear()
                             if (page == "ajustes") page = "inicio"
                             renderNav(); renderPage()
                             send("get_deckra", silencioso = true)
-                        } else { setStatus("PIN incorreto", cMudo); toast("PIN incorreto. Confira o PIN no DECKRA do PC.") }
+                        } else if (msg.optBoolean("esquecido")) {
+                            // o PC não conhece mais este celular: volta a pedir o PIN
+                            chavePc = ""; prefs.edit().remove("pc_token").apply()
+                            setStatus("Digite o PIN", cAlerta); renderPage()
+                            toast("O PC não reconheceu este celular. No DECKRA do PC, toque em \"Procurar celular\" e digite o PIN.")
+                        } else { setStatus("PIN incorreto", cMudo); toast(msg.optString("message").ifBlank { "PIN incorreto." } + " Confira o PIN no DECKRA do PC.") }
                     }
                     "state" -> {}
                     "result" -> {
@@ -976,22 +1259,37 @@ class MainActivity : Activity() {
             }
             override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
                 runOnUiThread {
+                    if (socket !== ws) return@runOnUiThread
                     val estava = paired
-                    paired = false; refreshPolling()
+                    paired = false; tentando = false; refreshPolling()
                     setStatus(if (estava) "PC desconectado" else "Falha na conexão", cAlerta)
-                    if (!estava) toast("Não conectou. No PC, abra a procura do DECKRA Mobile e tente de novo.")
+                    when {
+                        estava -> voltarSozinho(5000)                          // caiu: tenta voltar uma vez
+                        automatico && !jaProcurou -> { jaProcurou = true; discoverPc(silencioso = true) }   // o IP pode ter mudado
+                        automatico -> setStatus("PC não encontrado", cAlerta)
+                        else -> toast("Não conectou. No PC, abra a procura do DECKRA Mobile e tente de novo.")
+                    }
                     renderPage()
                 }
             }
             override fun onClosed(ws: WebSocket, code: Int, reason: String) {
-                runOnUiThread { paired = false; refreshPolling(); setStatus("PC desconectado", cAlerta); renderPage() }
+                runOnUiThread {
+                    if (socket !== ws) return@runOnUiThread
+                    val estava = paired
+                    paired = false; tentando = false; refreshPolling(); setStatus("PC desconectado", cAlerta); renderPage()
+                    if (estava) voltarSozinho(5000)
+                }
             }
         })
     }
 
+    /** Desconectar: o PC esquece este celular, e da próxima vez precisa do PIN. */
     private fun disconnect() {
-        socket?.close(1000, "desconectado pelo usuário"); socket = null
-        paired = false; refreshPolling(); setStatus("Não conectado", cAlerta); renderPage()
+        val ws = socket; socket = null
+        if (paired) ws?.send(JSONObject().put("type", "forget").toString())
+        ws?.close(1000, "desconectado pelo usuário")
+        chavePc = ""; prefs.edit().remove("pc_token").apply()
+        paired = false; tentando = false; refreshPolling(); setStatus("Não conectado", cAlerta); renderPage()
     }
 
     private fun refreshPolling() {
@@ -1153,6 +1451,7 @@ class MainActivity : Activity() {
     override fun onResume() {
         super.onResume()
         if (ultimaVerificacao > 0 && System.currentTimeMillis() - ultimaVerificacao > 30 * 60 * 1000L) checkForUpdates(manual = false)
+        if (!paired && !tentando) voltarSozinho(300)
         if (awaitingInstallPermission && packageManager.canRequestPackageInstalls()) {
             awaitingInstallPermission = false
             installDownloadedUpdate(File(cacheDir, "deckra-mobile-update.apk"))
