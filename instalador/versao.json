@@ -1,7 +1,7 @@
 {
-  "versao": "1.12.7",
+  "versao": "1.12.8",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "454008452e9433ccf017ffdff1e442ff962590793ca68fece70a1fd0186d74df",
-  "tamanho": 31289462,
-  "notas": "DECKRA Mobile (acesso antecipado): o app do celular agora é igual ao DECKRA APP, com canais, aplicativos, microfone e equalizador. Precisa do DECKRA Mobile 0.2.0 ou mais novo no celular."
+  "sha256": "b90c6de6a3ea9052c496b134f07c6edef51ebfbdd47718e8705369fd88b01e35",
+  "tamanho": 31301348,
+  "notas": "Janela com qualquer tamanho: arraste a borda ou maximize; numa janela grande aparecem mais coisas (mais cartões lado a lado). Saiu a opção \"Usar em tela cheia\" e o F11. Aplicativos: arraste um cartão para trocar canais de lugar (DECKRA 1 a 4 e extras). Nova opção \"Controle de volume\" em Configurações: Círculo ou Deslizante (potenciômetro com o medidor de áudio ao lado)."
 }
