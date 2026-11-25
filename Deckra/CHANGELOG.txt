@@ -3,36 +3,6 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
-1.12.4 beta - 24/11/2026
---------------------------------------------------------------------------
-Novidades
-- Tela cheia: nova opção "Usar em tela cheia" em Configurações (ou F11).
-  As abas ocupam a tela toda, sem cobrir a barra de tarefas, e o DECKRA
-  lembra o modo escolhido.
-
-Melhorias
-- O DECKRA gasta bem menos processador, principalmente parado perto do
-  relógio, e responde na hora ao DECKRA ONE.
-- Roda do mouse mais suave, no volume e na rolagem das páginas.
-- Os círculos de volume são desenhados bem mais rápido: girar o controle
-  ou arrastar na tela não dá mais pequenas travadas.
-- A lista de saídas de som e de microfones abre na hora.
-- Equalizador: avisa quando o Equalizer APO não está ativado na saída de
-  som em uso, com botão "Abrir Configurator".
-- Potenciômetros do DECKRA ONE com o giro invertido: girar para a direita
-  aumenta o volume.
-
-Correções
-- Nomes compridos nas caixas de seleção encostavam na setinha; agora são
-  cortados pela largura de verdade.
-- O "Escutar este dispositivo" do Windows era desligado ao abrir o DECKRA;
-  agora ele só desliga o que o próprio DECKRA ligou.
-- Equalizador: o título "Perfis" ficava sobrando quando aparecia o aviso.
-- Tema claro: a chave desligada aparecia com a bolinha escura.
-- Os mudos não eram mantidos quando o DECKRA reabria sozinho (ao trocar o
-  tema ou a tela cheia).
-
-
 1.12.2 beta - 18/11/2026
 --------------------------------------------------------------------------
 Melhorias
