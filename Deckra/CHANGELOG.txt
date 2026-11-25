@@ -38,6 +38,17 @@ Correções
   tema ou a tela cheia).
 
 
+1.12.4 beta - 24/11/2026
+--------------------------------------------------------------------------
+(Retirada poucos minutos depois de publicada: travava ao passar o mouse
+no "?" de Configurações. Tudo o que ela trazia está na 1.12.5.)
+
+
+1.12.3 beta - 21/11/2026
+--------------------------------------------------------------------------
+(Não publicada: versão de testes. Tudo o que ela trazia está na 1.12.5.)
+
+
 1.12.2 beta - 18/11/2026
 --------------------------------------------------------------------------
 Melhorias
