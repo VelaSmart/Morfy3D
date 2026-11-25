@@ -3,6 +3,19 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
+1.13.0 beta - 25/11/2026
+--------------------------------------------------------------------------
+Novidades
+- DECKRA Mobile (acesso antecipado): o celular agora mostra a mídia que
+  está tocando no PC (título, botões e a barrinha de tempo para adiantar
+  ou voltar), troca canais de lugar arrastando o cartão e tem a opção de
+  controle deslizante. Precisa do DECKRA Mobile 0.3.0.
+
+Melhorias
+- DECKRA Mobile: o PIN só é pedido na primeira vez que o celular conecta.
+  Depois ele conecta sozinho, até você tocar em "Desconectar" no celular.
+
+
 1.12.9 beta - 25/11/2026
 --------------------------------------------------------------------------
 Novidades

@@ -1,7 +1,7 @@
 {
-  "versao": "1.12.9",
+  "versao": "1.13.0",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "d67bfa420e99badf75a7ee78efcaf3ff826b695ce00c890a2ace87071fea9202",
-  "tamanho": 31312533,
-  "notas": "Início: o cartão do Equalizador deu lugar ao cartão Mídia, com o que está tocando agora (título, artista, botões) e a barrinha de tempo: clique ou arraste para adiantar ou voltar a música/vídeo. Maximizar a janela não trava mais. Aplicativos: o cartão inteiro acompanha o mouse ao trocar canais de lugar. O mostrador na tela não aparece mais ao escolher um aplicativo na lista."
+  "sha256": "e80cfe7943374d2c7eefdca31ffbaa5890322c7c9fb89cce14049420a3eb5bed",
+  "tamanho": 31318127,
+  "notas": "DECKRA Mobile (acesso antecipado): o celular agora mostra a mídia que está tocando no PC, com a barrinha de tempo para adiantar ou voltar, troca canais de lugar arrastando o cartão e tem o controle deslizante. O PIN só é pedido na primeira vez que o celular conecta (ou depois de tocar em Desconectar). Precisa do DECKRA Mobile 0.3.0."
 }
