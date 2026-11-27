@@ -3,6 +3,28 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
+2.0.0 beta - 27/11/2026
+--------------------------------------------------------------------------
+Design novo
+- Nova fonte: Inter, mais limpa e moderna, em todo o app.
+- Botões em pílula com degradê azul -> roxo nas opções escolhidas e nos
+  botões principais (tema, estilo do volume, overlay, perfis do
+  equalizador, "Verificar agora" e outros).
+- Brilho roxo (neon) nos botões: na opção escolhida, nos botões
+  principais e em qualquer botão com o mouse em cima (Mutar, caixas de
+  aplicativo, opções), além do cartão em destaque e do item do menu.
+- Menu lateral renovado: nomes em seminegrito, o item escolhido na cor de
+  destaque e um fundo suave marcando o item embaixo do mouse.
+- Menu lateral na mesma cor do conteúdo, separado por uma linha de
+  divisão (sem a faixa de outra cor que aparecia em cima).
+- Troca de aba com uma transição bem sutil, só na área da página.
+- Lista de aplicativos e notificações com cantos arredondados.
+
+Correções
+- Aplicativos: ao arrastar um cartão, as caixas dos outros cartões não
+  ficam mais por cima dele.
+
+
 1.13.1 beta - 27/11/2026
 --------------------------------------------------------------------------
 Novidades
