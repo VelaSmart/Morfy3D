@@ -1,7 +1,7 @@
 {
-  "versao": "1.13.1",
+  "versao": "2.0.0",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "3df849077e3af62c2ebbc5529c235781879e5327540b7ea1e4fe6369a1c481e7",
-  "tamanho": 31339126,
-  "notas": "Visual novo: cabeçalho no estilo do DECKRA (sino, tamanho original, minimizar/maximizar/fechar) no lugar da barra do Windows. Configurações reorganizadas em categorias. Tema claro/escuro troca na hora. Equalizador com 7 faixas. VU meter nas cores do DECKRA (vermelho quando estoura). Modo Slider também no Início e no Microfone. Ícones mais suaves. Em janela estreita, o menu lateral vira só ícones."
+  "sha256": "6198a4da7f9a7be74bdef1742fce931d1338b0bab6257098b2f8512a8e88c109",
+  "tamanho": 31696641,
+  "notas": "DECKRA 2.0: design novo! Fonte Inter, botões em pílula com degradê roxo, brilho neon nos botões e no que está em destaque, menu lateral renovado com realce ao passar o mouse, transição sutil entre abas e janelinhas arredondadas. As funções continuam as mesmas."
 }
