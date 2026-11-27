@@ -1,7 +1,7 @@
 {
-  "versao": "1.13.0",
+  "versao": "1.13.1",
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/instalador/DECKRA-Setup.exe",
-  "sha256": "e80cfe7943374d2c7eefdca31ffbaa5890322c7c9fb89cce14049420a3eb5bed",
-  "tamanho": 31318127,
-  "notas": "DECKRA Mobile (acesso antecipado): o celular agora mostra a mídia que está tocando no PC, com a barrinha de tempo para adiantar ou voltar, troca canais de lugar arrastando o cartão e tem o controle deslizante. O PIN só é pedido na primeira vez que o celular conecta (ou depois de tocar em Desconectar). Precisa do DECKRA Mobile 0.3.0."
+  "sha256": "3df849077e3af62c2ebbc5529c235781879e5327540b7ea1e4fe6369a1c481e7",
+  "tamanho": 31339126,
+  "notas": "Visual novo: cabeçalho no estilo do DECKRA (sino, tamanho original, minimizar/maximizar/fechar) no lugar da barra do Windows. Configurações reorganizadas em categorias. Tema claro/escuro troca na hora. Equalizador com 7 faixas. VU meter nas cores do DECKRA (vermelho quando estoura). Modo Slider também no Início e no Microfone. Ícones mais suaves. Em janela estreita, o menu lateral vira só ícones."
 }

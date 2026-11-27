@@ -3,6 +3,33 @@ Morfy3D - https://morfy3d.com.br/deckra
 ==========================================================================
 
 
+1.13.1 beta - 27/11/2026
+--------------------------------------------------------------------------
+Novidades
+- Janela no estilo do DECKRA: a barra do Windows saiu. Um cabeçalho fixo
+  em cima das abas mostra o caminho (DECKRA / aba), o sino de notificações
+  e os botões minimizar, maximizar e fechar. Para mover a janela, arraste
+  pelo cabeçalho; duplo clique maximiza.
+- Equalizador com 7 faixas: 60 Hz, 150 Hz, 400 Hz, 1 kHz, 2,5 kHz, 6 kHz e
+  12 kHz. Os ajustes salvos passam para as faixas novas sozinhos.
+- O tema claro/escuro agora troca na hora, sem reiniciar o DECKRA.
+- Barrinhas de som nos Aplicativos, no Microfone e no cartão Mídia do
+  Início, nas cores do DECKRA (vermelhas quando o som estoura).
+- Janela estreita: o menu lateral vira uma coluna só de ícones.
+- Configurações reorganizadas em categorias (Geral, Aparência, Controles,
+  Overlay, Dispositivos de áudio, DECKRA Mobile e Atualizações), com
+  nomes mais claros. A posição do overlay agora é escolhida em botões.
+- Botão no cabeçalho para voltar a janela ao tamanho original.
+
+Melhorias
+- Tema claro: a cor escolhida do overlay agora aparece marcada.
+- Bolinhas e ícones mais suaves (sem serrilhado), e a bolinha de
+  notificação não cobre mais o sino.
+- Modo Deslizante também no Início e no Microfone, com o volume embaixo.
+- Maximizar ocupa a área de trabalho sem cobrir a barra de tarefas.
+- A opção "VU meter" avisa que aumenta um pouco o uso de CPU.
+
+
 1.13.0 beta - 25/11/2026
 --------------------------------------------------------------------------
 Novidades
