@@ -10,13 +10,14 @@ Design novo
 - Botões em pílula com degradê azul -> roxo nas opções escolhidas e nos
   botões principais (tema, estilo do volume, overlay, perfis do
   equalizador, "Verificar agora" e outros).
-- Brilho roxo (neon) nos botões: na opção escolhida, nos botões
-  principais e em qualquer botão com o mouse em cima (Mutar, caixas de
-  aplicativo, opções), além do cartão em destaque e do item do menu.
+- Brilho roxo (neon) em qualquer botão com o mouse em cima (opções,
+  botões principais, Mutar, caixas de aplicativo), no cartão em destaque e
+  no item escolhido do menu.
 - Menu lateral renovado: nomes em seminegrito, o item escolhido na cor de
   destaque e um fundo suave marcando o item embaixo do mouse.
-- Menu lateral na mesma cor do conteúdo, separado por uma linha de
-  divisão (sem a faixa de outra cor que aparecia em cima).
+- Linha de divisão entre o menu lateral e o conteúdo, cabeçalho sem a
+  faixa de outra cor em cima e fundo um pouco mais roxo. No modo claro, o
+  menu fica na mesma cor do conteúdo.
 - Troca de aba com uma transição bem sutil, só na área da página.
 - Lista de aplicativos e notificações com cantos arredondados.
 
