@@ -1,8 +1,8 @@
 {
-  "versao": "1.0.0",
-  "versionCode": 33,
+  "versao": "1.0.1",
+  "versionCode": 35,
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/mobile/DECKRA-Mobile.apk",
-  "sha256": "60ac045ff6f82aef09e7ac6450bea47056074a0339487a68cf431adfa51d5541",
-  "tamanho": 2802638,
-  "notas": "Visual novo, igual ao DECKRA 2.0: fundo mais roxo, linhas de divisão, fonte Inter e botões escolhidos em degradê azul e roxo. Em pé, as abas ficam embaixo (Início, Apps, Mic, EQ, Ajustes). Novo Modo DECKRA: deite o celular e ele vira um controle com os 8 canais lado a lado, com potenciômetro ou deslizante, VU, Mutar e a mídia ao lado; a tela fica ligada enquanto o modo estiver aberto. Toque no ícone de um canal para trocar o aplicativo."
+  "sha256": "49cd18dc07ca4faf317006fadb6f279afbe293869ed26b004eb98544489ad5a3",
+  "tamanho": 2802674,
+  "notas": "Tela cheia: a barra de cima (bateria e hora) e os botões de baixo (voltar, início) ficam escondidos; arraste da borda para vê-los por um instante. Inclui tudo do 1.0.0: visual do DECKRA 2.0, abas embaixo com o celular em pé e o Modo DECKRA ao deitar o celular."
 }
