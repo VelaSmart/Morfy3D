@@ -1,8 +1,8 @@
 {
-  "versao": "0.3.0",
-  "versionCode": 31,
+  "versao": "1.0.0",
+  "versionCode": 33,
   "url": "https://raw.githubusercontent.com/VelaSmart/Morfy3D/Deckra/mobile/DECKRA-Mobile.apk",
-  "sha256": "8823ec7bf5fe6aaf8c4304b747d2a245c0d46c9994f5445464c9170aa2f485da",
-  "tamanho": 2338196,
-  "notas": "Início: o cartão Mídia mostra o que está tocando no PC, com a barrinha de tempo para adiantar ou voltar. Aplicativos: segure um cartão e arraste para trocar canais de lugar. Configurações: novo \"Controle de volume\" (Círculo ou Deslizante). O PIN só é pedido na primeira vez; depois o celular conecta sozinho, até você tocar em Desconectar. Precisa do DECKRA APP 1.13.0 no PC."
+  "sha256": "60ac045ff6f82aef09e7ac6450bea47056074a0339487a68cf431adfa51d5541",
+  "tamanho": 2802638,
+  "notas": "Visual novo, igual ao DECKRA 2.0: fundo mais roxo, linhas de divisão, fonte Inter e botões escolhidos em degradê azul e roxo. Em pé, as abas ficam embaixo (Início, Apps, Mic, EQ, Ajustes). Novo Modo DECKRA: deite o celular e ele vira um controle com os 8 canais lado a lado, com potenciômetro ou deslizante, VU, Mutar e a mídia ao lado; a tela fica ligada enquanto o modo estiver aberto. Toque no ícone de um canal para trocar o aplicativo."
 }
