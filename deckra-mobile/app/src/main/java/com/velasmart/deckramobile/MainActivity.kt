@@ -102,7 +102,7 @@ class MainActivity : Activity() {
     private var cFundo = 0; private var cLateral = 0; private var cPainel = 0; private var cBorda = 0
     private var cTexto = 0; private var cSuave = 0; private var cFraco = 0; private var cSelecao = 0
     private var cDisco = 0; private var cTrilho = 0; private var cBotaoTopo = 0; private var cBotaoBase = 0
-    private var cBotaoBorda = 0; private var cMarca = 0; private var cCampo = 0
+    private var cBotaoBorda = 0; private var cMarca = 0; private var cCampo = 0; private var cDiv = 0
     private val cRoxo = Color.rgb(140, 107, 255)
     private val cRoxoClaro = Color.rgb(165, 140, 255)
     private val cAzul = Color.rgb(61, 123, 255)
@@ -112,6 +112,13 @@ class MainActivity : Activity() {
     private val cAlerta = Color.rgb(224, 168, 74)
 
     private val d get() = resources.displayMetrics.density
+    private val retrato get() = resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+    private val inter: Typeface? by lazy { try { resources.getFont(R.font.inter) } catch (_: Exception) { null } }
+    private fun fonte(forte: Boolean): Typeface {
+        val base = inter ?: return if (forte) Typeface.create("sans-serif-medium", Typeface.NORMAL) else Typeface.DEFAULT
+        return if (Build.VERSION.SDK_INT >= 28) Typeface.create(base, if (forte) 600 else 400, false)
+        else if (forte) Typeface.create(base, Typeface.BOLD) else base
+    }
     private fun dp(v: Float) = (v * d).toInt()
     private fun dp(v: Int) = (v * d).toInt()
 
@@ -123,6 +130,7 @@ class MainActivity : Activity() {
         chavePc = prefs.getString("pc_token", "") ?: ""
         estiloVolume = prefs.getString("estilo_volume", "circulo") ?: "circulo"
         applyTheme()
+        if (!retrato) page = "deckra"
         buildShell()
         renderPage()
         handler.postDelayed({ checkForUpdates(manual = false) }, 2500)
@@ -142,8 +150,9 @@ class MainActivity : Activity() {
             cFraco = Color.rgb(140, 142, 166); cSelecao = Color.rgb(221, 212, 255); cDisco = Color.rgb(232, 233, 246)
             cTrilho = Color.rgb(214, 216, 236); cBotaoTopo = Color.rgb(250, 250, 255); cBotaoBase = Color.rgb(226, 227, 242)
             cBotaoBorda = Color.rgb(190, 192, 214); cMarca = Color.rgb(36, 37, 56); cCampo = Color.rgb(240, 240, 252)
+            cFundo = Color.rgb(244, 243, 251); cLateral = cFundo; cDiv = Color.rgb(217, 216, 234)
         } else {
-            cFundo = Color.rgb(15, 15, 25); cLateral = Color.rgb(18, 18, 30); cPainel = Color.rgb(22, 23, 37)
+            cFundo = Color.rgb(16, 14, 29); cLateral = Color.rgb(19, 17, 35); cPainel = Color.rgb(22, 23, 37); cDiv = Color.rgb(30, 31, 51)
             cBorda = Color.rgb(38, 40, 62); cTexto = Color.rgb(236, 236, 244); cSuave = Color.rgb(139, 141, 166)
             cFraco = Color.rgb(92, 94, 120); cSelecao = Color.rgb(40, 32, 84); cDisco = Color.rgb(19, 20, 33)
             cTrilho = Color.rgb(38, 40, 64); cBotaoTopo = Color.rgb(44, 45, 66); cBotaoBase = Color.rgb(21, 22, 35)
@@ -157,56 +166,113 @@ class MainActivity : Activity() {
     // =====================================================================
     //  Estrutura: menu lateral + página (igual ao DECKRA APP)
     // =====================================================================
+    private var divLateral: View? = null
+
     private fun buildShell() {
-        root = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setBackgroundColor(cFundo) }
-        sidebar = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL; setBackgroundColor(cLateral); setPadding(dp(12), dp(14), dp(12), dp(12))
-        }
-        val marca = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
-        marca.addView(ImageView(this).apply {
-            setImageResource(R.drawable.deckra_logo); scaleType = ImageView.ScaleType.FIT_CENTER; adjustViewBounds = true
-        }, LinearLayout.LayoutParams(dp(26), dp(26)))
-        marca.addView(text("D E C K R A", 13f, cTexto, bold = true).apply { letterSpacing = 0.12f },
-            LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(10) })
-        sidebar.addView(marca, LinearLayout.LayoutParams(-1, dp(36)))
-        sidebar.addView(View(this).apply { setBackgroundColor(cBorda) },
-            LinearLayout.LayoutParams(-1, dp(1)).apply { topMargin = dp(10); bottomMargin = dp(10) })
-        nav = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        sidebar.addView(nav, LinearLayout.LayoutParams(-1, 0, 1f))
-        sidebar.addView(View(this).apply { setBackgroundColor(cBorda) },
-            LinearLayout.LayoutParams(-1, dp(1)).apply { bottomMargin = dp(8) })
-        val linhaStatus = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        val vertical = retrato
+        root = LinearLayout(this).apply { orientation = if (vertical) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL; setBackgroundColor(cFundo) }
         statusDot = View(this).apply { background = oval(statusColor) }
-        linhaStatus.addView(statusDot, LinearLayout.LayoutParams(dp(8), dp(8)))
         statusLabel = text(statusText, 11f, cTexto).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
-        linhaStatus.addView(statusLabel, LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(8) })
-        sidebar.addView(linhaStatus)
-        sidebar.addView(text("v${versionName()} beta · Morfy3D", 10f, cFraco), LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(4) })
-        root.addView(sidebar, LinearLayout.LayoutParams(dp(178), -1))
         scroll = ScrollView(this).apply { isFillViewport = true; overScrollMode = View.OVER_SCROLL_NEVER; isVerticalScrollBarEnabled = false }
-        content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(22), dp(16), dp(22), dp(18)) }
+        content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         scroll.addView(content, FrameLayout.LayoutParams(-1, -2))
-        root.addView(scroll, LinearLayout.LayoutParams(0, -1, 1f))
+        if (vertical) {
+            // celular em pé: marca + status em cima, abas embaixo (como a prévia)
+            val topo = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL; setPadding(dp(18), dp(10), dp(18), dp(10))
+            }
+            topo.addView(ImageView(this).apply { setImageResource(R.drawable.deckra_logo); scaleType = ImageView.ScaleType.FIT_CENTER },
+                LinearLayout.LayoutParams(dp(22), dp(22)))
+            topo.addView(text("D E C K R A", 12f, cTexto, bold = true).apply { letterSpacing = 0.12f },
+                LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(10) })
+            val chip = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
+                background = rounded(cPainel, 40, cBorda); setPadding(dp(10), dp(5), dp(12), dp(5))
+            }
+            chip.addView(statusDot, LinearLayout.LayoutParams(dp(7), dp(7)))
+            chip.addView(statusLabel, LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(6) })
+            topo.addView(chip, LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(8) })
+            root.addView(topo, LinearLayout.LayoutParams(-1, -2))
+            root.addView(View(this).apply { setBackgroundColor(cDiv) }, LinearLayout.LayoutParams(-1, dp(1)))
+            root.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+            root.addView(View(this).apply { setBackgroundColor(cDiv) }, LinearLayout.LayoutParams(-1, dp(1)))
+            nav = LinearLayout(this).apply {
+                orientation = LinearLayout.HORIZONTAL; setBackgroundColor(cLateral); setPadding(dp(6), dp(6), dp(6), dp(8))
+            }
+            root.addView(nav, LinearLayout.LayoutParams(-1, -2))
+            sidebar = LinearLayout(this); divLateral = null
+        } else {
+            sidebar = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL; setBackgroundColor(cLateral); setPadding(dp(12), dp(14), dp(12), dp(12))
+            }
+            val marca = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+            marca.addView(ImageView(this).apply {
+                setImageResource(R.drawable.deckra_logo); scaleType = ImageView.ScaleType.FIT_CENTER; adjustViewBounds = true
+            }, LinearLayout.LayoutParams(dp(26), dp(26)))
+            marca.addView(text("D E C K R A", 13f, cTexto, bold = true).apply { letterSpacing = 0.12f },
+                LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(10) })
+            sidebar.addView(marca, LinearLayout.LayoutParams(-1, dp(36)))
+            sidebar.addView(View(this).apply { setBackgroundColor(cDiv) },
+                LinearLayout.LayoutParams(-1, dp(1)).apply { topMargin = dp(10); bottomMargin = dp(10) })
+            nav = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+            sidebar.addView(nav, LinearLayout.LayoutParams(-1, 0, 1f))
+            sidebar.addView(View(this).apply { setBackgroundColor(cDiv) },
+                LinearLayout.LayoutParams(-1, dp(1)).apply { bottomMargin = dp(8) })
+            val linhaStatus = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+            linhaStatus.addView(statusDot, LinearLayout.LayoutParams(dp(8), dp(8)))
+            linhaStatus.addView(statusLabel, LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(8) })
+            sidebar.addView(linhaStatus)
+            sidebar.addView(text("v${versionName()} beta · Morfy3D", 10f, cFraco), LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(4) })
+            root.addView(sidebar, LinearLayout.LayoutParams(dp(178), -1))
+            divLateral = View(this).apply { setBackgroundColor(cDiv) }
+            root.addView(divLateral, LinearLayout.LayoutParams(dp(1), -1))
+            root.addView(scroll, LinearLayout.LayoutParams(0, -1, 1f))
+        }
+        window.statusBarColor = if (vertical) cFundo else cFundo
+        window.navigationBarColor = if (vertical) cLateral else cFundo
         setContentView(root)
         renderNav()
     }
 
-    private val pages = listOf("inicio" to ("⌂" to "Início"), "apps" to ("☰" to "Aplicativos"),
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // deitou o celular: vira o Modo DECKRA; ficou em pé: volta para as abas
+        if (retrato && page == "deckra") page = "inicio"
+        else if (!retrato) page = "deckra"
+        applyTheme(); buildShell(); renderPage()
+    }
+
+    private val pages get() = if (retrato) listOf("inicio" to ("⌂" to "Início"), "apps" to ("☰" to "Apps"),
+        "mic" to ("◉" to "Mic"), "eq" to ("♫" to "EQ"), "ajustes" to ("⚙" to "Ajustes"))
+    else listOf("deckra" to ("▦" to "Modo DECKRA"), "inicio" to ("⌂" to "Início"), "apps" to ("☰" to "Aplicativos"),
         "mic" to ("◉" to "Microfone"), "eq" to ("♫" to "Equalizador"), "ajustes" to ("⚙" to "Configurações"))
+
+    private fun irPara(chave: String) { if (page != chave) { page = chave; renderNav(); renderPage() } }
 
     private fun renderNav() {
         nav.removeAllViews()
         for ((chave, par) in pages) {
             val sel = chave == page
+            if (retrato) {
+                val item = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; setPadding(0, dp(6), 0, dp(5))
+                    background = if (sel) rounded(cSelecao, 14, cRoxo) else null
+                    isClickable = true; setOnClickListener { irPara(chave) }
+                }
+                item.addView(text(par.first, 17f, if (sel) cRoxoClaro else cFraco).apply { gravity = Gravity.CENTER })
+                item.addView(text(par.second, 10f, if (sel) cTexto else cFraco, bold = true).apply { gravity = Gravity.CENTER })
+                nav.addView(item, LinearLayout.LayoutParams(0, -2, 1f).apply { leftMargin = dp(3); rightMargin = dp(3) })
+                continue
+            }
             val item = LinearLayout(this).apply {
                 orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL; setPadding(dp(12), 0, dp(8), 0)
                 background = if (sel) rounded(cSelecao, 10, cRoxo) else null
                 isClickable = true
-                setOnClickListener { if (page != chave) { page = chave; renderNav(); renderPage() } }
+                setOnClickListener { irPara(chave) }
             }
             item.addView(text(par.first, 16f, if (sel) cRoxoClaro else cSuave).apply { gravity = Gravity.CENTER },
                 LinearLayout.LayoutParams(dp(22), -2))
-            item.addView(text(par.second, 13f, if (sel) cTexto else cSuave), LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(10) })
+            item.addView(text(par.second, 13f, if (sel) cTexto else cSuave, bold = true), LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(10) })
             nav.addView(item, LinearLayout.LayoutParams(-1, dp(40)).apply { bottomMargin = dp(5) })
         }
     }
@@ -226,7 +292,15 @@ class MainActivity : Activity() {
         hostInput = null; pinInput = null; updateButton = null
         assinatura = estrutura(deckra)
         scroll.scrollTo(0, 0)
+        val modo = page == "deckra"
+        if (!retrato) { sidebar.visibility = if (modo) View.GONE else View.VISIBLE; divLateral?.visibility = sidebar.visibility }
+        if (modo) window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        else window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        if (modo) content.setPadding(dp(12), dp(10), dp(14), dp(10))
+        else if (retrato) content.setPadding(dp(16), dp(14), dp(16), dp(18))
+        else content.setPadding(dp(22), dp(16), dp(22), dp(18))
         when (page) {
+            "deckra" -> renderDeckra()
             "inicio" -> renderHome()
             "apps" -> renderApps()
             "mic" -> renderMic()
@@ -286,13 +360,15 @@ class MainActivity : Activity() {
             val i = canal.optInt("indice")
             val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL }
             val dial = DialView(this).apply { onChange = { v -> send("canal_volume", JSONObject().put("indice", i).put("valor", v / 100.0), true) } }
-            col.addView(dial, LinearLayout.LayoutParams(dp(96), dp(96)))
+            val tamDisco = if (retrato) 70 else 96
+            col.addView(dial, LinearLayout.LayoutParams(dp(tamDisco), dp(tamDisco)))
             val icone = ImageView(this)
             col.addView(icone, LinearLayout.LayoutParams(dp(22), dp(22)).apply { topMargin = dp(6) })
             val nome = text("", 12f, cTexto, bold = true).apply { gravity = Gravity.CENTER; maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
             col.addView(nome, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(2) })
             val mudo = PillButton(this) { send("canal_mudo", JSONObject().put("indice", i)) }
-            col.addView(mudo, LinearLayout.LayoutParams(dp(96), dp(30)).apply { topMargin = dp(6) })
+            col.addView(mudo, LinearLayout.LayoutParams(dp(tamDisco), dp(30)).apply { topMargin = dp(6) })
+            if (retrato) mudo.textSize = 10f
             linha.addView(col, LinearLayout.LayoutParams(0, -2, 1f))
             atualizadores += { s -> canalDe(s, i)?.let { k ->
                 if (!dial.dragging) dial.setValue(k.optValor(), k.optBoolean("ativo") && !k.optBoolean("mudo"))
@@ -302,7 +378,9 @@ class MainActivity : Activity() {
         c.second.addView(linha)
         content.addView(c.first, LinearLayout.LayoutParams(-1, -2))
 
-        val baixo = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        val baixo = LinearLayout(this).apply { orientation = if (retrato) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL }
+        fun lp(peso: Float) = if (retrato) LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(12) }
+            else LinearLayout.LayoutParams(0, -1, peso).apply { rightMargin = dp(10) }
         // Microfone
         val mic = card("◉", "Microfone")
         val micNome = text("", 10f, cSuave).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
@@ -316,7 +394,7 @@ class MainActivity : Activity() {
             if (!micDial.dragging) micDial.setValue(m.optValor(), m.optBoolean("existe") && !m.optBoolean("mudo"))
             micMudo.setMuted(m.optBoolean("mudo"))
         } }
-        baixo.addView(mic.first, LinearLayout.LayoutParams(0, -1, 1f).apply { rightMargin = dp(10) })
+        baixo.addView(mic.first, lp(1f))
         // Mídia: o que está tocando no PC agora
         val md = card("♫", "Mídia")
         val mdApp = text("", 11f, cFraco).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
@@ -367,7 +445,8 @@ class MainActivity : Activity() {
                 mdTocar.text = if (m.optBoolean("tocando")) "⏸" else "▶"
             }
         }
-        baixo.addView(md.first, LinearLayout.LayoutParams(0, -1, 1f).apply { rightMargin = dp(10) })
+        if (retrato) { baixo.removeView(mic.first); baixo.addView(md.first, lp(1f)); baixo.addView(mic.first, lp(1f)) }
+        else baixo.addView(md.first, lp(1f))
         // Dispositivos
         val disp = card("⚙", "Dispositivos")
         val ponto = View(this); val ctrl = text("", 12f, cTexto); val saida = text("", 12f, cTexto); val entrada = text("", 12f, cTexto)
@@ -387,8 +466,130 @@ class MainActivity : Activity() {
             ctrl.text = if (nome != null) "$nome conectado" else "Procurando o controle…"
             saida.text = s.optString("saida").ifBlank { "—" }; entrada.text = s.optString("entrada").ifBlank { "—" }
         }
-        baixo.addView(disp.first, LinearLayout.LayoutParams(0, -1, 1.05f))
+        baixo.addView(disp.first, if (retrato) LinearLayout.LayoutParams(-1, -2) else LinearLayout.LayoutParams(0, -1, 1.05f))
         content.addView(baixo, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+    }
+
+    // ---------- Modo DECKRA (celular deitado): vira uma mesa de som igual ao controle ----------
+    private fun renderDeckra() {
+        val tudo = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        // lateral: marca, conexão e a mídia
+        val lado = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(8), dp(4), dp(10), 0) }
+        lado.addView(text("D E C K R A", 13f, cTexto, bold = true).apply { letterSpacing = 0.12f })
+        lado.addView(text("MODO DECKRA", 10f, cRoxoClaro, bold = true), LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(2) })
+        val chip = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
+            background = rounded(cPainel, 40, cBorda); setPadding(dp(9), dp(4), dp(10), dp(4))
+        }
+        val chipPonto = View(this).apply { background = oval(statusColor) }
+        val chipTxt = text(statusLabel.text.toString(), 10f, cTexto).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        chip.addView(chipPonto, LinearLayout.LayoutParams(dp(7), dp(7)))
+        chip.addView(chipTxt, LinearLayout.LayoutParams(-2, -2).apply { leftMargin = dp(6) })
+        lado.addView(chip, LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(10) })
+        val sair = pill("Sair do modo", false) { irPara("inicio") }.apply { textSize = 11f }
+        val baixoLado = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        tudo.addView(lado, LinearLayout.LayoutParams(dp(170), -1))
+        tudo.addView(View(this).apply { setBackgroundColor(cDiv) }, LinearLayout.LayoutParams(dp(1), -1).apply { rightMargin = dp(12) })
+        val palco = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        tudo.addView(palco, LinearLayout.LayoutParams(0, -2, 1f))
+        content.addView(tudo, LinearLayout.LayoutParams(-1, -2))
+        atualizadores += { _ -> chipPonto.background = oval(statusColor); chipTxt.text = statusLabel.text }
+
+        // topo do palco: estilo do volume + sair
+        val topo = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL }
+        for ((chave, rot) in listOf("circulo" to "Potenciômetro", "deslizante" to "Deslizante")) {
+            topo.addView(pill(rot, estiloVolume == chave) {
+                if (estiloVolume != chave) { estiloVolume = chave; prefs.edit().putString("estilo_volume", chave).apply(); renderPage() }
+            }.apply { textSize = 11f }, LinearLayout.LayoutParams(dp(112), dp(30)).apply { rightMargin = dp(6) })
+        }
+        topo.addView(View(this), LinearLayout.LayoutParams(0, 1, 1f))
+        topo.addView(sair, LinearLayout.LayoutParams(dp(110), dp(30)))
+        palco.addView(topo, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(8) })
+
+        if (!paired || antigo || deckra == null) {
+            content.removeView(tudo); topo.removeView(sair)
+            val antes = content.childCount
+            precisaConexao()
+            if (content.childCount == antes) content.addView(text("Carregando…", 13f, cSuave))
+            content.addView(sair, LinearLayout.LayoutParams(dp(140), dp(34)).apply { topMargin = dp(10) })
+            return
+        }
+
+        // mídia na lateral
+        val md = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; background = rounded(cPainel, 14, cBorda); setPadding(dp(10), dp(10), dp(10), dp(8)) }
+        val mdApp = text("", 10f, cFraco).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        val mdTitulo = text("", 13f, cTexto, bold = true).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        val mdArtista = text("", 10f, cSuave).apply { maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+        md.addView(mdApp); md.addView(mdTitulo); md.addView(mdArtista)
+        val prog = ProgressoView(this).apply { aoSoltar = { seg -> send("midia_buscar", JSONObject().put("segundos", seg)) } }
+        md.addView(prog, LinearLayout.LayoutParams(-1, dp(22)).apply { topMargin = dp(4) })
+        val mdBotoes = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER }
+        val mdTocar = botaoMidia("▶", true) { send("midia_comando", JSONObject().put("acao", "tocar")) }
+        mdBotoes.addView(botaoMidia("⏮", false) { send("midia_comando", JSONObject().put("acao", "anterior")) }, LinearLayout.LayoutParams(dp(32), dp(32)))
+        mdBotoes.addView(mdTocar, LinearLayout.LayoutParams(dp(40), dp(40)).apply { leftMargin = dp(8); rightMargin = dp(8) })
+        mdBotoes.addView(botaoMidia("⏭", false) { send("midia_comando", JSONObject().put("acao", "proxima")) }, LinearLayout.LayoutParams(dp(32), dp(32)))
+        md.addView(mdBotoes, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(2) })
+        baixoLado.addView(md, LinearLayout.LayoutParams(-1, -2))
+        lado.addView(View(this), LinearLayout.LayoutParams(1, 0, 1f))
+        lado.addView(baixoLado, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(14) })
+        atualizadores += { s ->
+            val m = if (temRecurso(s, "midia")) s.optJSONObject("midia") else null
+            md.visibility = if (m != null) View.VISIBLE else View.GONE
+            if (m != null) {
+                mdApp.text = m.optString("app"); mdTitulo.text = m.optString("titulo").ifBlank { "Sem título" }; mdArtista.text = m.optString("artista")
+                val dur = m.optDouble("dur", 0.0)
+                prog.definir(m.optDouble("pos", 0.0), dur, m.optBoolean("pode_buscar"))
+                prog.visibility = if (dur > 0) View.VISIBLE else View.INVISIBLE
+                mdTocar.text = if (m.optBoolean("tocando")) "⏸" else "▶"
+            }
+        }
+
+        // os canais lado a lado
+        val lista = canais().take(8)
+        val n = lista.size.coerceAtLeast(1)
+        val largura = resources.displayMetrics.widthPixels / d
+        val alturaTela = resources.displayMetrics.heightPixels / d
+        val col = ((largura - 170 - 1 - 12 - 26 - n * 6) / n).coerceIn(56f, 150f)
+        val deslizante = estiloVolume == "deslizante"
+        val disco = (col - 10).coerceAtMost(alturaTela - 200).coerceIn(48f, 120f).toInt()
+        val alturaFader = (alturaTela - 210).coerceIn(90f, 220f).toInt()
+        val linha = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+        for (canal in lista) {
+            val i = canal.optInt("indice")
+            val c = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL
+                background = rounded(cPainel, 14, cBorda); setPadding(dp(4), dp(8), dp(4), dp(8))
+            }
+            val icone = ImageView(this).apply { isClickable = true; setOnClickListener { escolherAplicativo(i) } }
+            c.addView(icone, LinearLayout.LayoutParams(dp(24), dp(24)))
+            val nome = text("", 10f, cTexto, bold = true).apply { gravity = Gravity.CENTER; maxLines = 1; ellipsize = TextUtils.TruncateAt.END }
+            c.addView(nome, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(3) })
+            val envio: (Int) -> Unit = { x -> send("canal_volume", JSONObject().put("indice", i).put("valor", x / 100.0), true) }
+            val dial = DialView(this).apply { onChange = envio }
+            val fader = FaderView(this).apply { onChange = envio }
+            if (deslizante) c.addView(fader, LinearLayout.LayoutParams(dp(44), dp(alturaFader)).apply { topMargin = dp(6) })
+            else c.addView(dial, LinearLayout.LayoutParams(dp(disco), dp(disco)).apply { topMargin = dp(8); bottomMargin = dp(4) })
+            val pct = text("", 12f, cTexto, bold = true).apply { gravity = Gravity.CENTER }
+            c.addView(pct, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(2) })
+            val vu = VuView(this)
+            c.addView(vu, LinearLayout.LayoutParams((col * 0.75f * d).toInt(), dp(5)).apply { topMargin = dp(4) })
+            val mudo = PillButton(this) { send("canal_mudo", JSONObject().put("indice", i)) }.apply { textSize = 10f }
+            c.addView(mudo, LinearLayout.LayoutParams(-1, dp(28)).apply { topMargin = dp(6) })
+            linha.addView(c, LinearLayout.LayoutParams(0, -2, 1f).apply { rightMargin = dp(6) })
+            atualizadores += { s -> canalDe(s, i)?.let { k ->
+                val ativo = k.optBoolean("ativo") && !k.optBoolean("mudo")
+                if (!dial.dragging) dial.setValue(k.optValor(), ativo)
+                if (!fader.dragging) fader.setValue(k.optValor(), ativo, k.optBoolean("mudo"))
+                val valor = if (fader.dragging) fader.value else k.optValor()
+                pct.text = if (valor == null) "—" else "$valor%"
+                pct.setTextColor(if (ativo) cTexto else cSuave)
+                nome.text = k.optString("nome"); mudo.setMuted(k.optBoolean("mudo"))
+                vu.setLevel(k.optDouble("nivel", 0.0).toFloat()); pintarIcone(icone, k.optString("alvo"))
+            } }
+        }
+        palco.addView(linha, LinearLayout.LayoutParams(-1, -2))
+        palco.addView(text("Toque no ícone de um canal para trocar o aplicativo. A tela fica ligada enquanto o Modo DECKRA estiver aberto.", 10f, cFraco),
+            LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
     }
 
     // ---------- Aplicativos ----------
@@ -531,7 +732,7 @@ class MainActivity : Activity() {
         header("Microfone", "Regule o volume de captação e silencie o microfone.")
         if (precisaConexao()) return
         val painel = LinearLayout(this).apply {
-            orientation = LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
+            orientation = if (retrato) LinearLayout.VERTICAL else LinearLayout.HORIZONTAL; gravity = Gravity.CENTER_VERTICAL
             background = rounded(cPainel, 14, cBorda); setPadding(dp(20), dp(18), dp(20), dp(18))
         }
         val esq = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
@@ -546,7 +747,8 @@ class MainActivity : Activity() {
         esq.addView(text("O ajuste vale para o microfone padrão do Windows, em qualquer programa (Discord, Teams, jogos, gravação…). " +
             "Para controlar pelo potenciômetro, escolha \"Microfone\" em um dos canais.", 11f, cFraco),
             LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
-        painel.addView(esq, LinearLayout.LayoutParams(0, -2, 1f).apply { rightMargin = dp(16) })
+        painel.addView(esq, if (retrato) LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(16) }
+            else LinearLayout.LayoutParams(0, -2, 1f).apply { rightMargin = dp(16) })
         val dir = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER_HORIZONTAL }
         val vu = VuView(this)
         dir.addView(vu, LinearLayout.LayoutParams(dp(150), dp(6)))
@@ -610,7 +812,7 @@ class MainActivity : Activity() {
             val valor = text("", 13f, cTexto, bold = true)
             col.addView(valor)
             val bv = BandaView(this, valor) { g -> send("eq_ganho", JSONObject().put("banda", chaveB).put("valor", g), true) }
-            col.addView(bv, LinearLayout.LayoutParams(dp(56), dp(130)).apply { topMargin = dp(4) })
+            col.addView(bv, LinearLayout.LayoutParams(dp(if (retrato) 40 else 56), dp(130)).apply { topMargin = dp(4) })
             col.addView(text(b.optString("nome"), 12f, cTexto, bold = true), LinearLayout.LayoutParams(-2, -2).apply { topMargin = dp(4) })
             col.addView(text(b.optString("freq"), 10f, cSuave))
             bandas.addView(col, LinearLayout.LayoutParams(0, -2, 1f))
@@ -700,9 +902,12 @@ class MainActivity : Activity() {
         pinInput = field(if (chavePc.isNotBlank()) "PIN (não precisa)" else "PIN de 6 dígitos", InputType.TYPE_CLASS_NUMBER)
         linha.addView(hostInput, LinearLayout.LayoutParams(0, dp(40), 1f))
         linha.addView(pinInput, LinearLayout.LayoutParams(0, dp(40), 1f).apply { leftMargin = dp(8) })
-        linha.addView(pill("Procurar", false) { discoverPc() }, LinearLayout.LayoutParams(dp(104), dp(40)).apply { leftMargin = dp(8) })
-        linha.addView(pill("Conectar", true) { connectPc() }, LinearLayout.LayoutParams(dp(104), dp(40)).apply { leftMargin = dp(8) })
+        val linha2 = if (retrato) LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL } else linha
+        val larg = if (retrato) LinearLayout.LayoutParams(0, dp(42), 1f) else LinearLayout.LayoutParams(dp(104), dp(40))
+        linha2.addView(pill("Procurar", false) { discoverPc() }, LinearLayout.LayoutParams(larg).apply { leftMargin = if (retrato) 0 else dp(8) })
+        linha2.addView(pill("Conectar", true) { connectPc() }, LinearLayout.LayoutParams(larg).apply { leftMargin = dp(8) })
         c.second.addView(linha, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(12) })
+        if (retrato) c.second.addView(linha2, LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(8) })
         if (!compacto) c.second.addView(text("Celular e PC precisam estar na mesma rede Wi-Fi. Na primeira vez, o Windows pergunta " +
             "se o DECKRA pode usar a rede: permita para redes privadas.", 11f, cFraco),
             LinearLayout.LayoutParams(-1, -2).apply { topMargin = dp(10) })
@@ -732,12 +937,17 @@ class MainActivity : Activity() {
     // =====================================================================
     private fun text(valor: String, tam: Float, cor: Int, bold: Boolean = false) = TextView(this).apply {
         text = valor; textSize = tam; setTextColor(cor)
-        typeface = if (bold) Typeface.create("sans-serif-medium", Typeface.NORMAL) else Typeface.DEFAULT
+        typeface = fonte(bold)
     }
 
     private fun rounded(cor: Int, raio: Int, borda: Int = Color.TRANSPARENT) = GradientDrawable().apply {
         setColor(cor); cornerRadius = raio * d
         if (borda != Color.TRANSPARENT) setStroke(dp(1).coerceAtLeast(1), borda)
+    }
+
+    /** Pílula em degradê azul -> roxo (botão escolhido / principal, como no DECKRA 2.0). */
+    private fun degrade(raio: Int) = GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, intArrayOf(cAzul, cRoxoArco)).apply {
+        cornerRadius = raio * d
     }
 
     private fun oval(cor: Int) = GradientDrawable().apply { shape = GradientDrawable.OVAL; setColor(cor) }
@@ -765,9 +975,9 @@ class MainActivity : Activity() {
 
     private fun pill(rotulo: String, destaque: Boolean, acao: () -> Unit) = TextView(this).apply {
         text = rotulo; gravity = Gravity.CENTER; textSize = 13f; isClickable = true
-        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
-        setTextColor(cTexto)
-        background = rounded(if (destaque) cSelecao else cCampo, 40, if (destaque) cRoxo else cBorda)
+        typeface = fonte(true)
+        setTextColor(if (destaque) Color.WHITE else cTexto)
+        background = if (destaque) degrade(40) else rounded(cCampo, 40, cBorda)
         setOnClickListener { acao() }
     }
 
@@ -867,13 +1077,13 @@ class MainActivity : Activity() {
         private var mudo = false
         init {
             gravity = Gravity.CENTER; textSize = 13f; isClickable = true
-            typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            typeface = fonte(true)
             setOnClickListener { acao() }
             pintar()
         }
         fun setMuted(m: Boolean) { if (m != mudo || text.isNullOrEmpty()) { mudo = m; pintar() } }
         private fun pintar() {
-            text = if (mudo) "🔇  Mudo" else "🔊  Mutar"
+            text = if (textSize < 11.5f * d) (if (mudo) "🔇 Mudo" else "🔊 Mutar") else if (mudo) "🔇  Mudo" else "🔊  Mutar"
             setTextColor(if (mudo) Color.rgb(255, 214, 220) else cTexto)
             background = if (mudo) rounded(Color.rgb(64, 24, 40), 40, cMudo) else rounded(cCampo, 40, cBorda)
         }
@@ -921,7 +1131,7 @@ class MainActivity : Activity() {
         private val pBotao = Paint(Paint.ANTI_ALIAS_FLAG)
         private val pContorno = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
         private val pMarca = Paint(Paint.ANTI_ALIAS_FLAG).apply { strokeCap = Paint.Cap.ROUND }
-        private val pNum = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER; typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL) }
+        private val pNum = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.CENTER; typeface = fonte(true) }
         private val pPct = Paint(Paint.ANTI_ALIAS_FLAG).apply { textAlign = Paint.Align.LEFT }
         private val caixa = RectF()
         init { setLayerType(LAYER_TYPE_SOFTWARE, null) }        // o brilho (blur) precisa de software
