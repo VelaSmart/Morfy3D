@@ -231,7 +231,29 @@ class MainActivity : Activity() {
         window.statusBarColor = if (vertical) cFundo else cFundo
         window.navigationBarColor = if (vertical) cLateral else cFundo
         setContentView(root)
+        telaCheia()
         renderNav()
+    }
+
+    /** Esconde a barra de cima (bateria, hora) e os botões de baixo (voltar, início). Arrastar da borda mostra por um instante. */
+    @Suppress("DEPRECATION")
+    private fun telaCheia() {
+        if (Build.VERSION.SDK_INT >= 30) {
+            window.setDecorFitsSystemWindows(false)
+            window.insetsController?.let {
+                it.hide(android.view.WindowInsets.Type.statusBars() or android.view.WindowInsets.Type.navigationBars())
+                it.systemBarsBehavior = android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        } else {
+            window.decorView.systemUiVisibility = (View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or View.SYSTEM_UI_FLAG_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) telaCheia()
     }
 
     override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
